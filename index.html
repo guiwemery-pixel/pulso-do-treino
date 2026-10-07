@@ -155,7 +155,7 @@ h3 { font-size: 13px; font-weight: 700; }
 .svg-graf { display: block; max-width: 100%; touch-action: pan-y; }
 .t-eixo { fill: var(--muted); font: 11px var(--sans); font-variant-numeric: tabular-nums; }
 .t-bloco { fill: var(--accent-ink); font: 700 10px var(--sans); }
-.t-marca { fill: var(--ink); font: 700 11px var(--sans); }
+.t-marca { fill: var(--ink); font: 700 11px var(--sans); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; }
 .l-grade { stroke: var(--grid); stroke-width: 1; }
 .l-base { stroke: var(--axis); stroke-width: 1; }
 .l-cursor { stroke: var(--ink-2); stroke-width: 1; }
@@ -238,6 +238,11 @@ h3 { font-size: 13px; font-weight: 700; }
 .tz input { width: 72px; }
 .tz td { vertical-align: middle; }
 .sw-z { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; }
+.chave { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); cursor: pointer; }
+.chave input { appearance: none; -webkit-appearance: none; width: 30px; height: 18px; border-radius: 9px; background: var(--axis); position: relative; margin: 0; cursor: pointer; transition: background .15s; flex: none; }
+.chave input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.chave input:checked { background: var(--accent); }
+.chave input:checked::after { transform: translateX(12px); }
 .refs { font-size: 12px; color: var(--muted); padding-left: 16px; margin: 0; display: flex; flex-direction: column; gap: 4px; }
 .confirmar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; }
 
@@ -760,7 +765,7 @@ const TIPOS_PADRAO = ['Jiu-jitsu', 'Musculação', 'Corrida', 'Ciclismo', 'Nata�
 const NOMES_ZONA = ['Abaixo da Z1', 'Muito leve', 'Leve', 'Moderada', 'Intensa', 'Máxima'];
 const PSE = ['Repouso', 'Muito, muito leve', 'Leve', 'Moderado', 'Um pouco difícil', 'Difícil', 'Difícil+', 'Muito difícil', 'Muito difícil+', 'Quase máximo', 'Máximo'];
 const PCTS_PADRAO = [50, 60, 70, 80, 90];
-const CONFIG_PADRAO = { metodo: 'fcmax', fcmax: null, fcrep: null, idade: null, pcts: PCTS_PADRAO.slice(), limites: null, esforco: 'z3', esforcoBpm: 140, ultimoTipo: null };
+const CONFIG_PADRAO = { metodo: 'fcmax', fcmax: null, fcrep: null, idade: null, pcts: PCTS_PADRAO.slice(), limites: null, esforco: 'z3', esforcoBpm: 140, ultimoTipo: null, mostrarPicos: true };
 const CORES_CMP = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)', 'var(--s6)'];
 const MAX_CMP = 6;
 
@@ -1030,7 +1035,7 @@ function desenharLinha(el, o) {
   for (const b of o.blocos || []) {
     const x0 = X(b.x0), x1 = X(b.x1);
     s.push(`<rect x="${x0}" y="${m.t}" width="${Math.max(1.5, x1 - x0)}" height="${ph}" class="r-bloco"/>`);
-    if (b.rotulo && x1 - x0 > 16) s.push(`<text x="${(x0 + x1) / 2}" y="${m.t + ph - 6}" text-anchor="middle" class="t-bloco">${esc(b.rotulo)}</text>`);
+    if (b.rotulo && x1 - x0 > 13) s.push(`<text x="${(x0 + x1) / 2}" y="${m.t + ph - 6}" text-anchor="middle" class="t-bloco">${esc(b.rotulo)}</text>`);
   }
   s.push(`<line x1="${m.l}" x2="${W - m.r}" y1="${m.t + ph}" y2="${m.t + ph}" class="l-base"/>`);
   for (const tk of o.xTicks ? o.xTicks(pw) : []) {
@@ -1056,11 +1061,24 @@ function desenharLinha(el, o) {
     if (se.pontos) for (let i = 0; i < se.x.length; i++) if (se.y[i] != null) s.push(`<circle cx="${X(se.x[i]).toFixed(1)}" cy="${Y(se.y[i]).toFixed(1)}" r="4" style="fill:${se.cor};stroke:var(--surface);stroke-width:2"/>`);
   }
   s.push('</g>');
-  for (const mk of o.marcas || []) {
-    const cx = X(mk.x), cy = Y(mk.y), anc = cx > m.l + pw * 0.72 ? 'end' : cx < m.l + pw * 0.15 ? 'start' : 'middle';
-    const ty = cy - 12 < m.t + 8 ? cy + 22 : cy - 12;
-    s.push(`<circle cx="${cx}" cy="${cy}" r="5" style="fill:${mk.cor || 'var(--ink)'};stroke:var(--surface);stroke-width:2"/><text x="${cx + (anc === 'end' ? -8 : anc === 'start' ? 8 : 0)}" y="${ty}" text-anchor="${anc}" class="t-marca">${esc(mk.texto)}</text>`);
+  // rótulos dos pontos: centrados acima do ponto; um rótulo que cobriria outro rótulo ou ponto fica de fora
+  const marcas = (o.marcas || []).slice().sort((a, b) => (b.prioridade || 0) - (a.prioridade || 0)), textos = [];
+  const pontosM = marcas.map(mk => { const cx = X(mk.x), cy = Y(mk.y), r = (mk.r || 5) + 2; return { mk, cx, cy, caixa: [cx - r, cy - r, cx + r, cy + r] }; });
+  const caixas = [];
+  const cruza = (a, c) => a[0] < c[2] && a[2] > c[0] && a[1] < c[3] && a[3] > c[1];
+  for (const { mk, cx, cy } of pontosM) s.push(`<circle cx="${cx}" cy="${cy}" r="${mk.r || 5}" style="fill:${mk.cor || 'var(--ink)'};stroke:var(--surface);stroke-width:2"/>`);
+  for (const p of pontosM) {
+    if (!p.mk.texto) continue;
+    const w = String(p.mk.texto).length * 6.4 + 4;
+    const anc = p.cx + w / 2 > W - m.r ? 'end' : p.cx - w / 2 < m.l ? 'start' : 'middle';
+    const tx = anc === 'end' ? p.cx + 4 : anc === 'start' ? p.cx - 4 : p.cx, x0 = anc === 'end' ? tx - w : anc === 'start' ? tx : tx - w / 2;
+    const ty = p.cy - 11 < m.t + 8 ? p.cy + 20 : p.cy - 11;
+    const caixa = [x0, ty - 11, x0 + w, ty + 3];
+    if (caixas.some(c => cruza(caixa, c)) || pontosM.some(q => q !== p && cruza(caixa, q.caixa))) continue;
+    caixas.push(caixa);
+    textos.push(`<text x="${tx}" y="${ty}" text-anchor="${anc}" class="t-marca">${esc(p.mk.texto)}</text>`);
   }
+  s.push(...textos);
   s.push(`<g class="cursor" visibility="hidden"><line class="l-cursor" y1="${m.t}" y2="${m.t + ph}"/>${o.series.map(se => `<circle r="4.5" style="fill:${se.cor};stroke:var(--surface);stroke-width:2"/>`).join('')}</g>`);
   s.push(`<rect class="r-alvo" x="${m.l}" y="${m.t}" width="${pw}" height="${ph}"/></svg><div class="dica-graf" hidden></div>`);
   el.innerHTML = s.join('');
@@ -1216,7 +1234,7 @@ async function renderTreino() {
       <div class="zl-trilho"><div class="zl-barra" style="width:${(an.zt[z] / zonasMax * 100).toFixed(1)}%;background:${corZona(z)}"></div></div>
       <span class="zl-val"><b>${esc(fmtMin(an.zt[z]))}</b> · ${esc(fmtPct(an.zt[z] / (an.totalZ || 1)))}</span></div>`).join('');
   // detalhes recolhidos
-  const nBlocos = an.blocos.length;
+  const nBlocos = an.blocos.length, picos = E.cfg.mostrarPicos !== false;
   const blocos = `<div class="botoes"><span class="nota">Contar a partir de</span><select id="c-esf" aria-label="Início dos blocos de esforço"><option value="z2">Z2 · ${Z.limites[1]} bpm</option><option value="z3">Z3 · ${Z.limites[2]} bpm</option><option value="z4">Z4 · ${Z.limites[3]} bpm</option><option value="z5">Z5 · ${Z.limites[4]} bpm</option><option value="bpm">Valor fixo</option></select>
       <input type="number" id="c-esf-bpm" min="60" max="230" value="${E.cfg.esforcoBpm || 140}" aria-label="FC mínima do bloco (bpm)" ${E.cfg.esforco === 'bpm' ? '' : 'hidden'} style="width:76px"></div>
     ${nBlocos ? `<div class="rolagem"><table class="tabela"><thead><tr><th></th><th>Minutos</th><th class="num">Duração</th><th class="num">Média</th><th class="num">Máx.</th><th class="num">Queda 1 min</th></tr></thead><tbody>${an.blocos.map((b, i) => `<tr><td>${ordinal(i)}</td><td>${fmtN(b.ini / 60)}–${fmtN(b.fim / 60)}</td><td class="num">${esc(fmtMin(b.dur))}</td><td class="num">${fmtN(b.fcMed)}</td><td class="num">${b.fcMax}</td><td class="num">${b.rec ? b.rec.queda : '–'}</td></tr>`).join('')}</tbody></table></div>`
@@ -1239,7 +1257,8 @@ async function renderTreino() {
   const subAnot = [meta.pse != null ? `PSE ${meta.pse}` : null, meta.rounds ? `${meta.rounds} rounds` : null, meta.notas ? 'com notas' : null].filter(Boolean).join(' · ');
   const excluir = demo ? '' : `<div class="confirmar">${E.confirmarExclusao ? `<span>Excluir este treino do histórico?</span><button class="btn btn-perigo-cheio" id="excluir-sim">Excluir</button><button class="btn" id="excluir-nao">Cancelar</button>` : `<button class="btn-link btn-perigo" id="excluir">Excluir este treino</button>`}</div>`;
   raiz.innerHTML = `${aviso}${seletor}${resumo}
-    <section class="card"><h2>Frequência cardíaca</h2><div class="graf" id="g-fc"></div></section>
+    <section class="card"><div class="card-topo"><h2>Frequência cardíaca</h2><label class="chave"><input type="checkbox" id="c-picos" ${picos ? 'checked' : ''}>Picos</label></div><div class="graf" id="g-fc"></div>
+      ${picos ? `<p class="nota">${nBlocos ? `Faixas: os ${nBlocos === 1 ? 'bloco' : `${nBlocos} blocos`} de esforço acima de ${fmtN(an.limiar)} bpm, com o pico de cada um.` : `Nenhum bloco de esforço acima de ${fmtN(an.limiar)} bpm.`}</p>` : ''}</section>
     <section class="card"><div class="card-topo"><h2>Tempo em cada zona</h2><span class="nota">carga ${fmtN(an.carga)}</span></div><div class="zonas-lista">${listaZonas}</div></section>
     <section class="card mais">
       ${secao('blocos', 'Blocos de esforço', nBlocos ? `${nBlocos} ${nBlocos === 1 ? 'bloco' : 'blocos'}${an.recPico ? ` · queda de ${an.recPico.queda} bpm` : ''}` : 'nenhum', blocos)}
@@ -1255,7 +1274,8 @@ async function renderTreino() {
     rotulo: `Frequência cardíaca em bpm ao longo de ${fmtN(durMin)} minutos`, xMin: 0, xMax: durMin, yPad: 4, rotulosDireita: true,
     series: [{ nome: 'FC', cor: 'var(--accent)', x: xs, y: suavizar(series.t, series.fc, 10), area: true, areaOp: 0.16 }],
     faixas: [1, 2, 3, 4, 5].map(z => ({ y0: Z.limites[z - 1], y1: z < 5 ? Z.limites[z] : 400, cor: corZona(z), rotulo: 'Z' + z, op: 0.13 })),
-    marcas: [{ x: r.tFcMax / 60, y: r.fcMax, texto: `máx. ${r.fcMax}` }],
+    blocos: picos ? an.blocos.map((b, i) => ({ x0: b.ini / 60, x1: b.fim / 60, rotulo: ordinal(i) })) : [],
+    marcas: [{ x: r.tFcMax / 60, y: r.fcMax, texto: `máx. ${r.fcMax}`, prioridade: 2 }].concat(picos ? an.blocos.filter(b => b.tMax !== r.tFcMax).map(b => ({ x: b.tMax / 60, y: b.fcMax, texto: String(b.fcMax), r: 4, prioridade: 1 })) : []),
     xTicks: pw => ticksMinutos(durMin, pw), yFmt: v => fmtN(v),
     dica: (x, ls) => ({ titulo: fmtRelogio(x * 60), linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y)} bpm`, nome: 'Z' + zonaDe(Math.round(l.y), Z.limites) })) })
   });
@@ -1274,6 +1294,7 @@ async function renderTreino() {
   if (series.lat) desenharMapa($('#g-mapa'), series);
   ligarSeletor();
   $('#c-parc').addEventListener('change', e => { E.tamParcial = +e.target.value; renderTreino(); });
+  $('#c-picos').addEventListener('change', e => { E.cfg.mostrarPicos = e.target.checked; salvarConfig(); renderTreino(); });
   $('#c-esf').value = E.cfg.esforco || 'z3';
   $('#c-esf').addEventListener('change', e => { E.cfg.esforco = e.target.value; salvarConfig(); renderTreino(); });
   $('#c-esf-bpm').addEventListener('change', e => { const v = +e.target.value; if (v >= 60 && v <= 230) { E.cfg.esforcoBpm = v; salvarConfig(); renderTreino(); } });
