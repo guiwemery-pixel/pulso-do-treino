@@ -130,6 +130,9 @@ h3 { font-size: 13px; font-weight: 700; }
 .seletor { display: flex; gap: 6px; align-items: center; }
 .seletor select { flex: 1; font-weight: 600; }
 .resumo { background: var(--hero); color: var(--hero-ink); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.resumo-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.btn-compart { display: inline-flex; align-items: center; gap: 6px; flex: none; border: 0; background: var(--hero-2); color: var(--hero-ink); border-radius: 999px; padding: 7px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.btn-compart svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .resumo h1 { font-size: 20px; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
 .resumo h1 span { font-weight: 400; color: var(--hero-muted); }
 .resumo-sub { font-size: 12.5px; color: var(--hero-muted); margin-top: 2px; }
@@ -245,6 +248,18 @@ h3 { font-size: 13px; font-weight: 700; }
 .chave input:checked::after { transform: translateX(12px); }
 .refs { font-size: 12px; color: var(--muted); padding-left: 16px; margin: 0; display: flex; flex-direction: column; gap: 4px; }
 .confirmar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; }
+
+/* imagem para compartilhar */
+.folha-fundo { position: fixed; inset: 0; z-index: 40; background: rgba(10,12,16,.62); display: flex; align-items: flex-end; justify-content: center; }
+.folha { background: var(--surface); width: 100%; max-width: 560px; max-height: 100%; overflow: auto; border-radius: 18px 18px 0 0; padding: 14px 14px calc(14px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 12px; }
+@media (min-width: 721px) { .folha-fundo { align-items: center; padding: 16px; } .folha { border-radius: 18px; } }
+.previa { display: flex; justify-content: center; background: var(--surface-2); border-radius: 12px; padding: 10px; }
+.previa canvas { display: block; max-width: 100%; max-height: min(50vh, 520px); width: auto; height: auto; border-radius: 10px; box-shadow: 0 4px 18px rgba(0,0,0,.22); }
+.previa.xadrez { background-color: #2B3038; background-image: linear-gradient(45deg, #3A4049 25%, transparent 25%), linear-gradient(-45deg, #3A4049 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #3A4049 75%), linear-gradient(-45deg, transparent 75%, #3A4049 75%); background-size: 16px 16px; background-position: 0 0, 0 8px, 8px -8px, -8px 0; }
+.previa.xadrez canvas { box-shadow: none; }
+.segmentado { display: flex; gap: 3px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 3px; }
+.segmentado button { flex: 1; border: 0; background: transparent; border-radius: 9px; padding: 6px 4px; min-height: 34px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); cursor: pointer; }
+.segmentado button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
 
 /* avisos flutuantes */
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 20; background: var(--ink); color: var(--bg); padding: 10px 14px; border-radius: 10px; font-size: 13px; width: max-content; max-width: min(92vw, 520px); box-shadow: 0 8px 28px rgba(0,0,0,.25); white-space: pre-line; }
@@ -886,20 +901,20 @@ async function obterSerie(id) {
 }
 const salvarConfig = debounce(async () => { try { await Armazem.salvarConfig(E.cfg); } catch (e) { toast('Não consegui salvar as zonas: ' + (e.message || e.code || 'erro')); } }, 500);
 
-async function salvarArquivo(nome, conteudo) {
+async function salvarArquivo(nome, conteudo, tipo = 'application/json', aviso = 'Backup salvo em Downloads.') {
   const claude = window.claude;
   if (claude && typeof claude.use === 'function') {
     let dl = null;
     try { dl = await claude.use('downloads'); } catch (e) { dl = null; }
     if (dl) {
-      try { await dl.save({ filename: nome, data: conteudo }); toast('Backup salvo.'); return true; }
-      catch (e) { if (e && e.code !== 'declined') toast('Não consegui salvar o arquivo aqui. Abra o Pulso do Treino pelo site para fazer o backup.'); return false; }
+      try { await dl.save({ filename: nome, data: conteudo }); toast(aviso.replace(' em Downloads', '')); return true; }
+      catch (e) { if (e && e.code !== 'declined') toast('Não consegui salvar o arquivo aqui. Abra o Pulso do Treino pelo site.'); return false; }
     }
   }
-  const url = URL.createObjectURL(new Blob([conteudo], { type: 'application/json' }));
+  const url = URL.createObjectURL(conteudo instanceof Blob ? conteudo : new Blob([conteudo], { type: tipo }));
   const a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
-  toast('Backup salvo em Downloads.');
+  toast(aviso);
   return true;
 }
 
@@ -1225,8 +1240,9 @@ async function renderTreino() {
     : Z.provisoria ? `<div class="aviso"><span>Zonas provisórias, pela maior FC registrada (${Z.fcmax} bpm).</span><button class="btn-link" data-ir="ajustes">Ajustar</button></div>` : '';
   const quarto = tot.calorias != null ? stat(fmtN(tot.calorias), 'kcal') : dist ? stat(`${fmtN(dist / 1000, 1)} km`, 'distância') : stat(fmtN(r.fcMin), 'FC mín.');
   const resumo = `<section class="resumo">
-    <div><h1>${esc(meta.tipo || 'Treino')}${meta.titulo ? ` <span>· ${esc(meta.titulo)}</span>` : ''}</h1>
+    <div class="resumo-topo"><div><h1>${esc(meta.tipo || 'Treino')}${meta.titulo ? ` <span>· ${esc(meta.titulo)}</span>` : ''}</h1>
     <p class="resumo-sub">${esc(fmtDiaSemana(meta.inicioMs, meta.fusoMin))}, ${esc(fmtData(meta.inicioMs, meta.fusoMin))} · ${esc(fmtHora(meta.inicioMs, meta.fusoMin))}–${esc(fmtHora(fim, meta.fusoMin))}</p></div>
+    <button class="btn-compart" id="t-compartilhar" aria-label="Compartilhar a imagem do treino"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>Compartilhar</button></div>
     <div class="stats">${stat(durCurta(r.duracaoS), 'duração')}${stat(fmtN(r.fcMed), 'FC média')}${stat(fmtN(r.fcMax), 'FC máx.')}${quarto}</div></section>`;
   const zonasMax = Math.max(1, ...an.zt);
   const listaZonas = [0, 1, 2, 3, 4, 5].filter(z => z > 0 || an.zt[0] > 0).map(z => `<div class="zl">
@@ -1293,6 +1309,7 @@ async function renderTreino() {
   }
   if (series.lat) desenharMapa($('#g-mapa'), series);
   ligarSeletor();
+  $('#t-compartilhar').addEventListener('click', () => abrirCartao(meta, series));
   $('#c-parc').addEventListener('change', e => { E.tamParcial = +e.target.value; renderTreino(); });
   $('#c-picos').addEventListener('change', e => { E.cfg.mostrarPicos = e.target.checked; salvarConfig(); renderTreino(); });
   $('#c-esf').value = E.cfg.esforco || 'z3';
@@ -1591,6 +1608,252 @@ function podeCompartilhar() {
 async function enviarArquivo(nome, conteudo) {
   try { await navigator.share({ files: [new File([conteudo], nome, { type: 'application/json' })], title: 'Backup do Pulso do Treino' }); toast('Backup enviado.'); return true; }
   catch (e) { if (e && e.name !== 'AbortError') toast('Não consegui enviar. Use "Fazer backup" para salvar o arquivo.'); return false; }
+}
+
+// ================= imagem do treino para compartilhar =================
+// Desenhada num canvas em resolução de rede social (1080 px de largura), como os cartões do Strava e do Samsung Health.
+const FORMATOS = { stories: { nome: 'Stories', w: 1080, h: 1920 }, feed: { nome: 'Feed', w: 1080, h: 1350 }, quadrado: { nome: 'Quadrado', w: 1080, h: 1080 } };
+const FUNDOS = { escuro: 'Escuro', claro: 'Claro', foto: 'Foto', transparente: 'Sem fundo' };
+const PALETA_IMG = {
+  escuro: { fundo: '#14181F', tinta: '#F2EEE6', suave: '#AEB5C0', acento: '#F28C4A', trilho: 'rgba(255,255,255,.12)', zonas: ['#5A616C', '#F2B582', '#EE9255', '#E1702F', '#BE5020', '#A23C16'] },
+  claro: { fundo: '#F2EEE6', tinta: '#14181F', suave: '#5F646C', acento: '#B9470F', trilho: 'rgba(20,24,31,.10)', zonas: ['#C9C3B6', '#E0A25E', '#DA8142', '#C9612A', '#A8461C', '#7E2D12'] }
+};
+const cartao = { foto: null };
+const fonteImg = (peso, t) => `${peso} ${t}px "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif`;
+const semAcento = t => String(t).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'treino';
+
+function retArred(ctx, x, y, w, h, r) {
+  r = Math.max(0, Math.min(r, w / 2, h / 2));
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+// escreve e diminui a fonte até caber na largura
+function escrever(ctx, txt, x, y, maxW, tam, peso, cor, alinhar = 'left') {
+  let t = tam;
+  ctx.font = fonteImg(peso, t);
+  while (maxW && ctx.measureText(txt).width > maxW && t > 16) { t -= 2; ctx.font = fonteImg(peso, t); }
+  ctx.fillStyle = cor; ctx.textAlign = alinhar; ctx.textBaseline = 'alphabetic';
+  ctx.fillText(txt, x, y);
+  return ctx.measureText(txt).width;
+}
+
+async function desenharCartao(cv, meta, series) {
+  const F = FORMATOS[E.cfg.cartaoFormato] || FORMATOS.stories, W = F.w, H = F.h, pad = 72;
+  const fundo = E.cfg.cartaoFundo === 'foto' && !cartao.foto ? 'escuro' : (E.cfg.cartaoFundo || 'escuro');
+  const semFundo = fundo === 'transparente', comFoto = fundo === 'foto';
+  const P = fundo === 'claro' ? PALETA_IMG.claro : semFundo || comFoto ? { ...PALETA_IMG.escuro, suave: '#E1E5EB' } : PALETA_IMG.escuro;
+  try { await Promise.all([document.fonts.load(fonteImg(700, 80)), document.fonts.load(fonteImg(400, 30)), document.fonts.load(fonteImg(600, 30))]); } catch (e) { /* usa a fonte do sistema */ }
+  cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  const Z = zonasAtuais(), r = meta.resumo, tot = meta.totais || {};
+  const zt = temposZona(r.hist, Z.limites), totalZ = zt.reduce((a, b) => a + b, 0) || 1;
+  const formato = E.cfg.cartaoFormato || 'stories';
+  const compacto = formato !== 'stories' || comFoto || semFundo;
+  const altGraf = comFoto ? { stories: 300, feed: 220, quadrado: 150 }[formato] : { stories: 400, feed: 300, quadrado: 220 }[formato];
+  const gap = formato === 'stories' && !compacto ? 60 : 42;
+  const altZonas = compacto ? 172 : 44 + 5 * 64;
+  const blocos = [50, gap, 150, gap, 132, gap + 6, altGraf, gap + 6, altZonas];
+  const total = blocos.reduce((a, b) => a + b, 0);
+  const y0 = comFoto ? H - pad - total : Math.max(pad, (H - total) / 2);
+
+  // fundo
+  ctx.clearRect(0, 0, W, H);
+  if (comFoto) {
+    const img = cartao.foto, e = Math.max(W / img.width, H / img.height), iw = img.width * e, ih = img.height * e;
+    ctx.drawImage(img, (W - iw) / 2, (H - ih) / 2, iw, ih);
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, 'rgba(12,14,18,.10)'); g.addColorStop(clamp((y0 - 260) / H, 0, 1), 'rgba(12,14,18,.18)');
+    g.addColorStop(clamp((y0 + 80) / H, 0, 1), 'rgba(12,14,18,.78)'); g.addColorStop(1, 'rgba(12,14,18,.92)');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  } else if (!semFundo) {
+    ctx.fillStyle = P.fundo; ctx.fillRect(0, 0, W, H);
+    const brilho = ctx.createRadialGradient(W * 0.85, H * 0.08, 0, W * 0.85, H * 0.08, W * 0.9);
+    brilho.addColorStop(0, fundo === 'claro' ? 'rgba(242,140,74,.16)' : 'rgba(242,140,74,.14)'); brilho.addColorStop(1, 'rgba(242,140,74,0)');
+    ctx.fillStyle = brilho; ctx.fillRect(0, 0, W, H);
+  }
+  // sem fundo ou sobre foto, uma sombra leve mantém o texto legível
+  const sombra = (on) => { ctx.shadowColor = on && (semFundo || comFoto) ? 'rgba(0,0,0,.45)' : 'transparent'; ctx.shadowBlur = on ? 14 : 0; ctx.shadowOffsetY = on ? 2 : 0; };
+  sombra(true);
+  let y = y0;
+
+  // marca
+  const mx = pad, my = y + 6, esc_ = 52 / 384;
+  ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = PALETA_IMG.escuro.acento;
+  ctx.beginPath();
+  [[64, 292], [168, 292], [204, 226], [246, 350], [292, 118], [336, 292], [448, 292]].forEach(([px, py], i) => { const X = mx + (px - 64) * esc_, Y = my + (py - 118) * esc_; i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); });
+  ctx.stroke();
+  ctx.fillStyle = P.tinta; ctx.beginPath(); ctx.arc(mx + (292 - 64) * esc_, my, 5, 0, Math.PI * 2); ctx.fill();
+  ctx.font = fonteImg(700, 26); ctx.fillStyle = P.suave; ctx.textAlign = 'left';
+  try { ctx.letterSpacing = '4px'; } catch (e) { /* sem espaçamento */ }
+  ctx.fillText('PULSO DO TREINO', mx + 66, y + 38);
+  try { ctx.letterSpacing = '0px'; } catch (e) { /* sem espaçamento */ }
+  y += blocos[0] + blocos[1];
+
+  // título e data
+  const fim = meta.inicioMs + r.duracaoS * 1000;
+  escrever(ctx, meta.tipo || 'Treino', pad, y + 92, W - 2 * pad, 96, 700, P.tinta);
+  const sub = `${meta.titulo ? meta.titulo + ' · ' : ''}${fmtDiaSemana(meta.inicioMs, meta.fusoMin)}, ${fmtData(meta.inicioMs, meta.fusoMin)} · ${fmtHora(meta.inicioMs, meta.fusoMin)}–${fmtHora(fim, meta.fusoMin)}`;
+  escrever(ctx, sub, pad, y + 142, W - 2 * pad, 34, 400, P.suave);
+  y += blocos[2] + blocos[3];
+
+  // números
+  const dist = tot.distanciaM > 0 ? tot.distanciaM : null;
+  const quarto = tot.calorias != null ? [fmtN(tot.calorias), '', 'kcal'] : dist ? [fmtN(dist / 1000, 1), 'km', 'distância'] : [fmtN(r.fcMin), 'bpm', 'FC mín.'];
+  const nums = [[durCurta(r.duracaoS), '', 'duração'], [fmtN(r.fcMed), 'bpm', 'FC média'], [fmtN(r.fcMax), 'bpm', 'FC máx.', true], quarto];
+  const colW = (W - 2 * pad) / 4;
+  nums.forEach(([v, un, rot, destaque], i) => {
+    const x = pad + i * colW;
+    const wv = escrever(ctx, v, x, y + 78, colW - 12, 80, 700, destaque ? P.acento : P.tinta);
+    if (un && wv + 70 < colW) escrever(ctx, un, x + wv + 8, y + 78, 0, 28, 600, P.suave);
+    escrever(ctx, rot, x, y + 122, colW - 12, 28, 400, P.suave);
+  });
+  y += blocos[4] + blocos[5];
+
+  // gráfico da FC, com a linha na cor da zona
+  const gx0 = pad, gx1 = W - pad, gy0 = y, gy1 = y + altGraf - 40;
+  const s30 = suavizar(series.t, series.fc, 30), dur = series.t[series.t.length - 1] || 1;
+  const passo = Math.max(1, Math.floor(series.t.length / 320)), pts = [];
+  for (let i = 0; i < series.t.length; i += passo) if (s30[i] != null) pts.push([series.t[i], s30[i]]);
+  let vmin = Math.min(...pts.map(p => p[1])), vmax = Math.max(r.fcMax, ...pts.map(p => p[1]));
+  vmin -= 6; vmax += 10;
+  const GX = t => gx0 + t / dur * (gx1 - gx0), GY = v => gy1 - (v - vmin) / (vmax - vmin) * (gy1 - gy0);
+  sombra(false);
+  const area = ctx.createLinearGradient(0, gy0, 0, gy1);
+  area.addColorStop(0, fundo === 'claro' ? 'rgba(242,140,74,.30)' : 'rgba(242,140,74,.34)'); area.addColorStop(1, 'rgba(242,140,74,0)');
+  ctx.beginPath(); ctx.moveTo(GX(pts[0][0]), gy1);
+  for (const [t, v] of pts) ctx.lineTo(GX(t), GY(v));
+  ctx.lineTo(GX(pts[pts.length - 1][0]), gy1); ctx.closePath(); ctx.fillStyle = area; ctx.fill();
+  ctx.strokeStyle = P.trilho; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(gx0, gy1 + 1); ctx.lineTo(gx1, gy1 + 1); ctx.stroke();
+  sombra(true);
+  ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  let zAtual = null;
+  for (let i = 1; i < pts.length; i++) {
+    const z = Math.max(1, zonaDe(Math.round((pts[i - 1][1] + pts[i][1]) / 2), Z.limites));
+    if (z !== zAtual) { if (zAtual != null) ctx.stroke(); ctx.strokeStyle = P.zonas[z]; ctx.beginPath(); ctx.moveTo(GX(pts[i - 1][0]), GY(pts[i - 1][1])); zAtual = z; }
+    ctx.lineTo(GX(pts[i][0]), GY(pts[i][1]));
+  }
+  ctx.stroke();
+  // pico
+  const px = GX(r.tFcMax), py = GY(r.fcMax);
+  ctx.fillStyle = P.tinta; ctx.beginPath(); ctx.arc(px, py, 11, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = PALETA_IMG.escuro.acento; ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI * 2); ctx.fill();
+  ctx.font = fonteImg(700, 30);
+  const rotPico = `máx. ${r.fcMax}`, wp = ctx.measureText(rotPico).width;
+  escrever(ctx, rotPico, clamp(px, gx0 + wp / 2, gx1 - wp / 2), Math.max(gy0 - 8, py - 26), 0, 30, 700, P.tinta, 'center');
+  escrever(ctx, '0 min', gx0, gy1 + 36, 0, 26, 400, P.suave, 'left');
+  escrever(ctx, `${fmtN(dur / 60)} min`, gx1, gy1 + 36, 0, 26, 400, P.suave, 'right');
+  y += blocos[6] + blocos[7];
+
+  // tempo em cada zona
+  escrever(ctx, 'Tempo nas zonas', pad, y + 30, 0, 30, 600, P.suave);
+  if (compacto) {
+    const by = y + 52, bh = 24, bw = W - 2 * pad;
+    sombra(false);
+    ctx.save(); retArred(ctx, pad, by, bw, bh, bh / 2); ctx.clip();
+    let x = pad;
+    const visiveis = zt.map((v, z) => [v, z]).filter(([v]) => v > 0);
+    visiveis.forEach(([v, z], i) => { const w = v / totalZ * bw; ctx.fillStyle = P.zonas[z]; ctx.fillRect(x, by, Math.max(0, w - (i < visiveis.length - 1 ? 4 : 0)), bh); x += w; });
+    ctx.restore();
+    sombra(true);
+    const cw = bw / 5;
+    for (let z = 1; z <= 5; z++) {
+      const cx = pad + (z - 1) * cw, cy = by + bh + 44;
+      ctx.fillStyle = P.zonas[z]; retArred(ctx, cx, cy - 18, 18, 18, 4); ctx.fill();
+      escrever(ctx, `Z${z}`, cx + 28, cy, 0, 28, 700, P.tinta);
+      escrever(ctx, fmtMin(zt[z]), cx, cy + 42, cw - 10, 32, 700, P.tinta);
+      escrever(ctx, fmtPct(zt[z] / totalZ), cx, cy + 76, cw - 10, 26, 400, P.suave);
+    }
+  } else {
+    const maxZ = Math.max(1, ...zt.slice(1));
+    for (let z = 1; z <= 5; z++) {
+      const ry = y + 44 + (z - 1) * 64 + 40;
+      ctx.fillStyle = P.zonas[z]; ctx.beginPath(); ctx.arc(pad + 10, ry - 11, 10, 0, Math.PI * 2); ctx.fill();
+      escrever(ctx, `Z${z}`, pad + 32, ry, 0, 32, 700, P.tinta);
+      escrever(ctx, NOMES_ZONA[z], pad + 92, ry, 170, 28, 400, P.suave);
+      const pct = fmtPct(zt[z] / totalZ), mins = fmtMin(zt[z]);
+      const wPct = escrever(ctx, pct, W - pad, ry, 0, 28, 400, P.suave, 'right');
+      escrever(ctx, mins, W - pad - wPct - 14, ry, 0, 32, 700, P.tinta, 'right');
+      const tx0 = pad + 280, tx1 = W - pad - 240;
+      sombra(false);
+      ctx.fillStyle = P.trilho; retArred(ctx, tx0, ry - 20, tx1 - tx0, 16, 8); ctx.fill();
+      if (zt[z] > 0) { ctx.fillStyle = P.zonas[z]; retArred(ctx, tx0, ry - 20, Math.max(16, (tx1 - tx0) * zt[z] / maxZ), 16, 8); ctx.fill(); }
+      sombra(true);
+    }
+  }
+  sombra(false);
+}
+
+const podeCompartilharImagem = () => { try { return ehSite() && !!navigator.canShare && navigator.canShare({ files: [new File([''], 'treino.png', { type: 'image/png' })] }); } catch (e) { return false; } };
+function fecharCartao() {
+  const el = $('#cartao'); if (!el) return;
+  el.remove(); document.body.style.overflow = '';
+  document.removeEventListener('keydown', teclaCartao);
+  $('#t-compartilhar')?.focus();
+}
+function teclaCartao(ev) { if (ev.key === 'Escape') fecharCartao(); }
+async function carregarFoto(arquivo) {
+  try { return await createImageBitmap(arquivo); }
+  catch (e) {
+    const url = URL.createObjectURL(arquivo), img = new Image();
+    img.src = url; await img.decode(); return img;
+  }
+}
+function abrirCartao(meta, series) {
+  fecharCartao();
+  if (!FORMATOS[E.cfg.cartaoFormato]) E.cfg.cartaoFormato = 'stories';
+  if (!FUNDOS[E.cfg.cartaoFundo] || (E.cfg.cartaoFundo === 'foto' && !cartao.foto)) E.cfg.cartaoFundo = 'escuro';
+  const enviar = podeCompartilharImagem();
+  const el = document.createElement('div');
+  el.className = 'folha-fundo'; el.id = 'cartao';
+  el.innerHTML = `<div class="folha" role="dialog" aria-modal="true" aria-labelledby="cartao-tit">
+    <div class="card-topo"><h2 id="cartao-tit">Compartilhar treino</h2><button class="btn btn-icone" id="cartao-fechar" aria-label="Fechar">×</button></div>
+    <div class="previa" id="cartao-previa"><canvas id="cartao-cv" role="img" aria-label="Imagem do treino para compartilhar"></canvas></div>
+    <div class="campo"><span>Formato</span><div class="segmentado" data-grupo="cartaoFormato">${Object.entries(FORMATOS).map(([k, f]) => `<button data-valor="${k}">${f.nome}</button>`).join('')}</div></div>
+    <div class="campo"><span>Fundo</span><div class="segmentado" data-grupo="cartaoFundo">${Object.entries(FUNDOS).map(([k, n]) => `<button data-valor="${k}">${n}</button>`).join('')}</div></div>
+    <input type="file" id="cartao-foto" accept="image/*" class="oculto-visual">
+    <p class="nota" id="cartao-nota"></p>
+    <div class="botoes">${enviar ? '<button class="btn btn-acento" id="cartao-enviar">Compartilhar</button>' : ''}<button class="btn${enviar ? '' : ' btn-acento'}" id="cartao-salvar">Salvar imagem</button></div></div>`;
+  document.body.appendChild(el); document.body.style.overflow = 'hidden';
+  const cv = $('#cartao-cv');
+  const notas = { escuro: '', claro: '', foto: 'Toque em Foto de novo para trocar a imagem.', transparente: 'Imagem sem fundo, para colocar por cima de uma foto nos Stories.' };
+  const atualizar = async () => {
+    $$('.segmentado button', el).forEach(b => b.setAttribute('aria-pressed', String(E.cfg[b.parentElement.dataset.grupo] === b.dataset.valor)));
+    $('#cartao-previa').classList.toggle('xadrez', E.cfg.cartaoFundo === 'transparente');
+    $('#cartao-nota').textContent = notas[E.cfg.cartaoFundo] || '';
+    await desenharCartao(cv, meta, series);
+  };
+  const gerar = () => new Promise(ok => {
+    const jpg = E.cfg.cartaoFundo === 'foto';
+    cv.toBlob(b => ok({ blob: b, ext: jpg ? 'jpg' : 'png', tipo: jpg ? 'image/jpeg' : 'image/png' }), jpg ? 'image/jpeg' : 'image/png', 0.92);
+  });
+  const nomeArq = ext => { const d = parede(meta.inicioMs, meta.fusoMin); return `pulso-${semAcento(meta.tipo)}-${d.getUTCFullYear()}-${p2(d.getUTCMonth() + 1)}-${p2(d.getUTCDate())}.${ext}`; };
+  el.addEventListener('click', ev => { if (ev.target === el) fecharCartao(); });
+  document.addEventListener('keydown', teclaCartao);
+  $('#cartao-fechar').addEventListener('click', fecharCartao);
+  $$('.segmentado button', el).forEach(b => b.addEventListener('click', () => {
+    const grupo = b.parentElement.dataset.grupo, valor = b.dataset.valor;
+    if (grupo === 'cartaoFundo' && valor === 'foto' && (!cartao.foto || E.cfg.cartaoFundo === 'foto')) { $('#cartao-foto').click(); return; }
+    E.cfg[grupo] = valor; salvarConfig(); atualizar();
+  }));
+  $('#cartao-foto').addEventListener('change', async e => {
+    const f = e.target.files[0]; e.target.value = '';
+    if (!f) return;
+    try { cartao.foto = await carregarFoto(f); E.cfg.cartaoFundo = 'foto'; salvarConfig(); atualizar(); }
+    catch (err) { toast('Não consegui abrir essa foto. Tente outra imagem.'); }
+  });
+  const btE = $('#cartao-enviar');
+  if (btE) btE.addEventListener('click', async () => {
+    const { blob, ext, tipo } = await gerar();
+    try { await navigator.share({ files: [new File([blob], nomeArq(ext), { type: tipo })], title: `${meta.tipo} · ${fmtData(meta.inicioMs, meta.fusoMin)}` }); }
+    catch (err) { if (err && err.name !== 'AbortError') toast('Não consegui compartilhar. Use Salvar imagem.'); }
+  });
+  $('#cartao-salvar').addEventListener('click', async () => {
+    const { blob, ext, tipo } = await gerar();
+    await salvarArquivo(nomeArq(ext), blob, tipo, 'Imagem salva em Downloads.');
+  });
+  atualizar();
+  $('#cartao-fechar').focus();
 }
 
 // ================= aplicativo instalável =================
