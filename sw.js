@@ -1,6 +1,6 @@
 // Pulso do Treino: guarda o app para abrir sem internet.
 // A página vem da rede quando há conexão (assim as atualizações chegam) e do cache quando não há.
-const CACHE = 'pulso-do-treino-v1';
+const CACHE = 'pulso-do-treino-v2';
 const ARQUIVOS = ['./', 'manifest.webmanifest', 'icones/icone-192.png', 'icones/icone-512.png', 'icones/icone-maskable-512.png', 'icones/apple-touch-icon.png', 'icones/favicon-32.png'];
 
 self.addEventListener('install', ev => {

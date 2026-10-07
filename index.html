@@ -18,17 +18,17 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Pulso do Treino">
 <meta property="og:description" content="Frequência cardíaca, tempo em cada zona e o histórico dos seus treinos para comparar.">
-<meta property="og:url" content="https://guiwemery-pixel.github.io/pulso-de-treino/">
-<meta property="og:image" content="https://guiwemery-pixel.github.io/pulso-de-treino/capa.png">
+<meta property="og:url" content="https://guiwemery-pixel.github.io/pulso-do-treino/">
+<meta property="og:image" content="https://guiwemery-pixel.github.io/pulso-do-treino/capa.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <!-- /pwa -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700&display=swap">
 <style>
-/* Layout: uma coluna de cartões (até 1120px), abas fixas no alto e um herói escuro abrindo cada análise, como na apresentação do treino */
+/* Layout: uma coluna estreita (até 760px), resumo escuro no topo do treino, o resto recolhido; abas fixas embaixo no celular */
 :root {
   --bg: #F2EEE6; --surface: #FBF9F4; --surface-2: #EFEAE0; --ink: #14181F; --ink-2: #474C55; --muted: #676C75;
   --line: #DDD6C8; --grid: #E7E1D5; --axis: #C9C2B3;
@@ -37,7 +37,6 @@
   --z0: #C9C3B6; --z1: #E0A25E; --z2: #DA8142; --z3: #C9612A; --z4: #A8461C; --z5: #7E2D12;
   --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #008300;
   --good: #1C7C3A; --bad: #B3261E;
-  --display: 'Oswald', 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif;
   --sans: 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   color-scheme: light;
 }
@@ -46,7 +45,7 @@
     --bg: #0F1217; --surface: #171C23; --surface-2: #1E242D; --ink: #F2EEE6; --ink-2: #C3C8D0; --muted: #959BA5;
     --line: #2A313C; --grid: #232A34; --axis: #3A424E;
     --accent: #F28C4A; --accent-ink: #F5A673; --accent-soft: rgba(242,140,74,.16); --on-accent: #14181F;
-    --hero: #1B212A; --hero-2: #2A3240; --hero-ink: #F2EEE6; --hero-muted: #B4BBC6;
+    --hero: #1F2630; --hero-2: #2A3240; --hero-ink: #F2EEE6; --hero-muted: #B4BBC6;
     --z0: #4A515C; --z1: #F2B582; --z2: #EE9255; --z3: #E1702F; --z4: #BE5020; --z5: #A23C16;
     --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300;
     --good: #4CC27A; --bad: #F2766B;
@@ -57,7 +56,7 @@
   --bg: #0F1217; --surface: #171C23; --surface-2: #1E242D; --ink: #F2EEE6; --ink-2: #C3C8D0; --muted: #959BA5;
   --line: #2A313C; --grid: #232A34; --axis: #3A424E;
   --accent: #F28C4A; --accent-ink: #F5A673; --accent-soft: rgba(242,140,74,.16); --on-accent: #14181F;
-  --hero: #1B212A; --hero-2: #2A3240; --hero-ink: #F2EEE6; --hero-muted: #B4BBC6;
+  --hero: #1F2630; --hero-2: #2A3240; --hero-ink: #F2EEE6; --hero-muted: #B4BBC6;
   --z0: #4A515C; --z1: #F2B582; --z2: #EE9255; --z3: #E1702F; --z4: #BE5020; --z5: #A23C16;
   --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #008300;
   --good: #4CC27A; --bad: #F2766B;
@@ -66,104 +65,97 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--sans); }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 var(--sans); -webkit-tap-highlight-color: transparent; }
 button, input, select, textarea { font: inherit; color: inherit; }
 h1, h2, h3 { margin: 0; text-wrap: balance; }
 p { margin: 0; }
-.app { max-width: 1120px; margin: 0 auto; padding-inline: 16px; padding-block: 12px 48px; display: flex; flex-direction: column; gap: 16px; }
+.app { max-width: 760px; margin: 0 auto; padding-inline: 14px; padding-block: 10px 92px; display: flex; flex-direction: column; gap: 12px; }
 
 /* topo e abas */
-.topo { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-top: 4px; }
-.marca { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 600; font-size: 22px; letter-spacing: .5px; text-transform: uppercase; }
-.marca svg { width: 30px; height: 30px; flex: none; }
-.topo-acoes { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.selo { font-size: 12.5px; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
-.selo::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--good); }
-.selo[data-tipo="local"]::before { background: var(--accent); }
-.selo[data-tipo="memoria"]::before, .selo[data-tipo="carregando"]::before { background: var(--muted); }
-.abas { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 6; display: flex; gap: 4px; padding: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; overflow-x: auto; scrollbar-width: none; }
-.abas::-webkit-scrollbar { display: none; }
-.aba { flex: 1 0 auto; border: 0; background: transparent; padding: 9px 16px; border-radius: 999px; font-weight: 600; font-size: 14px; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
-.aba[aria-selected="true"] { background: var(--ink); color: var(--bg); }
-.aba:focus-visible, .btn:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, .svg-graf:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.vista { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.topo { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.marca { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; }
+.marca svg { width: 26px; height: 26px; flex: none; }
+.topo-acoes { display: flex; align-items: center; gap: 8px; }
+.abas { display: flex; gap: 2px; }
+.aba { flex: 1; border: 0; background: transparent; color: var(--muted); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; font-size: 11px; font-weight: 600; border-radius: 10px; }
+.aba svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.aba[aria-selected="true"] { color: var(--accent-ink); }
+@media (max-width: 720px) {
+  .abas { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: var(--surface); border-top: 1px solid var(--line); padding: 4px 8px calc(4px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (min-width: 721px) {
+  .app { padding-block: 16px 48px; }
+  .abas { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 6; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 4px; }
+  .aba { flex-direction: row; justify-content: center; gap: 6px; font-size: 13px; padding: 8px; }
+  .aba svg { width: 17px; height: 17px; }
+  .aba[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+}
+.aba:focus-visible, .btn:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible, summary:focus-visible, .svg-graf:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.vista { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .vista.carregando { opacity: .55; transition: opacity .2s; }
 
 /* botões e campos */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 600; font-size: 14px; cursor: pointer; text-decoration: none; white-space: nowrap; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 600; font-size: 13px; cursor: pointer; white-space: nowrap; }
 .btn:hover { border-color: var(--axis); }
 .btn-acento { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-.btn-acento:hover { filter: brightness(1.05); border-color: var(--accent); }
-.btn-escuro { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.btn-acento:hover { border-color: var(--accent); filter: brightness(1.05); }
+.btn-icone { width: 38px; padding: 0; font-size: 18px; }
+.btn-link { border: 0; background: none; padding: 4px 0; color: var(--accent-ink); font-weight: 600; font-size: 13px; cursor: pointer; white-space: nowrap; }
 .btn-perigo { color: var(--bad); }
 .btn-perigo-cheio { background: var(--bad); border-color: var(--bad); color: #fff; }
-.btn-sm { padding: 6px 12px; font-size: 13px; }
-.btn[disabled] { opacity: .5; cursor: not-allowed; }
+.btn[disabled] { opacity: .45; cursor: not-allowed; }
 .oculto-visual { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-input[type="number"], input[type="text"], select, textarea { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; min-width: 0; }
-textarea { width: 100%; resize: vertical; min-height: 84px; }
+input[type="number"], input[type="text"], select, textarea { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; min-height: 36px; min-width: 0; font-size: 14px; }
+@media (pointer: coarse) { input[type="number"], input[type="text"], select, textarea { font-size: 16px; } }
+textarea { width: 100%; resize: vertical; min-height: 72px; }
 select { cursor: pointer; }
-.campo { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-.campo > span { font-size: 12px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); }
-.form-grade { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
-.botoes { display: flex; flex-wrap: wrap; gap: 8px; }
-.check { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--ink-2); cursor: pointer; }
-.check input { accent-color: var(--accent); width: 16px; height: 16px; }
+.campo { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.campo > span { font-size: 11px; font-weight: 600; color: var(--muted); }
+.form-grade { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.form-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.botoes { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.filtros { display: flex; gap: 8px; }
+.filtros select { flex: 1; }
 
 /* cartões */
-.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
-.card-topo { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.card-topo > div:first-child { min-width: 0; }
-.sobretitulo { font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--accent-ink); }
-h2 { font-family: var(--display); font-weight: 600; font-size: 26px; line-height: 1.15; }
-h3 { font-size: 15px; font-weight: 700; }
-.nota { font-size: 13px; color: var(--muted); }
-.texto { color: var(--ink-2); max-width: 70ch; }
-.controles { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
-.controles select { padding: 6px 8px; font-size: 13.5px; }
-.grade-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; }
-.alternar { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; background: var(--surface-2); }
-.alternar button { border: 0; background: transparent; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--ink-2); cursor: pointer; }
-.alternar button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+h2 { font-size: 15px; font-weight: 700; }
+h3 { font-size: 13px; font-weight: 700; }
+.nota { font-size: 12px; color: var(--muted); }
+.texto { color: var(--ink-2); font-size: 13.5px; }
+.aviso { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--accent-soft); border-radius: 10px; padding: 7px 12px; font-size: 12.5px; }
 
-/* herói */
-.seletor { display: flex; gap: 8px; align-items: center; }
-.seletor select { flex: 1; min-width: 0; font-weight: 600; }
-.seletor .btn { padding: 8px 12px; }
-.heroi { position: relative; overflow: hidden; background: var(--hero); color: var(--hero-ink); border-radius: 18px; padding: 28px 24px 30px; min-height: 260px; display: flex; flex-direction: column; justify-content: flex-start; gap: 10px; }
-.heroi-curva { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 58%; pointer-events: none; }
-.heroi > *:not(.heroi-curva) { position: relative; }
-.heroi .sobretitulo { color: var(--accent); }
-.heroi h1 { font-family: var(--display); font-weight: 700; font-size: clamp(40px, 9vw, 84px); line-height: 1; text-transform: uppercase; letter-spacing: .5px; margin-top: 14px; overflow-wrap: anywhere; }
-.heroi-sub { font-size: 17px; color: var(--hero-muted); }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-.chip { background: var(--hero-2); color: var(--hero-ink); padding: 6px 14px; border-radius: 999px; font-weight: 600; font-size: 14px; }
-.chip-acento { background: var(--accent); color: var(--on-accent); }
+/* resumo do treino */
+.seletor { display: flex; gap: 6px; align-items: center; }
+.seletor select { flex: 1; font-weight: 600; }
+.resumo { background: var(--hero); color: var(--hero-ink); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.resumo h1 { font-size: 20px; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
+.resumo h1 span { font-weight: 400; color: var(--hero-muted); }
+.resumo-sub { font-size: 12.5px; color: var(--hero-muted); margin-top: 2px; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.stat { display: flex; flex-direction: column; min-width: 0; }
+.stat b { font-size: 19px; font-weight: 700; line-height: 1.2; white-space: nowrap; }
+.stat span { font-size: 11px; color: var(--muted); }
+.resumo .stat span { color: var(--hero-muted); }
+@media (max-width: 350px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
-/* números */
-.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.kpi-rot { font-size: 11.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
-.kpi-valor { font-family: var(--display); font-weight: 600; font-size: 44px; line-height: 1.05; margin-top: 4px; }
-.kpi-un { font-size: 15px; font-weight: 700; color: var(--accent-ink); }
-.kpi-sub { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
-.kpi-escuro { background: var(--hero); border-color: var(--hero); color: var(--hero-ink); }
-.kpi-escuro .kpi-rot, .kpi-escuro .kpi-sub { color: var(--hero-muted); }
-.kpi-escuro .kpi-un { color: var(--accent); }
-.destaques { border-left: 6px solid var(--accent); padding: 4px 0 4px 18px; display: flex; flex-direction: column; gap: 8px; }
-.destaques p { font-size: 16px; color: var(--ink); max-width: 75ch; }
-
-/* avisos */
-.aviso { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 14px; padding: 12px 16px; font-size: 14px; }
-.aviso p { max-width: 75ch; }
-.vazio { text-align: left; align-items: flex-start; }
+/* seções recolhidas */
+.mais { padding: 0; gap: 0; }
+.mais details + details { border-top: 1px solid var(--grid); }
+.mais summary { list-style: none; cursor: pointer; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; font-weight: 600; font-size: 14px; }
+.mais summary::-webkit-details-marker { display: none; }
+.mais summary small { color: var(--muted); font-weight: 400; font-size: 12px; margin-left: 6px; }
+.mais summary::after { content: ""; flex: none; width: 7px; height: 7px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); margin: -3px 4px 0 0; transition: transform .15s; }
+.mais details[open] > summary::after { transform: rotate(-135deg); margin-top: 3px; }
+.mais .conteudo { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 
 /* gráficos */
 .graf { position: relative; width: 100%; min-width: 0; }
 .svg-graf { display: block; max-width: 100%; touch-action: pan-y; }
-.t-eixo { fill: var(--muted); font: 12px var(--sans); font-variant-numeric: tabular-nums; }
-.t-bloco { fill: var(--accent-ink); font: 700 11px var(--sans); }
-.t-marca { fill: var(--ink); font: 700 12px var(--sans); }
+.t-eixo { fill: var(--muted); font: 11px var(--sans); font-variant-numeric: tabular-nums; }
+.t-bloco { fill: var(--accent-ink); font: 700 10px var(--sans); }
+.t-marca { fill: var(--ink); font: 700 11px var(--sans); }
 .l-grade { stroke: var(--grid); stroke-width: 1; }
 .l-base { stroke: var(--axis); stroke-width: 1; }
 .l-cursor { stroke: var(--ink-2); stroke-width: 1; }
@@ -172,112 +164,88 @@ h3 { font-size: 15px; font-weight: 700; }
 .r-alvo { fill: transparent; cursor: crosshair; }
 .r-coluna { fill: transparent; cursor: pointer; }
 .r-coluna:hover { fill: var(--ink); fill-opacity: .05; }
-.dica-graf, #dica { position: absolute; z-index: 8; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 12.5px; box-shadow: 0 6px 20px rgba(0,0,0,.14); min-width: 120px; max-width: 260px; }
+.dica-graf, #dica { position: absolute; z-index: 8; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.14); min-width: 110px; max-width: 240px; }
 #dica { position: fixed; white-space: pre-line; }
-.dica-tit { font-weight: 600; color: var(--muted); margin-bottom: 4px; }
-.dica-lin { display: flex; align-items: center; gap: 8px; }
-.dica-lin i { width: 12px; height: 3px; border-radius: 2px; flex: none; }
+.dica-tit { font-weight: 600; color: var(--muted); margin-bottom: 2px; }
+.dica-lin { display: flex; align-items: center; gap: 6px; }
+.dica-lin i { width: 10px; height: 3px; border-radius: 2px; flex: none; }
 .dica-lin b { font-variant-numeric: tabular-nums; }
 .dica-lin span { color: var(--muted); }
-.legenda { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
-.legenda span { display: inline-flex; align-items: center; gap: 6px; }
-.legenda i { width: 12px; height: 12px; border-radius: 3px; flex: none; }
-.legenda i.lk { height: 3px; width: 16px; border-radius: 2px; }
+.legenda { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--ink-2); }
+.legenda span { display: inline-flex; align-items: center; gap: 5px; }
+.legenda i { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.legenda i.lk { height: 3px; width: 14px; border-radius: 2px; }
 
-/* zonas (barras horizontais) */
-.zonas-lista { display: flex; flex-direction: column; gap: 10px; }
-.zl { display: grid; grid-template-columns: minmax(110px, 160px) 1fr auto; align-items: center; gap: 12px; }
-.zl-rot { font-weight: 600; font-size: 14px; line-height: 1.25; }
-.zl-rot small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
-.zl-trilho { height: 26px; min-width: 0; }
-.zl-barra { height: 100%; border-radius: 0 6px 6px 0; min-width: 2px; }
-.zl-val { font-size: 14px; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+/* zonas */
+.zonas-lista { display: flex; flex-direction: column; gap: 7px; }
+.zl { display: grid; grid-template-columns: 76px minmax(0, 1fr) 96px; align-items: center; gap: 8px; font-size: 12.5px; }
+.zl-rot b { font-weight: 700; }
+.zl-rot small { color: var(--muted); font-size: 11px; margin-left: 4px; font-variant-numeric: tabular-nums; }
+.zl-trilho { height: 10px; background: var(--surface-2); border-radius: 5px; overflow: hidden; }
+.zl-barra { height: 100%; border-radius: 5px; }
+.zl-val { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .zl-val b { font-weight: 700; }
 
-/* barras empilhadas (histórico e comparação) */
-.pilhas { display: flex; flex-direction: column; gap: 10px; }
-.pl { display: grid; grid-template-columns: minmax(96px, 150px) 1fr auto; gap: 12px; align-items: center; }
-.pl-rot { border: 0; background: none; padding: 0; text-align: left; cursor: pointer; font-size: 13.5px; font-weight: 600; line-height: 1.25; min-width: 0; display: flex; gap: 8px; align-items: flex-start; }
+/* barras empilhadas */
+.pilhas { display: flex; flex-direction: column; gap: 8px; }
+.pl { display: grid; grid-template-columns: minmax(90px, 140px) minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.pl-rot { border: 0; background: none; padding: 0; text-align: left; cursor: pointer; font-size: 12.5px; font-weight: 600; line-height: 1.25; min-width: 0; display: flex; gap: 6px; align-items: flex-start; }
 .pl-rot small { display: block; font-weight: 400; color: var(--muted); }
-.pl-rot i { width: 12px; height: 12px; border-radius: 3px; flex: none; margin-top: 3px; }
-.pl-rot:hover span { text-decoration: underline; }
-.pilha { display: flex; gap: 2px; height: 22px; min-width: 0; }
+.pl-rot i { width: 10px; height: 10px; border-radius: 3px; flex: none; margin-top: 3px; }
+.pilha { display: flex; gap: 2px; height: 12px; min-width: 0; border-radius: 4px; overflow: hidden; }
 .pilha .seg { min-width: 2px; height: 100%; }
-.pilha .seg:last-child { border-radius: 0 5px 5px 0; }
-.pilha .seg:hover { filter: brightness(1.12); }
-.pl-val { font-size: 13px; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink-2); }
+.pl-val { font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink-2); }
+@media (max-width: 520px) { .pl { grid-template-columns: minmax(0, 1fr) auto; } .pl .pilha { grid-column: 1 / -1; grid-row: 2; } }
 
 /* tabelas */
 .rolagem { overflow-x: auto; min-width: 0; -webkit-overflow-scrolling: touch; }
-.tabela { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
-.tabela th { text-align: left; font-size: 11.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-.tabela td { padding: 9px 10px; border-bottom: 1px solid var(--grid); vertical-align: top; }
-.tabela tbody tr:nth-child(even) td { background: var(--surface-2); }
+.tabela { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.tabela th { text-align: left; font-size: 11px; font-weight: 600; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.tabela td { padding: 7px 8px; border-bottom: 1px solid var(--grid); vertical-align: top; }
 .tabela .num { text-align: right; white-space: nowrap; }
-.tabela .dif { display: block; font-size: 12px; color: var(--muted); }
-.tabela th .sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
-.dl { display: grid; grid-template-columns: minmax(130px, 220px) 1fr; gap: 8px 16px; font-size: 14px; }
+.tabela .dif { display: block; font-size: 11px; color: var(--muted); }
+.tabela th .sw { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 5px; }
+.dl { display: grid; grid-template-columns: minmax(110px, 180px) minmax(0, 1fr); gap: 4px 12px; font-size: 12.5px; margin: 0; }
 .dl dt { color: var(--muted); }
 .dl dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
-details > summary { cursor: pointer; font-size: 13.5px; font-weight: 600; color: var(--ink-2); }
-details[open] > summary { margin-bottom: 10px; }
+@media (max-width: 520px) { .dl { grid-template-columns: 1fr; gap: 0; } .dl dd { margin-bottom: 6px; } }
 
-/* recuperação */
-.recup { background: var(--accent); color: var(--on-accent); border: 0; }
-.recup .sobretitulo { color: var(--on-accent); }
-.recup .recup-num { font-family: var(--display); font-weight: 700; font-size: clamp(56px, 12vw, 104px); line-height: 1; }
-.recup p { font-size: 17px; font-weight: 600; max-width: 60ch; }
-.recup .recup-num { max-width: none; }
-.recup .nota { color: var(--on-accent); opacity: .85; font-weight: 400; }
-
-/* histórico */
+/* histórico e comparação */
 .lista-treinos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-.lt { display: flex; align-items: center; gap: 12px; padding: 12px 4px; border-bottom: 1px solid var(--grid); }
-.lt:last-child { border-bottom: 0; }
+.lt { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--grid); }
+.lt:last-child { border-bottom: 0; padding-bottom: 0; }
 .lt input { accent-color: var(--accent); width: 18px; height: 18px; flex: none; }
-.lt-abrir { flex: 1; min-width: 0; border: 0; background: none; padding: 0; text-align: left; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) minmax(90px, 220px); gap: 4px 16px; align-items: center; }
-.lt-abrir:hover .lt-tipo { text-decoration: underline; }
-.lt-tipo { font-weight: 700; }
-.lt-data { color: var(--muted); font-size: 13px; font-weight: 400; margin-left: 6px; }
-.lt-metr { grid-column: 1; font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-.lt .pilha { grid-column: 2; grid-row: 1 / span 2; height: 14px; }
-.barra-comparar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.escolha { max-height: 300px; overflow: auto; border: 1px solid var(--line); border-radius: 12px; }
-.escolha label { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-bottom: 1px solid var(--grid); cursor: pointer; font-size: 14px; }
+.lt-abrir { flex: 1; min-width: 0; border: 0; background: none; padding: 0; text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
+.lt-l1 { display: flex; justify-content: space-between; gap: 8px; font-size: 13.5px; }
+.lt-tipo { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lt-data { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.lt-metr { font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.lt .pilha { height: 5px; gap: 1px; }
+.chips-cmp { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-cmp { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 3px 4px 3px 10px; font-size: 12.5px; background: var(--surface); }
+.chip-cmp i { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.chip-cmp button { border: 0; background: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; color: var(--muted); font-size: 15px; line-height: 1; }
+.escolha { display: flex; flex-direction: column; max-height: 260px; overflow: auto; }
+.escolha label { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--grid); cursor: pointer; font-size: 13px; }
 .escolha label:last-child { border-bottom: 0; }
 .escolha input { accent-color: var(--accent); width: 17px; height: 17px; flex: none; }
-.escolha i { width: 12px; height: 12px; border-radius: 3px; flex: none; background: transparent; border: 1px dashed var(--axis); }
-.escolha small { color: var(--muted); margin-left: auto; text-align: right; white-space: nowrap; }
+.escolha small { color: var(--muted); margin-left: auto; white-space: nowrap; }
+.alternar { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; background: var(--surface-2); }
+.alternar button { border: 0; background: transparent; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--ink-2); cursor: pointer; }
+.alternar button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
 
-/* zonas (config) */
-.tz input { width: 82px; }
+/* ajustes */
+.tz input { width: 72px; }
 .tz td { vertical-align: middle; }
-.sw-z { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 8px; vertical-align: -1px; }
-.metodo { border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px 12px; display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 0; }
-.metodo legend { font-size: 12px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); padding: 0 6px; }
-.metodo label { display: inline-flex; gap: 8px; align-items: center; cursor: pointer; font-size: 14px; }
-.metodo input { accent-color: var(--accent); }
-.refs { font-size: 12.5px; color: var(--muted); padding-left: 18px; margin: 0; display: flex; flex-direction: column; gap: 4px; }
-.confirmar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 14px; }
+.sw-z { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; }
+.refs { font-size: 12px; color: var(--muted); padding-left: 16px; margin: 0; display: flex; flex-direction: column; gap: 4px; }
+.confirmar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; }
 
 /* avisos flutuantes */
-.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 20; background: var(--ink); color: var(--bg); padding: 12px 18px; border-radius: 12px; font-size: 14px; max-width: min(92vw, 560px); box-shadow: 0 8px 28px rgba(0,0,0,.25); white-space: pre-line; }
-.soltar { position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: rgba(20,24,31,.72); color: #F2EEE6; font-family: var(--display); font-size: clamp(26px, 5vw, 44px); text-transform: uppercase; letter-spacing: 1px; padding: 24px; text-align: center; }
-.soltar span { border: 3px dashed var(--accent); border-radius: 24px; padding: 40px 32px; }
-
-@media (max-width: 560px) {
-  .card { padding: 16px; }
-  .heroi { padding: 22px 18px 26px; min-height: 230px; }
-  .zl { grid-template-columns: 96px 1fr; }
-  .zl-val { grid-column: 2; text-align: left; margin-top: -6px; }
-  .pl { grid-template-columns: 1fr auto; }
-  .pl .pilha { grid-column: 1 / -1; grid-row: 2; }
-  .lt-abrir { grid-template-columns: 1fr; }
-  .lt .pilha { grid-column: 1; grid-row: auto; }
-  .dl { grid-template-columns: 1fr; gap: 2px; }
-  .dl dd { margin-bottom: 8px; }
-  .kpi-valor { font-size: 38px; }
-}
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 20; background: var(--ink); color: var(--bg); padding: 10px 14px; border-radius: 10px; font-size: 13px; width: max-content; max-width: min(92vw, 520px); box-shadow: 0 8px 28px rgba(0,0,0,.25); white-space: pre-line; }
+@media (min-width: 721px) { .toast { bottom: 20px; } }
+.soltar { position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: rgba(20,24,31,.72); color: #F2EEE6; font-size: 22px; font-weight: 700; padding: 24px; text-align: center; }
+.soltar span { border: 2px dashed var(--accent); border-radius: 18px; padding: 32px 28px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 </head>
@@ -289,17 +257,17 @@ details[open] > summary { margin-bottom: 10px; }
       <span>Pulso do Treino</span>
     </div>
     <div class="topo-acoes">
-      <span id="selo" class="selo" data-tipo="carregando">Carregando…</span>
-      <button class="btn" id="instalar" hidden>Instalar app</button>
-      <label class="btn btn-acento" for="arquivo">Importar treino</label>
+      <button class="btn" id="instalar" hidden>Instalar</button>
+      <label class="btn btn-acento" for="arquivo">+ Importar</label>
       <input id="arquivo" class="oculto-visual" type="file" multiple>
+      <input id="restaurar" class="oculto-visual" type="file" accept=".json,application/json">
     </div>
   </header>
   <nav class="abas" role="tablist" aria-label="Seções">
-    <button class="aba" role="tab" id="t-treino" data-aba="treino" aria-selected="true" aria-controls="aba-treino">Treino</button>
-    <button class="aba" role="tab" id="t-historico" data-aba="historico" aria-selected="false" aria-controls="aba-historico">Histórico</button>
-    <button class="aba" role="tab" id="t-comparar" data-aba="comparar" aria-selected="false" aria-controls="aba-comparar">Comparar</button>
-    <button class="aba" role="tab" id="t-zonas" data-aba="zonas" aria-selected="false" aria-controls="aba-zonas">Zonas</button>
+    <button class="aba" role="tab" id="t-treino" data-aba="treino" aria-selected="true" aria-controls="aba-treino"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2.5-6 4 12 2.5-6h5"/></svg><span>Treino</span></button>
+    <button class="aba" role="tab" id="t-historico" data-aba="historico" aria-selected="false" aria-controls="aba-historico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span>Histórico</span></button>
+    <button class="aba" role="tab" id="t-comparar" data-aba="comparar" aria-selected="false" aria-controls="aba-comparar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 20V11M12 20V5M18 20v-6"/></svg><span>Comparar</span></button>
+    <button class="aba" role="tab" id="t-ajustes" data-aba="ajustes" aria-selected="false" aria-controls="aba-ajustes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg><span>Ajustes</span></button>
   </nav>
   <main>
     <section id="aba-treino" class="vista" role="tabpanel" aria-labelledby="t-treino">
@@ -307,7 +275,7 @@ details[open] > summary { margin-bottom: 10px; }
     </section>
     <section id="aba-historico" class="vista" role="tabpanel" aria-labelledby="t-historico" hidden></section>
     <section id="aba-comparar" class="vista" role="tabpanel" aria-labelledby="t-comparar" hidden></section>
-    <section id="aba-zonas" class="vista" role="tabpanel" aria-labelledby="t-zonas" hidden></section>
+    <section id="aba-ajustes" class="vista" role="tabpanel" aria-labelledby="t-ajustes" hidden></section>
   </main>
 </div>
 <div id="soltar" class="soltar" hidden><span>Solte o arquivo do treino</span></div>
@@ -919,15 +887,15 @@ async function salvarArquivo(nome, conteudo) {
     let dl = null;
     try { dl = await claude.use('downloads'); } catch (e) { dl = null; }
     if (dl) {
-      try { await dl.save({ filename: nome, data: conteudo }); toast('Backup salvo.'); }
-      catch (e) { if (e && e.code !== 'declined') toast('Não consegui salvar o arquivo aqui. Abra o Pulso do Treino como arquivo HTML para exportar.'); }
-      return;
+      try { await dl.save({ filename: nome, data: conteudo }); toast('Backup salvo.'); return true; }
+      catch (e) { if (e && e.code !== 'declined') toast('Não consegui salvar o arquivo aqui. Abra o Pulso do Treino pelo site para fazer o backup.'); return false; }
     }
   }
   const url = URL.createObjectURL(new Blob([conteudo], { type: 'application/json' }));
   const a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
-  toast('Backup exportado.');
+  toast('Backup salvo em Downloads.');
+  return true;
 }
 
 // ================= importação =================
@@ -959,7 +927,6 @@ async function importarArquivos(lista) {
   if (erros.length) partes.push('Não consegui ler ' + erros.join('; '));
   toast(partes.join('\n'), erros.length && !novos ? 9000 : 5000);
   if (ultimo) { E.atual = ultimo; E.confirmarExclusao = false; mostrarAba('treino'); }
-  atualizarSelo();
 }
 async function importarBackup(txt) {
   let dados; try { dados = JSON.parse(txt); } catch (e) { throw new Error('o JSON está corrompido'); }
@@ -973,13 +940,6 @@ async function importarBackup(txt) {
   }
   if (dados.config && !E.cfg.fcmax && !E.cfg.idade && E.cfg.metodo !== 'manual') { E.cfg = { ...CONFIG_PADRAO, ...dados.config }; salvarConfig(); }
   return { novos, repetidos, ultimo };
-}
-async function exportarBackup() {
-  if (!E.treinos.length) { toast('Ainda não há treinos para exportar.'); return; }
-  const treinos = [];
-  for (const m of E.treinos) treinos.push({ meta: m, series: await obterSerie(m.id) });
-  const hoje = new Date();
-  await salvarArquivo(`pulso-do-treino-${hoje.getFullYear()}-${p2(hoje.getMonth() + 1)}-${p2(hoje.getDate())}.json`, JSON.stringify({ app: 'pulso-do-treino', versao: 1, exportadoEm: hoje.toISOString(), config: E.cfg, treinos }));
 }
 const ordenar = () => E.treinos.sort((a, b) => b.inicioMs - a.inicioMs);
 
@@ -1048,8 +1008,8 @@ let idClip = 0;
 function graficoLinha(el, o) { montar(el, () => desenharLinha(el, o)); }
 function desenharLinha(el, o) {
   const W = Math.max(260, el.clientWidth || 600); el._w = el.clientWidth;
-  const H = o.altura || (W < 520 ? 230 : 290);
-  const m = { l: 44, r: o.rotulosDireita ? 30 : 14, t: 16, b: 30 }, pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const H = o.altura || (W < 520 ? 190 : 230);
+  const m = { l: 34, r: o.rotulosDireita ? 24 : 8, t: 12, b: 24 }, pw = W - m.l - m.r, ph = H - m.t - m.b;
   let yMin = Infinity, yMax = -Infinity;
   for (const s of o.series) for (const v of s.y) if (v != null) { if (v < yMin) yMin = v; if (v > yMax) yMax = v; }
   if (!isFinite(yMin)) { yMin = 0; yMax = 1; }
@@ -1064,9 +1024,9 @@ function desenharLinha(el, o) {
   for (const f of o.faixas || []) {
     const y0 = clamp(f.y0, ey.a, ey.b), y1 = clamp(f.y1, ey.a, ey.b); if (y1 <= y0) continue;
     s.push(`<rect x="${m.l}" y="${Y(y1)}" width="${pw}" height="${Y(y0) - Y(y1)}" style="fill:${f.cor};opacity:${f.op ?? 0.16}"/>`);
-    if (f.rotulo && Y(y0) - Y(y1) >= 14) s.push(`<text x="${W - m.r + 6}" y="${(Y(y0) + Y(y1)) / 2 + 4}" class="t-eixo">${esc(f.rotulo)}</text>`);
+    if (f.rotulo && Y(y0) - Y(y1) >= 12) s.push(`<text x="${W - m.r + 4}" y="${(Y(y0) + Y(y1)) / 2 + 4}" class="t-eixo">${esc(f.rotulo)}</text>`);
   }
-  for (const v of ey.ticks) s.push(`<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" class="l-grade"/><text x="${m.l - 8}" y="${Y(v) + 4}" text-anchor="end" class="t-eixo">${esc(o.yFmt ? o.yFmt(v) : fmtN(v))}</text>`);
+  for (const v of ey.ticks) s.push(`<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" class="l-grade"/><text x="${m.l - 6}" y="${Y(v) + 4}" text-anchor="end" class="t-eixo">${esc(o.yFmt ? o.yFmt(v) : fmtN(v))}</text>`);
   for (const b of o.blocos || []) {
     const x0 = X(b.x0), x1 = X(b.x1);
     s.push(`<rect x="${x0}" y="${m.t}" width="${Math.max(1.5, x1 - x0)}" height="${ph}" class="r-bloco"/>`);
@@ -1075,7 +1035,7 @@ function desenharLinha(el, o) {
   s.push(`<line x1="${m.l}" x2="${W - m.r}" y1="${m.t + ph}" y2="${m.t + ph}" class="l-base"/>`);
   for (const tk of o.xTicks ? o.xTicks(pw) : []) {
     const x = X(tk.v), anc = x < m.l + 24 ? 'start' : x > W - m.r - 24 ? 'end' : 'middle';
-    s.push(`<text x="${x}" y="${H - 8}" text-anchor="${anc}" class="t-eixo">${esc(tk.rotulo)}</text>`);
+    s.push(`<text x="${x}" y="${H - 6}" text-anchor="${anc}" class="t-eixo">${esc(tk.rotulo)}</text>`);
   }
   s.push(`<g clip-path="url(#${clip})">`);
   for (const se of o.series) {
@@ -1149,8 +1109,8 @@ function caminhoColuna(x, y, w, h, r) {
 }
 function desenharColunas(el, o) {
   const W = Math.max(260, el.clientWidth || 600); el._w = el.clientWidth;
-  const H = o.altura || (W < 520 ? 210 : 240);
-  const m = { l: 44, r: 10, t: 14, b: 30 }, pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const H = o.altura || (W < 520 ? 170 : 200);
+  const m = { l: 34, r: 8, t: 12, b: 24 }, pw = W - m.l - m.r, ph = H - m.t - m.b;
   const n = o.cats.length, banda = pw / Math.max(1, n), bw = Math.max(2, Math.min(o.largMax || 24, banda * 0.72));
   const totais = o.cats.map((_, i) => o.camadas.reduce((a, c) => a + (c.v[i] || 0), 0));
   const topo = Math.max(...totais, ...(o.marcas || []).filter(v => v != null), 0);
@@ -1158,7 +1118,7 @@ function desenharColunas(el, o) {
   const ey = escalaY(base0, topo || 1, ph < 180 ? 4 : 5);
   const Y = v => m.t + (1 - (v - ey.a) / (ey.b - ey.a)) * ph;
   const s = [`<svg class="svg-graf" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.rotulo || '')}">`];
-  for (const v of ey.ticks) s.push(`<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" class="l-grade"/><text x="${m.l - 8}" y="${Y(v) + 4}" text-anchor="end" class="t-eixo">${esc(o.yFmt ? o.yFmt(v) : fmtN(v))}</text>`);
+  for (const v of ey.ticks) s.push(`<line x1="${m.l}" x2="${W - m.r}" y1="${Y(v)}" y2="${Y(v)}" class="l-grade"/><text x="${m.l - 6}" y="${Y(v) + 4}" text-anchor="end" class="t-eixo">${esc(o.yFmt ? o.yFmt(v) : fmtN(v))}</text>`);
   const pulo = Math.max(1, Math.ceil((o.largRotulo || 46) / banda));
   for (let i = 0; i < n; i++) {
     const x = m.l + banda * i + (banda - bw) / 2;
@@ -1173,7 +1133,7 @@ function desenharColunas(el, o) {
     });
     const mk = o.marcas?.[i];
     if (mk != null) s.push(`<line x1="${x - 2}" x2="${x + bw + 2}" y1="${Y(mk)}" y2="${Y(mk)}" class="l-marca"/>`);
-    if (i % pulo === 0) s.push(`<text x="${m.l + banda * i + banda / 2}" y="${H - 8}" text-anchor="middle" class="t-eixo">${esc(o.cats[i])}</text>`);
+    if (i % pulo === 0) s.push(`<text x="${m.l + banda * i + banda / 2}" y="${H - 6}" text-anchor="middle" class="t-eixo">${esc(o.cats[i])}</text>`);
   }
   s.push(`<line x1="${m.l}" x2="${W - m.r}" y1="${m.t + ph}" y2="${m.t + ph}" class="l-base"/>`);
   for (let i = 0; i < n; i++) s.push(`<rect class="r-coluna" data-i="${i}" x="${m.l + banda * i}" y="${m.t}" width="${banda}" height="${ph}"/>`);
@@ -1200,7 +1160,7 @@ function linhasPilhas(linhas, modo) {
   const maxTot = Math.max(1, ...linhas.map(l => l.total));
   return `<div class="pilhas">${linhas.map(l => {
     const larg = modo === 'pct' ? 100 : Math.max(2, l.total / maxTot * 100);
-    const val = modo === 'pct' ? `${fmtPct(l.alta / (l.total || 1))} em Z4–Z5` : fmtDur(l.total);
+    const val = modo === 'pct' ? `${fmtPct(l.alta / (l.total || 1))} em Z4–Z5` : durCurta(l.total);
     return `<div class="pl"><button class="pl-rot" data-abrir="${esc(l.id)}">${l.cor ? `<i style="background:${l.cor}"></i>` : ''}<span>${esc(l.rotulo)}<small>${esc(l.sub)}</small></span></button>
       <div class="pilha" style="width:${larg.toFixed(1)}%" role="img" aria-label="${esc(l.rotulo + ': ' + l.zt.map((v, z) => `${rotZona(z)} ${fmtMin(v)}`).join(', '))}">${pilhaZonas(l.zt, l.total, l.rotulo)}</div>
       <span class="pl-val">${esc(val)}</span></div>`;
@@ -1212,32 +1172,12 @@ function legendaZonas(Z, comAbaixo = true) {
 
 // ================= vistas =================
 function rotuloTreino(m) { return `${fmtData(m.inicioMs, m.fusoMin)} · ${m.tipo}${m.titulo ? ' · ' + m.titulo : ''}`; }
-function kpi(rot, valor, un, sub, escuro) {
-  return `<div class="kpi${escuro ? ' kpi-escuro' : ''}"><span class="kpi-rot">${esc(rot)}</span><span class="kpi-valor">${esc(valor)}</span>${un ? `<span class="kpi-un">${esc(un)}</span>` : ''}${sub ? `<span class="kpi-sub">${esc(sub)}</span>` : ''}</div>`;
-}
-function curvaHeroi(series) {
-  const s = suavizar(series.t, series.fc, 60), n = series.t.length, dur = series.t[n - 1] || 1;
-  const vals = s.filter(v => v != null); const mn = Math.min(...vals), mx = Math.max(...vals);
-  const pts = []; const passo = Math.max(1, Math.floor(n / 160));
-  for (let i = 0; i < n; i += passo) if (s[i] != null) pts.push(`${(series.t[i] / dur * 1000).toFixed(1)} ${(190 - (s[i] - mn) / ((mx - mn) || 1) * 170).toFixed(1)}`);
-  const d = 'M' + pts.join('L');
-  return `<svg class="heroi-curva" viewBox="0 0 1000 200" preserveAspectRatio="none" aria-hidden="true"><path d="${d}L1000 200L0 200Z" style="fill:var(--accent);fill-opacity:.14"/><path d="${d}" style="fill:none;stroke:var(--accent);stroke-opacity:.7;stroke-width:2.5" vector-effect="non-scaling-stroke"/></svg>`;
-}
-
-function destaquesTreino(meta, an) {
-  const r = meta.resumo, out = [];
-  const [m1, m2] = an.metades;
-  if (m1 != null && m2 != null && Math.abs(m2 - m1) >= 8) out.push(`${m2 > m1 ? 'A segunda metade foi mais intensa' : 'A primeira metade foi mais intensa'}: FC média de ${fmtN(Math.max(m1, m2))} bpm, contra ${fmtN(Math.min(m1, m2))} bpm na ${m2 > m1 ? 'primeira' : 'segunda'}.`);
-  else if (m1 != null && m2 != null) out.push(`Intensidade parecida nas duas metades do treino: FC média de ${fmtN(m1)} e ${fmtN(m2)} bpm.`);
-  if (an.blocos.length) {
-    const tot = an.blocos.reduce((a, b) => a + b.dur, 0), top = an.blocos.reduce((a, b) => (b.fcMed > a.fcMed ? b : a));
-    const i = an.blocos.indexOf(top);
-    out.push(`${an.blocos.length} ${an.blocos.length === 1 ? 'bloco' : 'blocos'} de esforço acima de ${fmtN(an.limiar)} bpm, somando ${fmtDur(tot)}. O mais intenso foi o ${ordinal(i)}, de ${fmtN(top.ini / 60)} a ${fmtN(top.fim / 60)} min, com média de ${fmtN(top.fcMed)} bpm.`);
-  }
-  if (an.recPico) out.push(`Pico de ${r.fcMax} bpm aos ${fmtN(r.tFcMax / 60)} min. Um minuto depois a FC estava em ${an.recPico.para} bpm (queda de ${an.recPico.queda} bpm).`);
-  out.push(`${fmtMin(an.altaS)} (${fmtPct(an.altaS / (an.totalZ || 1))}) em Z4 ou Z5, as zonas mais intensas.`);
-  return out;
-}
+const durCurta = s => { const m = Math.round((s || 0) / 60); return m < 60 ? `${m} min` : `${Math.floor(m / 60)}h${p2(m % 60)}`; };
+const stat = (valor, rot) => `<div class="stat"><b>${esc(valor)}</b><span>${esc(rot)}</span></div>`;
+// seção recolhível; lembra quais estavam abertas entre uma renderização e outra
+const abertos = new Set();
+const secao = (chave, titulo, sub, conteudo) => `<details data-secao="${chave}"${abertos.has(chave) ? ' open' : ''}><summary><span>${esc(titulo)}${sub ? `<small>${esc(sub)}</small>` : ''}</span></summary><div class="conteudo">${conteudo}</div></details>`;
+function ligarSecoes(raiz) { $$('details[data-secao]', raiz).forEach(d => d.addEventListener('toggle', () => { if (d.open) abertos.add(d.dataset.secao); else abertos.delete(d.dataset.secao); })); }
 
 async function renderTreino() {
   const raiz = $('#aba-treino'), tok = ++E.tok;
@@ -1253,153 +1193,106 @@ async function renderTreino() {
   const demo = !!meta.exemplo;
   const idx = E.treinos.indexOf(meta);
   const seletor = demo ? '' : `<div class="seletor">
-    <button class="btn" id="t-ant" ${idx >= E.treinos.length - 1 ? 'disabled' : ''} aria-label="Treino anterior">‹</button>
+    <button class="btn btn-icone" id="t-ant" ${idx >= E.treinos.length - 1 ? 'disabled' : ''} aria-label="Treino anterior">‹</button>
     <select id="t-sel" aria-label="Escolher treino">${E.treinos.map(t => `<option value="${esc(t.id)}" ${t.id === meta.id ? 'selected' : ''}>${esc(rotuloTreino(t))}</option>`).join('')}</select>
-    <button class="btn" id="t-prox" ${idx <= 0 ? 'disabled' : ''} aria-label="Próximo treino">›</button></div>`;
+    <button class="btn btn-icone" id="t-prox" ${idx <= 0 ? 'disabled' : ''} aria-label="Próximo treino">›</button></div>`;
   if (!series || !series.fc) {
-    raiz.innerHTML = seletor + `<div class="card"><h2>Não consegui abrir os registros deste treino</h2><p class="texto">Os dados resumidos estão no histórico, mas a série de frequência cardíaca não carregou. Tente recarregar a página.</p></div>`;
+    raiz.innerHTML = seletor + `<div class="card"><h2>Não consegui abrir os registros deste treino</h2><p class="texto">O resumo está no histórico, mas a série de frequência cardíaca não carregou. Tente recarregar a página.</p></div>`;
     ligarSeletor(); return;
   }
   const Z = zonasAtuais(), an = analisar(meta, series, Z), r = meta.resumo, tot = meta.totais || {};
-  const fim = meta.inicioMs + r.duracaoS * 1000, kcal = tot.calorias;
+  const fim = meta.inicioMs + r.duracaoS * 1000, durMin = r.duracaoS / 60;
   const dist = tot.distanciaM > 0 ? tot.distanciaM : null;
-  const aviso = demo ? `<div class="aviso"><p><b>Este é um treino fictício de exemplo.</b> Importe o arquivo do seu treino (TCX, FIT, GPX ou CSV) para ver a sua análise. Cada treino importado fica guardado no histórico.</p><label class="btn btn-escuro" for="arquivo">Importar treino</label></div>`
-    : Z.provisoria ? `<div class="aviso"><p>Zonas provisórias: calculadas com a maior FC já registrada nos seus treinos (${Z.fcmax} bpm). Informe sua FC máxima ou sua idade para que as zonas fiquem certas.</p><button class="btn btn-escuro" data-ir="zonas">Definir zonas</button></div>` : '';
-  const kpis = [
-    kpi('Duração', fmtN(r.duracaoS / 60), 'min', `${fmtHora(meta.inicioMs, meta.fusoMin)} às ${fmtHora(fim, meta.fusoMin)}`),
-    kcal != null ? kpi('Gasto estimado', fmtN(kcal), 'kcal', `${fmtN(kcal / (r.duracaoS / 60), 1)} kcal/min · estimativa do aparelho`) : '',
-    kpi('FC média', fmtN(r.fcMed), 'bpm', `mediana ${r.fcMediana} · ${fmtPct(r.fcMed / Z.fcmax)} da FC máx.`),
-    kpi('FC máxima', fmtN(r.fcMax), 'bpm', `mínima ${r.fcMin} · pico aos ${fmtN(r.tFcMax / 60)} min`, true),
-    kpi('Tempo em Z4–Z5', an.altaS < 600 ? fmtN(an.altaS / 60, 1) : fmtN(an.altaS / 60), 'min', `${fmtPct(an.altaS / (an.totalZ || 1))} do treino`),
-    kpi('Carga por zonas', fmtN(an.carga), 'pontos', 'minutos em cada zona × nº da zona'),
-    dist ? kpi('Distância', fmtN(dist / 1000, 2), 'km', tot.velMed ? `velocidade média ${fmtN(tot.velMed * 3.6, 1)} km/h` : `${fmtN(r.duracaoS / 60 / (dist / 1000), 1)} min/km`) : '',
-    meta.pse != null ? kpi('Carga pela PSE', fmtN(meta.pse * r.duracaoS / 60), 'UA', `PSE ${meta.pse} × ${fmtN(r.duracaoS / 60)} min`) : ''
-  ].join('');
-  const chipsData = `<span class="chip">${esc(fmtData(meta.inicioMs, meta.fusoMin))}</span><span class="chip">${esc(fmtHora(meta.inicioMs, meta.fusoMin))} – ${esc(fmtHora(fim, meta.fusoMin))}</span><span class="chip chip-acento">${esc(fmtDur(r.duracaoS))}</span>${meta.rounds ? `<span class="chip">${esc(meta.rounds)} ${meta.rounds == 1 ? 'round' : 'rounds'}</span>` : ''}`;
-  const heroi = `<article class="heroi">${curvaHeroi(series)}
-    <p class="sobretitulo">Análise de sessão · ${esc(fmtDiaSemana(meta.inicioMs, meta.fusoMin))}</p>
-    <h1>${esc(meta.tipo || 'Treino')}</h1>
-    <p class="heroi-sub">${esc(meta.titulo || 'Frequência cardíaca da sessão')}</p>
-    <div class="chips">${chipsData}</div></article>`;
+  const aviso = demo ? `<div class="aviso"><span>Treino fictício de exemplo. Importe o arquivo do seu treino.</span><label class="btn-link" for="arquivo">Importar</label></div>`
+    : Z.provisoria ? `<div class="aviso"><span>Zonas provisórias, pela maior FC registrada (${Z.fcmax} bpm).</span><button class="btn-link" data-ir="ajustes">Ajustar</button></div>` : '';
+  const quarto = tot.calorias != null ? stat(fmtN(tot.calorias), 'kcal') : dist ? stat(`${fmtN(dist / 1000, 1)} km`, 'distância') : stat(fmtN(r.fcMin), 'FC mín.');
+  const resumo = `<section class="resumo">
+    <div><h1>${esc(meta.tipo || 'Treino')}${meta.titulo ? ` <span>· ${esc(meta.titulo)}</span>` : ''}</h1>
+    <p class="resumo-sub">${esc(fmtDiaSemana(meta.inicioMs, meta.fusoMin))}, ${esc(fmtData(meta.inicioMs, meta.fusoMin))} · ${esc(fmtHora(meta.inicioMs, meta.fusoMin))}–${esc(fmtHora(fim, meta.fusoMin))}</p></div>
+    <div class="stats">${stat(durCurta(r.duracaoS), 'duração')}${stat(fmtN(r.fcMed), 'FC média')}${stat(fmtN(r.fcMax), 'FC máx.')}${quarto}</div></section>`;
   const zonasMax = Math.max(1, ...an.zt);
   const listaZonas = [0, 1, 2, 3, 4, 5].filter(z => z > 0 || an.zt[0] > 0).map(z => `<div class="zl">
-      <span class="zl-rot">${z ? 'Z' + z + ' · ' + NOMES_ZONA[z] : 'Abaixo da Z1'}<small>${esc(faixaZona(z, Z.limites))}</small></span>
+      <span class="zl-rot"><b>${z ? 'Z' + z : 'Abaixo'}</b><small>${esc(faixaZona(z, Z.limites).replace(' bpm', ''))}</small></span>
       <div class="zl-trilho"><div class="zl-barra" style="width:${(an.zt[z] / zonasMax * 100).toFixed(1)}%;background:${corZona(z)}"></div></div>
       <span class="zl-val"><b>${esc(fmtMin(an.zt[z]))}</b> · ${esc(fmtPct(an.zt[z] / (an.totalZ || 1)))}</span></div>`).join('');
-  const origemZ = Z.metodo === 'manual' ? 'limites definidos por você' : `${Z.metodo === 'reserva' ? '% da FC de reserva' : '% da FC máxima'} de ${Z.fcmax} bpm${Z.origem === 'idade' ? ' (estimada pela idade)' : Z.origem === 'observada' ? ' (maior FC registrada, provisória)' : ''}`;
-  const blocosHTML = an.blocos.length ? `<div class="rolagem"><table class="tabela"><thead><tr><th>Bloco</th><th>Janela</th><th class="num">Duração</th><th class="num">FC média</th><th class="num">FC máx.</th><th class="num">Queda em 1 min</th></tr></thead><tbody>${an.blocos.map((b, i) => `<tr><td>${ordinal(i)}</td><td>${fmtN(b.ini / 60)}–${fmtN(b.fim / 60)} min</td><td class="num">${esc(fmtMin(b.dur))}</td><td class="num">${fmtN(b.fcMed)} bpm</td><td class="num">${b.fcMax} bpm</td><td class="num">${b.rec ? `${b.rec.queda} bpm` : '–'}</td></tr>`).join('')}</tbody></table></div>`
-    : `<p class="texto">Nenhum trecho ficou acima de ${fmtN(an.limiar)} bpm por mais de 1 minuto.</p>`;
-  const recs = an.blocos.filter(b => b.rec).map(b => b.rec);
-  const pausas = an.blocos.slice(1).map((b, i) => b.ini - an.blocos[i].fim <= 600 ? minEntre(series, an.blocos[i].fim, b.ini) : null).filter(v => v != null).sort((a, b) => a - b);
-  const melhor = an.recPico || (recs.length ? recs.reduce((a, b) => b.de > a.de ? b : a) : null);
-  const recup = melhor ? `<section class="card recup"><p class="sobretitulo">Esforço e recuperação</p>
-    <p class="recup-num">${melhor.queda > 0 ? '−' : ''}${Math.abs(melhor.queda)} bpm</p>
-    <p>de queda da FC no 1º minuto depois do pico de ${melhor.de} bpm (de ${melhor.de} para ${melhor.para} bpm).</p>
-    ${pausas.length ? `<p class="nota">Nas pausas curtas entre os blocos, a FC voltou para ${pausas[0] === pausas[pausas.length - 1] ? pausas[0] : `${pausas[0]}–${pausas[pausas.length - 1]}`} bpm antes do esforço seguinte.</p>` : ''}
-    <p class="nota">Leitura descritiva do sensor do aparelho, não é um teste clínico de condicionamento.</p></section>` : '';
+  // detalhes recolhidos
+  const nBlocos = an.blocos.length;
+  const blocos = `<div class="botoes"><span class="nota">Contar a partir de</span><select id="c-esf" aria-label="Início dos blocos de esforço"><option value="z2">Z2 · ${Z.limites[1]} bpm</option><option value="z3">Z3 · ${Z.limites[2]} bpm</option><option value="z4">Z4 · ${Z.limites[3]} bpm</option><option value="z5">Z5 · ${Z.limites[4]} bpm</option><option value="bpm">Valor fixo</option></select>
+      <input type="number" id="c-esf-bpm" min="60" max="230" value="${E.cfg.esforcoBpm || 140}" aria-label="FC mínima do bloco (bpm)" ${E.cfg.esforco === 'bpm' ? '' : 'hidden'} style="width:76px"></div>
+    ${nBlocos ? `<div class="rolagem"><table class="tabela"><thead><tr><th></th><th>Minutos</th><th class="num">Duração</th><th class="num">Média</th><th class="num">Máx.</th><th class="num">Queda 1 min</th></tr></thead><tbody>${an.blocos.map((b, i) => `<tr><td>${ordinal(i)}</td><td>${fmtN(b.ini / 60)}–${fmtN(b.fim / 60)}</td><td class="num">${esc(fmtMin(b.dur))}</td><td class="num">${fmtN(b.fcMed)}</td><td class="num">${b.fcMax}</td><td class="num">${b.rec ? b.rec.queda : '–'}</td></tr>`).join('')}</tbody></table></div>`
+      : `<p class="texto">Nenhum trecho acima de ${fmtN(an.limiar)} bpm por mais de 1 minuto.</p>`}
+    ${an.recPico ? `<p class="texto">No pico de ${r.fcMax} bpm (aos ${fmtN(r.tFcMax / 60)} min), a FC caiu ${an.recPico.queda} bpm no minuto seguinte.</p>` : ''}
+    <p class="nota">Bloco: FC média de 20 s acima do limite por mais de 1 min. Queda 1 min: FC no pico menos a FC 60 s depois. É uma leitura do sensor, não um teste clínico.</p>`;
+  const partes = `<div class="botoes"><select id="c-parc" aria-label="Tamanho das partes"><option value="300">A cada 5 min</option><option value="600">A cada 10 min</option><option value="900">A cada 15 min</option></select></div>
+    <div class="graf" id="g-parc"></div><p class="nota">Coluna: FC média, na cor da zona. Traço: FC máxima. O número embaixo é o minuto em que a parte começa.</p>`;
+  const anotacoes = `<div class="form-grade form-2">
+      <label class="campo"><span>Modalidade</span><input type="text" id="n-tipo" list="tipos" value="${esc(meta.tipo)}" ${demo ? 'disabled' : ''}></label>
+      <label class="campo"><span>Título</span><input type="text" id="n-titulo" value="${esc(meta.titulo)}" placeholder="opcional" ${demo ? 'disabled' : ''}></label>
+      <label class="campo"><span>Esforço percebido (0–10)</span><select id="n-pse" ${demo ? 'disabled' : ''}><option value="">–</option>${PSE.map((t, i) => `<option value="${i}" ${meta.pse === i ? 'selected' : ''}>${i} · ${t}</option>`).join('')}</select></label>
+      <label class="campo"><span>Rounds</span><input type="number" id="n-rounds" min="0" max="99" inputmode="numeric" value="${meta.rounds ?? ''}" ${demo ? 'disabled' : ''}></label></div>
+    <label class="campo"><span>Notas</span><textarea id="n-notas" placeholder="Como foi o treino" ${demo ? 'disabled' : ''}>${esc(meta.notas)}</textarea></label>
+    <datalist id="tipos">${[...new Set([...TIPOS_PADRAO, ...E.treinos.map(t => t.tipo)])].map(t => `<option value="${esc(t)}">`).join('')}</datalist>
+    <p class="nota" id="n-status">${meta.pse != null ? `Carga da sessão: PSE ${meta.pse} × ${fmtN(durMin)} min = ${fmtN(meta.pse * durMin)}.` : 'Com a PSE, o app calcula a carga da sessão (PSE × minutos).'}</p>`;
   const canaisExtra = [['alt', 'Altitude', 'm', v => v], ['vel', 'Velocidade', 'km/h', v => v * 3.6], ['cad', 'Cadência', 'rpm', v => v], ['pot', 'Potência', 'W', v => v], ['temp', 'Temperatura', '°C', v => v]].filter(([k]) => series[k]);
-  const outros = canaisExtra.length || series.lat ? `<section class="card"><div class="card-topo"><div><p class="sobretitulo">Outros dados do arquivo</p><h2>Demais registros</h2></div></div><div class="grade-2">${canaisExtra.map(([k, nome, un]) => `<div><h3>${nome} <span class="nota">(${un})</span></h3><div class="graf" id="g-${k}"></div></div>`).join('')}${series.lat ? '<div><h3>Percurso</h3><div class="graf" id="g-mapa"></div></div>' : ''}</div></section>` : '';
-  raiz.innerHTML = `${aviso}${seletor}${heroi}
-    <div class="kpis">${kpis}</div>
-    <div class="destaques">${destaquesTreino(meta, an).map(t => `<p>${esc(t)}</p>`).join('')}</div>
-    <section class="card"><div class="card-topo"><div><p class="sobretitulo">Intensidade ao longo do treino</p><h2>Frequência cardíaca</h2></div>
-      <div class="controles"><select id="c-suav" aria-label="Suavização"><option value="0">Sem suavização</option><option value="10">Média de 10 s</option><option value="30">Média de 30 s</option></select>
-      <label class="check"><input type="checkbox" id="c-zonas" ${E.mostrarZonas ? 'checked' : ''}>Zonas</label><label class="check"><input type="checkbox" id="c-blocos" ${E.mostrarBlocos ? 'checked' : ''}>Blocos de esforço</label></div></div>
-      <div class="graf" id="g-fc"></div>${legendaZonas(Z, false)}</section>
-    <div class="grade-2">
-      <section class="card"><div class="card-topo"><div><p class="sobretitulo">Intensidade</p><h2>Tempo em cada zona</h2></div></div><div class="zonas-lista">${listaZonas}</div><p class="nota">Zonas pelo ${esc(origemZ)}.</p></section>
-      <section class="card"><div class="card-topo"><div><p class="sobretitulo">Intensidade</p><h2>Distribuição da FC</h2></div></div><div class="graf" id="g-dist"></div><p class="nota">Minutos em cada faixa de 5 bpm, na cor da zona.</p></section>
-    </div>
-    <section class="card"><div class="card-topo"><div><p class="sobretitulo">Ao longo da aula</p><h2>FC por parte do treino</h2></div>
-      <div class="controles"><select id="c-parc" aria-label="Tamanho das partes"><option value="300">A cada 5 min</option><option value="600">A cada 10 min</option><option value="900">A cada 15 min</option></select></div></div>
-      <div class="graf" id="g-parc"></div><p class="nota">Cada coluna começa no minuto indicado. Coluna: FC média da parte, na cor da zona. Traço: FC máxima da parte.</p>
-      <details><summary>Ver tabela</summary><div class="rolagem" id="tab-parc"></div></details></section>
-    <section class="card"><div class="card-topo"><div><p class="sobretitulo">Esforço e recuperação</p><h2>Blocos de esforço</h2></div>
-      <div class="controles"><label class="check" for="c-esf">A partir de</label><select id="c-esf"><option value="z2">Z2 (${Z.limites[1]} bpm)</option><option value="z3">Z3 (${Z.limites[2]} bpm)</option><option value="z4">Z4 (${Z.limites[3]} bpm)</option><option value="z5">Z5 (${Z.limites[4]} bpm)</option><option value="bpm">Valor fixo</option></select>
-      <input type="number" id="c-esf-bpm" min="60" max="230" value="${E.cfg.esforcoBpm || 140}" aria-label="FC mínima do bloco (bpm)" ${E.cfg.esforco === 'bpm' ? '' : 'hidden'} style="width:84px"></div></div>
-      ${blocosHTML}<p class="nota">Bloco: FC média de 20 s acima de ${fmtN(an.limiar)} bpm por mais de 1 min, unindo pausas de menos de 45 s. Queda em 1 min: FC no pico do bloco menos a FC 60 s depois.</p></section>
-    ${recup}${outros}
-    <section class="card"><div class="card-topo"><div><p class="sobretitulo">Seu registro</p><h2>Anotações do treino</h2></div><span class="nota" id="n-status"></span></div>
-      <div class="form-grade">
-        <label class="campo"><span>Modalidade</span><input type="text" id="n-tipo" list="tipos" value="${esc(meta.tipo)}" ${demo ? 'disabled' : ''}></label>
-        <label class="campo"><span>Título (opcional)</span><input type="text" id="n-titulo" value="${esc(meta.titulo)}" placeholder="Ex.: aula de passagem de guarda" ${demo ? 'disabled' : ''}></label>
-        <label class="campo"><span>Esforço percebido (PSE 0–10)</span><select id="n-pse" ${demo ? 'disabled' : ''}><option value="">Não informado</option>${PSE.map((t, i) => `<option value="${i}" ${meta.pse === i ? 'selected' : ''}>${i} · ${t}</option>`).join('')}</select></label>
-        <label class="campo"><span>Rounds / rolas</span><input type="number" id="n-rounds" min="0" max="99" inputmode="numeric" value="${meta.rounds ?? ''}" ${demo ? 'disabled' : ''}></label>
-      </div>
-      <label class="campo"><span>Notas</span><textarea id="n-notas" placeholder="Como foi o treino, o que foi feito, sono, dores…" ${demo ? 'disabled' : ''}>${esc(meta.notas)}</textarea></label>
-      <datalist id="tipos">${[...new Set([...TIPOS_PADRAO, ...E.treinos.map(t => t.tipo)])].map(t => `<option value="${esc(t)}">`).join('')}</datalist>
-      <p class="nota">A PSE vezes a duração em minutos dá a carga da sessão (Foster e colaboradores, 2001).</p></section>
-    ${cartaoArquivo(meta, series)}
-    ${demo ? '' : `<div class="confirmar" id="excluir-area">${E.confirmarExclusao ? `<span>Excluir este treino do histórico? Isso não pode ser desfeito.</span><button class="btn btn-perigo-cheio btn-sm" id="excluir-sim">Excluir</button><button class="btn btn-sm" id="excluir-nao">Cancelar</button>` : `<button class="btn btn-perigo btn-sm" id="excluir">Excluir este treino</button>`}</div>`}`;
-
-  // gráfico da FC
-  $('#c-suav').value = String(E.suav);
-  const xs = series.t.map(v => v / 60), durMin = series.t[series.t.length - 1] / 60;
+  const outros = canaisExtra.length || series.lat ? secao('outros', 'Outros registros', canaisExtra.map(c => c[1].toLowerCase()).concat(series.lat ? ['percurso'] : []).join(', '),
+    canaisExtra.map(([k, nome, un]) => `<h3>${nome} <span class="nota">(${un})</span></h3><div class="graf" id="g-${k}"></div>`).join('') + (series.lat ? '<h3>Percurso</h3><div class="graf" id="g-mapa"></div>' : '')) : '';
+  const subAnot = [meta.pse != null ? `PSE ${meta.pse}` : null, meta.rounds ? `${meta.rounds} rounds` : null, meta.notas ? 'com notas' : null].filter(Boolean).join(' · ');
+  const excluir = demo ? '' : `<div class="confirmar">${E.confirmarExclusao ? `<span>Excluir este treino do histórico?</span><button class="btn btn-perigo-cheio" id="excluir-sim">Excluir</button><button class="btn" id="excluir-nao">Cancelar</button>` : `<button class="btn-link btn-perigo" id="excluir">Excluir este treino</button>`}</div>`;
+  raiz.innerHTML = `${aviso}${seletor}${resumo}
+    <section class="card"><h2>Frequência cardíaca</h2><div class="graf" id="g-fc"></div></section>
+    <section class="card"><div class="card-topo"><h2>Tempo em cada zona</h2><span class="nota">carga ${fmtN(an.carga)}</span></div><div class="zonas-lista">${listaZonas}</div></section>
+    <section class="card mais">
+      ${secao('blocos', 'Blocos de esforço', nBlocos ? `${nBlocos} ${nBlocos === 1 ? 'bloco' : 'blocos'}${an.recPico ? ` · queda de ${an.recPico.queda} bpm` : ''}` : 'nenhum', blocos)}
+      ${secao('partes', 'FC por parte do treino', '', partes)}
+      ${secao('anotacoes', 'Anotações', subAnot || 'modalidade, esforço, notas', anotacoes)}
+      ${outros}
+      ${secao('arquivo', 'Dados do arquivo', [meta.formato, meta.dispositivo?.nome].filter(Boolean).join(' · '), cartaoArquivo(meta))}
+    </section>${excluir}`;
+  ligarSecoes(raiz);
+  // gráfico principal
+  const xs = series.t.map(v => v / 60);
   graficoLinha($('#g-fc'), {
-    rotulo: `Frequência cardíaca em bpm ao longo de ${fmtN(durMin)} minutos`, xMin: 0, xMax: durMin, yPad: 4, rotulosDireita: E.mostrarZonas,
-    series: [{ nome: 'FC', cor: 'var(--accent)', x: xs, y: suavizar(series.t, series.fc, E.suav), area: true, areaOp: 0.18 }],
-    faixas: E.mostrarZonas ? [1, 2, 3, 4, 5].map(z => ({ y0: Z.limites[z - 1], y1: z < 5 ? Z.limites[z] : 400, cor: corZona(z), rotulo: 'Z' + z })) : [],
-    blocos: E.mostrarBlocos ? an.blocos.map((b, i) => ({ x0: b.ini / 60, x1: b.fim / 60, rotulo: ordinal(i) })) : [],
-    marcas: [{ x: r.tFcMax / 60, y: r.fcMax, texto: `pico ${r.fcMax} bpm` }],
+    rotulo: `Frequência cardíaca em bpm ao longo de ${fmtN(durMin)} minutos`, xMin: 0, xMax: durMin, yPad: 4, rotulosDireita: true,
+    series: [{ nome: 'FC', cor: 'var(--accent)', x: xs, y: suavizar(series.t, series.fc, 10), area: true, areaOp: 0.16 }],
+    faixas: [1, 2, 3, 4, 5].map(z => ({ y0: Z.limites[z - 1], y1: z < 5 ? Z.limites[z] : 400, cor: corZona(z), rotulo: 'Z' + z, op: 0.13 })),
+    marcas: [{ x: r.tFcMax / 60, y: r.fcMax, texto: `máx. ${r.fcMax}` }],
     xTicks: pw => ticksMinutos(durMin, pw), yFmt: v => fmtN(v),
-    dica: (x, ls) => ({ titulo: fmtRelogio(x * 60), linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y)} bpm`, nome: rotZona(zonaDe(Math.round(l.y), Z.limites)) })) })
+    dica: (x, ls) => ({ titulo: fmtRelogio(x * 60), linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y)} bpm`, nome: 'Z' + zonaDe(Math.round(l.y), Z.limites) })) })
   });
-  // distribuição
-  const h = r.hist, bins = new Map();
-  h.s.forEach((v, i) => { const b = Math.floor((h.de + i) / 5) * 5; bins.set(b, (bins.get(b) || 0) + v); });
-  const bks = [...bins.keys()].sort((a, b) => a - b);
-  graficoColunas($('#g-dist'), {
-    rotulo: 'Tempo em minutos por faixa de 5 bpm', cats: bks.map(b => String(b)), camadas: [{ v: bks.map(b => bins.get(b) / 60) }],
-    corBarra: i => corZona(zonaDe(bks[i] + 2, Z.limites)), yFmt: v => fmtN(v), largRotulo: 40,
-    dica: i => ({ titulo: `${bks[i]}–${bks[i] + 4} bpm`, linhas: [{ cor: corZona(zonaDe(bks[i] + 2, Z.limites)), valor: fmtMin(bins.get(bks[i])), nome: fmtPct(bins.get(bks[i]) / (an.totalZ || 1)) }] })
-  });
-  // parciais
+  // FC por parte
   $('#c-parc').value = String(E.tamParcial);
   const pa = parciais(series, an.P, E.tamParcial);
-  const rotP = p => `${fmtN(p.ini / 60)}–${fmtN(p.fim / 60)}`;
   graficoColunas($('#g-parc'), {
-    rotulo: 'FC média e máxima por parte do treino', cats: pa.map(p => String(fmtN(p.ini / 60))), camadas: [{ v: pa.map(p => p.med) }], marcas: pa.map(p => p.max),
-    yMin: Math.max(0, Math.floor((Math.min(...pa.map(p => p.min)) - 15) / 10) * 10), corBarra: i => corZona(zonaDe(Math.round(pa[i].med), Z.limites)), yFmt: v => fmtN(v), largMax: 32, largRotulo: 34,
-    dica: i => ({ titulo: `${rotP(pa[i])} min`, linhas: [{ cor: corZona(zonaDe(Math.round(pa[i].med), Z.limites)), valor: `${fmtN(pa[i].med)} bpm`, nome: 'média' }, { valor: `${pa[i].max} bpm`, nome: 'máxima' }, { valor: `${pa[i].min} bpm`, nome: 'mínima' }] })
+    rotulo: 'FC média e máxima por parte do treino', cats: pa.map(p => fmtN(p.ini / 60)), camadas: [{ v: pa.map(p => p.med) }], marcas: pa.map(p => p.max),
+    yMin: Math.max(0, Math.floor((Math.min(...pa.map(p => p.min)) - 15) / 10) * 10), corBarra: i => corZona(zonaDe(Math.round(pa[i].med), Z.limites)), largMax: 28, largRotulo: 30,
+    dica: i => ({ titulo: `${fmtN(pa[i].ini / 60)}–${fmtN(pa[i].fim / 60)} min`, linhas: [{ cor: corZona(zonaDe(Math.round(pa[i].med), Z.limites)), valor: `${fmtN(pa[i].med)} bpm`, nome: 'média' }, { valor: `${pa[i].max} bpm`, nome: 'máxima' }, { valor: `${pa[i].min} bpm`, nome: 'mínima' }] })
   });
-  $('#tab-parc').innerHTML = `<table class="tabela"><thead><tr><th>Parte</th><th class="num">FC média</th><th class="num">FC máx.</th><th class="num">FC mín.</th><th>Zona da média</th></tr></thead><tbody>${pa.map(p => `<tr><td>${rotP(p)} min</td><td class="num">${fmtN(p.med)}</td><td class="num">${p.max}</td><td class="num">${p.min}</td><td>${esc(rotZona(zonaDe(Math.round(p.med), Z.limites)))}</td></tr>`).join('')}</tbody></table>`;
-  // outros canais
   for (const [k, nome, un, f] of canaisExtra) {
     const ys = series[k].map(v => v == null ? null : f(v));
-    graficoLinha($('#g-' + k), { rotulo: `${nome} ao longo do treino`, xMin: 0, xMax: durMin, altura: 200, series: [{ nome, cor: 'var(--s1)', x: xs, y: suavizar(series.t, ys, 10) }], xTicks: pw => ticksMinutos(durMin, pw), yFmt: v => fmtN(v), dica: (x, ls) => ({ titulo: fmtRelogio(x * 60), linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y, k === 'vel' ? 1 : 0)} ${un}`, nome })) }) });
+    graficoLinha($('#g-' + k), { rotulo: `${nome} ao longo do treino`, xMin: 0, xMax: durMin, altura: 170, series: [{ nome, cor: 'var(--s1)', x: xs, y: suavizar(series.t, ys, 10) }], xTicks: pw => ticksMinutos(durMin, pw), yFmt: v => fmtN(v), dica: (x, ls) => ({ titulo: fmtRelogio(x * 60), linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y, k === 'vel' ? 1 : 0)} ${un}`, nome })) }) });
   }
   if (series.lat) desenharMapa($('#g-mapa'), series);
   ligarSeletor();
-  $('#c-suav').addEventListener('change', e => { E.suav = +e.target.value; renderTreino(); });
-  $('#c-zonas').addEventListener('change', e => { E.mostrarZonas = e.target.checked; renderTreino(); });
-  $('#c-blocos').addEventListener('change', e => { E.mostrarBlocos = e.target.checked; renderTreino(); });
   $('#c-parc').addEventListener('change', e => { E.tamParcial = +e.target.value; renderTreino(); });
   $('#c-esf').value = E.cfg.esforco || 'z3';
   $('#c-esf').addEventListener('change', e => { E.cfg.esforco = e.target.value; salvarConfig(); renderTreino(); });
   $('#c-esf-bpm').addEventListener('change', e => { const v = +e.target.value; if (v >= 60 && v <= 230) { E.cfg.esforcoBpm = v; salvarConfig(); renderTreino(); } });
-  if (!demo) {
-    const salvar = debounce(async () => {
-      const st = $('#n-status');
-      const pse = $('#n-pse').value, rounds = $('#n-rounds').value;
-      const patch = { tipo: $('#n-tipo').value.trim() || 'Treino', titulo: $('#n-titulo').value.trim(), pse: pse === '' ? null : +pse, rounds: rounds === '' ? null : clamp(Math.round(+rounds), 0, 99), notas: $('#n-notas').value };
-      Object.assign(meta, patch);
-      try { await Armazem.atualizar(meta.id, patch); if (st) st.textContent = 'Salvo'; } catch (e) { if (st) st.textContent = 'Não foi salvo'; toast('Não consegui salvar as anotações: ' + (e.message || e.code || 'erro')); }
-      if (patch.tipo !== E.cfg.ultimoTipo) { E.cfg.ultimoTipo = patch.tipo; salvarConfig(); }
-      if (E.aba !== 'treino' || E.atual !== meta.id) return;
-      const sel = $('#t-sel'); if (sel && sel.selectedOptions[0]) sel.selectedOptions[0].textContent = rotuloTreino(meta);
-      const h1 = $('.heroi h1'), sub = $('.heroi-sub');
-      if (h1) h1.textContent = meta.tipo;
-      if (sub) sub.textContent = meta.titulo || 'Frequência cardíaca da sessão';
-    }, 700);
-    for (const id of ['n-tipo', 'n-titulo', 'n-pse', 'n-rounds', 'n-notas']) $('#' + id).addEventListener(id === 'n-pse' ? 'change' : 'input', () => { $('#n-status').textContent = 'Salvando…'; salvar(); });
-    $('#n-pse').addEventListener('change', () => setTimeout(() => E.aba === 'treino' && renderTreinoSeMesmo(meta.id), 900));
-    const ex = $('#excluir'); if (ex) ex.addEventListener('click', () => { E.confirmarExclusao = true; renderTreino(); });
-    const nao = $('#excluir-nao'); if (nao) nao.addEventListener('click', () => { E.confirmarExclusao = false; renderTreino(); });
-    const sim = $('#excluir-sim'); if (sim) sim.addEventListener('click', () => excluirTreino(meta.id));
-  }
+  if (demo) return;
+  const salvar = debounce(async () => {
+    const st = $('#n-status');
+    const pse = $('#n-pse').value, rounds = $('#n-rounds').value;
+    const patch = { tipo: $('#n-tipo').value.trim() || 'Treino', titulo: $('#n-titulo').value.trim(), pse: pse === '' ? null : +pse, rounds: rounds === '' ? null : clamp(Math.round(+rounds), 0, 99), notas: $('#n-notas').value };
+    Object.assign(meta, patch);
+    try { await Armazem.atualizar(meta.id, patch); if (st) st.textContent = 'Salvo.'; } catch (e) { if (st) st.textContent = 'Não foi salvo.'; toast('Não consegui salvar as anotações: ' + (e.message || e.code || 'erro')); }
+    if (patch.tipo !== E.cfg.ultimoTipo) { E.cfg.ultimoTipo = patch.tipo; salvarConfig(); }
+  }, 700);
+  for (const id of ['n-tipo', 'n-titulo', 'n-pse', 'n-rounds', 'n-notas']) $('#' + id).addEventListener(id === 'n-pse' ? 'change' : 'input', () => { $('#n-status').textContent = 'Salvando…'; salvar(); });
+  // ao sair de um campo, atualiza o resumo do topo (sem atrapalhar quem ainda está digitando)
+  for (const id of ['n-tipo', 'n-titulo', 'n-pse', 'n-rounds']) $('#' + id).addEventListener('change', () => setTimeout(() => { if (E.aba === 'treino' && E.atual === meta.id && !raiz.contains(document.activeElement?.matches?.('input,textarea') ? document.activeElement : null)) renderTreino(); }, 900));
+  const ex = $('#excluir'); if (ex) ex.addEventListener('click', () => { E.confirmarExclusao = true; renderTreino(); });
+  const nao = $('#excluir-nao'); if (nao) nao.addEventListener('click', () => { E.confirmarExclusao = false; renderTreino(); });
+  const sim = $('#excluir-sim'); if (sim) sim.addEventListener('click', () => excluirTreino(meta.id));
 }
-function renderTreinoSeMesmo(id) { if (E.atual === id && document.activeElement?.id !== 'n-notas') renderTreino(); }
-function minEntre(series, a, b) { let mn = Infinity; for (let i = 0; i < series.t.length; i++) { const x = series.t[i]; if (x > a && x < b && series.fc[i] != null && series.fc[i] < mn) mn = series.fc[i]; } return isFinite(mn) ? mn : null; }
 function ligarSeletor() {
   const sel = $('#t-sel'); if (!sel) return;
   sel.addEventListener('change', () => abrirTreino(sel.value));
@@ -1413,10 +1306,10 @@ async function excluirTreino(id) {
   E.treinos = E.treinos.filter(t => t.id !== id); E.series.delete(id);
   E.cmp = E.cmp.filter(x => x !== id); E.corCmp.delete(id);
   E.confirmarExclusao = false; E.atual = E.treinos[0]?.id || null;
-  toast('Treino excluído.'); renderTreino(); atualizarSelo();
+  toast('Treino excluído.'); renderTreino();
 }
 
-function cartaoArquivo(meta, series) {
+function cartaoArquivo(meta) {
   const r = meta.resumo, tot = meta.totais || {}, d = meta.dispositivo;
   const fim = meta.inicioMs + r.duracaoS * 1000;
   const disp = d ? [d.nome, d.versao ? `versão ${d.versao}` : null, d.produto && d.produto !== '0' ? `produto ${d.produto}` : null].filter(Boolean).join(' · ') : null;
@@ -1427,41 +1320,40 @@ function cartaoArquivo(meta, series) {
     ['Duração registrada', tot.tempoS != null ? `${fmtRelogio(tot.tempoS)} (${fmtN(tot.tempoS, 1)} s)` : fmtRelogio(r.duracaoS)],
     ['Tempo em movimento', tot.tempoAtivoS != null ? fmtRelogio(tot.tempoAtivoS) : null],
     ['Calorias (aparelho)', tot.calorias != null ? `${fmtN(tot.calorias)} kcal` : null],
-    ['Distância', tot.distanciaM != null ? `${fmtN(tot.distanciaM)} m${tot.distanciaM === 0 ? ' (o aparelho não registrou deslocamento)' : ''}` : null],
+    ['Distância', tot.distanciaM != null ? `${fmtN(tot.distanciaM)} m` : null],
     ['FC média e máx. (aparelho)', tot.fcMed != null || tot.fcMax != null ? `${tot.fcMed ?? '–'} / ${tot.fcMax ?? '–'} bpm` : null],
+    ['FC mediana e mínima', `${r.fcMediana} / ${r.fcMin} bpm`],
     ['Velocidade média e máx.', tot.velMed != null || tot.velMax != null ? `${fmtN((tot.velMed || 0) * 3.6, 1)} / ${fmtN((tot.velMax || 0) * 3.6, 1)} km/h` : null],
-    ['Subida e descida', tot.subidaM != null ? `${fmtN(tot.subidaM)} m / ${fmtN(tot.descidaM)} m` : r.canais.alt ? `${fmtN(r.canais.alt.subida)} m / ${fmtN(r.canais.alt.descida)} m (calculado)` : null],
-    ['Registros', `${fmtN(r.nRegistros)} pontos · intervalo típico de ${fmtN(r.intervaloS)} s (de ${fmtN(r.intervaloMinS)} a ${fmtN(r.intervaloMaxS)} s)`],
-    ['Trechos sem registro', r.nPausas ? `${r.nPausas} (${fmtDur(r.semRegistroS)} no total)` : 'nenhum intervalo longo sem registro'],
+    ['Subida e descida', tot.subidaM != null ? `${fmtN(tot.subidaM)} / ${fmtN(tot.descidaM)} m` : r.canais.alt ? `${fmtN(r.canais.alt.subida)} / ${fmtN(r.canais.alt.descida)} m (calculado)` : null],
+    ['Registros', `${fmtN(r.nRegistros)} · a cada ${fmtN(r.intervaloS)} s (de ${fmtN(r.intervaloMinS)} a ${fmtN(r.intervaloMaxS)} s)`],
+    ['Trechos sem registro', r.nPausas ? `${r.nPausas} (${fmtDur(r.semRegistroS)})` : 'nenhum'],
     ['Notas no arquivo', meta.notasArquivo]
   ].filter(([, v]) => v != null && v !== '');
-  const nomesCanal = { fc: ['Frequência cardíaca', 'bpm', 0], alt: ['Altitude', 'm', 1], dist: ['Distância acumulada', 'm', 0], vel: ['Velocidade', 'm/s', 2], cad: ['Cadência', 'rpm', 0], pot: ['Potência', 'W', 0], temp: ['Temperatura', '°C', 1] };
-  const canais = Object.entries(r.canais).filter(([k]) => nomesCanal[k]).map(([k, c]) => `<tr><td>${nomesCanal[k][0]}</td><td class="num">${fmtN(c.n)}</td><td class="num">${fmtN(c.min, nomesCanal[k][2])}</td><td class="num">${fmtN(c.media, nomesCanal[k][2])}</td><td class="num">${fmtN(c.max, nomesCanal[k][2])}</td><td>${nomesCanal[k][1]}</td></tr>`).join('') + (r.canais.gps ? `<tr><td>Posição (GPS)</td><td class="num">${fmtN(r.canais.gps.n)}</td><td class="num">–</td><td class="num">–</td><td class="num">–</td><td>lat/long</td></tr>` : '');
-  const cols = [['inicioTxt', 'Início', v => esc(String(v).replace('T', ' ').replace(/\.\d+/, ''))], ['inicioMs', 'Início', v => fmtHora(v, meta.fusoMin)], ['tempoS', 'Tempo', v => fmtRelogio(v)], ['distanciaM', 'Distância', v => `${fmtN(v)} m`], ['calorias', 'Calorias', v => `${fmtN(v)} kcal`], ['fcMed', 'FC média', v => `${v} bpm`], ['fcMax', 'FC máx.', v => `${v} bpm`], ['velMax', 'Vel. máx.', v => `${fmtN(v * 3.6, 1)} km/h`], ['cadencia', 'Cadência', v => fmtN(v)], ['potMed', 'Potência média', v => `${fmtN(v)} W`], ['intensidade', 'Intensidade', v => esc(tr[v] || v)], ['gatilho', 'Fim da volta', v => esc(tr[v] || v)], ['notas', 'Notas', v => esc(v)]]
+  const nomesCanal = { fc: ['Frequência cardíaca', 'bpm', 0], alt: ['Altitude', 'm', 1], dist: ['Distância', 'm', 0], vel: ['Velocidade', 'm/s', 2], cad: ['Cadência', 'rpm', 0], pot: ['Potência', 'W', 0], temp: ['Temperatura', '°C', 1] };
+  const canais = Object.entries(r.canais).filter(([k]) => nomesCanal[k]).map(([k, c]) => `<tr><td>${nomesCanal[k][0]} (${nomesCanal[k][1]})</td><td class="num">${fmtN(c.n)}</td><td class="num">${fmtN(c.min, nomesCanal[k][2])}</td><td class="num">${fmtN(c.media, nomesCanal[k][2])}</td><td class="num">${fmtN(c.max, nomesCanal[k][2])}</td></tr>`).join('') + (r.canais.gps ? `<tr><td>Posição (GPS)</td><td class="num">${fmtN(r.canais.gps.n)}</td><td class="num">–</td><td class="num">–</td><td class="num">–</td></tr>` : '');
+  const cols = [['inicioTxt', 'Início', v => esc(String(v).replace('T', ' ').replace(/\.\d+/, ''))], ['inicioMs', 'Início', v => fmtHora(v, meta.fusoMin)], ['tempoS', 'Tempo', v => fmtRelogio(v)], ['distanciaM', 'Distância', v => `${fmtN(v)} m`], ['calorias', 'kcal', v => fmtN(v)], ['fcMed', 'FC média', v => v], ['fcMax', 'FC máx.', v => v], ['velMax', 'Vel. máx.', v => `${fmtN(v * 3.6, 1)} km/h`], ['cadencia', 'Cadência', v => fmtN(v)], ['potMed', 'Potência', v => `${fmtN(v)} W`], ['intensidade', 'Intensidade', v => esc(tr[v] || v)], ['gatilho', 'Fim', v => esc(tr[v] || v)], ['notas', 'Notas', v => esc(v)]]
     .filter(([k]) => meta.voltas.some(v => v[k] != null));
   const extras = [...new Set(meta.voltas.flatMap(v => Object.keys(v.extras || {})))];
   const voltas = meta.voltas.length ? `<h3>Voltas (${meta.voltas.length})</h3><div class="rolagem"><table class="tabela"><thead><tr><th>Nº</th>${cols.map(c => `<th>${c[1]}</th>`).join('')}${extras.map(x => `<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>${meta.voltas.map((v, i) => `<tr><td>${i + 1}</td>${cols.map(([k, , f]) => `<td>${v[k] != null ? f(v[k]) : '–'}</td>`).join('')}${extras.map(x => `<td>${v.extras?.[x] != null ? fmtN(v.extras[x], 2) : '–'}</td>`).join('')}</tr>`).join('')}</tbody></table></div>` : '';
-  return `<section class="card"><div class="card-topo"><div><p class="sobretitulo">Tudo o que veio no arquivo</p><h2>Dados do arquivo</h2></div></div>
-    <dl class="dl">${linhas.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>
-    ${voltas}
-    <h3>Canais registrados</h3><div class="rolagem"><table class="tabela"><thead><tr><th>Canal</th><th class="num">Registros</th><th class="num">Mín.</th><th class="num">Média</th><th class="num">Máx.</th><th>Unidade</th></tr></thead><tbody>${canais}</tbody></table></div></section>`;
+  return `<dl class="dl">${linhas.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>${voltas}
+    <h3>Canais registrados</h3><div class="rolagem"><table class="tabela"><thead><tr><th>Canal</th><th class="num">Registros</th><th class="num">Mín.</th><th class="num">Média</th><th class="num">Máx.</th></tr></thead><tbody>${canais}</tbody></table></div>`;
 }
 
 function desenharMapa(el, series) {
   montar(el, () => {
-    const W = Math.max(240, el.clientWidth || 400), H = Math.round(W * 0.7); el._w = el.clientWidth;
+    const W = Math.max(240, el.clientWidth || 400), H = Math.round(W * 0.65); el._w = el.clientWidth;
     const la = series.lat, lo = series.lon, pts = [];
     for (let i = 0; i < la.length; i++) if (la[i] != null && lo[i] != null) pts.push([lo[i], la[i]]);
     if (pts.length < 2) { el.innerHTML = '<p class="nota">Sem pontos de GPS suficientes.</p>'; return; }
     const lats = pts.map(p => p[1]), lons = pts.map(p => p[0]);
     const k = Math.cos((Math.min(...lats) + Math.max(...lats)) / 2 * Math.PI / 180);
     const x0 = Math.min(...lons), x1 = Math.max(...lons), y0 = Math.min(...lats), y1 = Math.max(...lats);
-    const sx = (x1 - x0) * k || 1e-6, sy = (y1 - y0) || 1e-6, esc_ = Math.min((W - 24) / sx, (H - 24) / sy);
-    const ox = (W - sx * esc_) / 2, oy = (H - sy * esc_) / 2;
-    const P = ([x, y]) => [ox + (x - x0) * k * esc_, H - oy - (y - y0) * esc_];
+    const sx = (x1 - x0) * k || 1e-6, sy = (y1 - y0) || 1e-6, e = Math.min((W - 24) / sx, (H - 24) / sy);
+    const ox = (W - sx * e) / 2, oy = (H - sy * e) / 2;
+    const P = ([x, y]) => [ox + (x - x0) * k * e, H - oy - (y - y0) * e];
     const d = pts.map((p, i) => (i ? 'L' : 'M') + P(p).map(v => v.toFixed(1)).join(' ')).join('');
     const [ax, ay] = P(pts[0]), [bx, by] = P(pts[pts.length - 1]);
-    el.innerHTML = `<svg class="svg-graf" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Percurso registrado pelo GPS"><rect width="${W}" height="${H}" rx="12" style="fill:var(--surface-2)"/><path d="${d}" style="fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round"/><circle cx="${ax}" cy="${ay}" r="5" style="fill:var(--good);stroke:var(--surface);stroke-width:2"/><circle cx="${bx}" cy="${by}" r="5" style="fill:var(--ink);stroke:var(--surface);stroke-width:2"/></svg><p class="nota">Ponto verde: início · ponto escuro: fim.</p>`;
+    el.innerHTML = `<svg class="svg-graf" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Percurso registrado pelo GPS"><rect width="${W}" height="${H}" rx="10" style="fill:var(--surface-2)"/><path d="${d}" style="fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round"/><circle cx="${ax}" cy="${ay}" r="5" style="fill:var(--good);stroke:var(--surface);stroke-width:2"/><circle cx="${bx}" cy="${by}" r="5" style="fill:var(--ink);stroke:var(--surface);stroke-width:2"/></svg><p class="nota">Verde: início · escuro: fim.</p>`;
   });
 }
 
@@ -1470,81 +1362,70 @@ function treinosFiltrados() {
   const dias = E.periodo === 'tudo' ? null : +E.periodo, corte = dias ? Date.now() - dias * 86400000 : -Infinity;
   return E.treinos.filter(t => t.inicioMs >= corte && (!E.filtroTipo || t.tipo === E.filtroTipo));
 }
-function vazioHistorico(titulo) {
-  return `<section class="card vazio"><p class="sobretitulo">Histórico</p><h2>${esc(titulo)}</h2><p class="texto">Importe o arquivo do treino exportado do relógio ou do app (TCX, FIT, GPX ou CSV). Cada treino importado fica guardado aqui, e você pode comparar a frequência cardíaca e o tempo em cada zona entre eles.</p><div class="botoes"><label class="btn btn-acento" for="arquivo">Importar treino</label></div></section>`;
+function vazio(titulo) {
+  return `<section class="card"><h2>${esc(titulo)}</h2><p class="texto">Importe o arquivo do treino exportado do relógio ou do app (TCX, FIT, GPX ou CSV). Cada treino fica guardado no histórico para comparar.</p><div class="botoes"><label class="btn btn-acento" for="arquivo">+ Importar treino</label></div></section>`;
+}
+function avisoBackup() {
+  if (!Armazem || Armazem.tipo === 'nuvem' || !E.treinos.length) return '';
+  const ult = E.cfg.ultimoBackup || 0;
+  const novos = E.treinos.filter(t => (Date.parse(t.importadoEm) || 0) > ult).length;
+  if (!novos || (ult && Date.now() - ult < 7 * 86400000)) return '';
+  return `<div class="aviso"><span>${novos === 1 ? '1 treino ainda não está' : `${novos} treinos ainda não estão`} no backup.</span><button class="btn-link" data-backup>Fazer backup</button></div>`;
 }
 function renderHistorico() {
   const raiz = $('#aba-historico');
-  if (!E.treinos.length) { raiz.innerHTML = vazioHistorico('Seu histórico ainda está vazio'); return; }
+  if (!E.treinos.length) { raiz.innerHTML = vazio('Seu histórico está vazio'); return; }
   const Z = zonasAtuais(), lista = treinosFiltrados();
   const tipos = [...new Set(E.treinos.map(t => t.tipo))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
-  const filtros = `<div class="controles">
-    <label class="campo"><span>Período</span><select id="h-per"><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="365">Últimos 12 meses</option><option value="tudo">Tudo</option></select></label>
-    <label class="campo"><span>Modalidade</span><select id="h-tipo"><option value="">Todas</option>${tipos.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('')}</select></label></div>`;
+  const filtros = `<div class="filtros"><select id="h-per" aria-label="Período"><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="365">Últimos 12 meses</option><option value="tudo">Todo o histórico</option></select>
+    ${tipos.length > 1 ? `<select id="h-tipo" aria-label="Modalidade"><option value="">Todas</option>${tipos.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('')}</select>` : ''}</div>`;
   if (!lista.length) {
-    raiz.innerHTML = filtros + `<section class="card vazio"><h2>Nenhum treino nesse período</h2><p class="texto">O treino mais recente é de ${esc(fmtData(E.treinos[0].inicioMs, E.treinos[0].fusoMin))}. Escolha um período maior ou outra modalidade.</p></section>`;
+    raiz.innerHTML = avisoBackup() + filtros + `<section class="card"><h2>Nenhum treino nesse período</h2><p class="texto">O mais recente é de ${esc(fmtData(E.treinos[0].inicioMs, E.treinos[0].fusoMin))}.</p></section>`;
     ligarFiltros(); return;
   }
-  const dados = lista.map(t => { const zt = temposZona(t.resumo.hist, Z.limites), total = zt.reduce((a, b) => a + b, 0); return { t, zt, total, alta: zt[4] + zt[5], carga: cargaZonas(zt) }; });
+  const dados = lista.map(t => { const zt = temposZona(t.resumo.hist, Z.limites), total = zt.reduce((a, b) => a + b, 0); return { t, zt, total, alta: zt[4] + zt[5] }; });
   const soma = f => dados.reduce((a, d) => a + (f(d) || 0), 0);
-  const tempo = soma(d => d.t.resumo.duracaoS), kcalN = dados.filter(d => d.t.totais?.calorias != null).length;
   const fcMedia = soma(d => d.t.resumo.fcMed * d.t.resumo.tempoFcS) / (soma(d => d.t.resumo.tempoFcS) || 1);
-  const kpis = [kpi('Treinos', fmtN(lista.length), lista.length === 1 ? 'treino' : 'treinos', `desde ${fmtData(lista[lista.length - 1].inicioMs, lista[lista.length - 1].fusoMin)}`),
-    kpi('Tempo total', ...durKpi(tempo), `média de ${fmtDur(tempo / lista.length)} por treino`),
-    kcalN ? kpi('Gasto estimado', fmtN(soma(d => d.t.totais?.calorias)), 'kcal', `em ${kcalN} ${kcalN === 1 ? 'treino' : 'treinos'}`) : '',
-    kpi('Em Z4–Z5', ...durKpi(soma(d => d.alta)), fmtPct(soma(d => d.alta) / (soma(d => d.total) || 1)) + ' do tempo'),
-    kpi('FC média', fmtN(fcMedia), 'bpm', `maior FC: ${Math.max(...lista.map(t => t.resumo.fcMax))} bpm`, true),
-    kpi('Carga por zonas', fmtN(soma(d => d.carga)), 'pontos', `média de ${fmtN(soma(d => d.carga) / lista.length)} por treino`)].join('');
   const marcados = E.cmp.length;
-  raiz.innerHTML = `${filtros}<div class="kpis">${kpis}</div>
-    <section class="card"><div class="card-topo"><div><p class="sobretitulo">Evolução</p><h2>FC média e máxima por treino</h2></div>
-      <div class="legenda"><span><i class="lk" style="background:var(--s1)"></i>FC média</span><span><i class="lk" style="background:var(--s2)"></i>FC máxima</span></div></div>
-      <div class="graf" id="g-evol"></div><p class="nota">Toque em um ponto para ver o treino. ${lista.length < 2 ? 'Importe mais treinos para ver a evolução.' : ''}</p></section>
-    <section class="card"><div class="card-topo"><div><p class="sobretitulo">Intensidade</p><h2>Tempo em cada zona por treino</h2></div>
-      <div class="alternar" role="group" aria-label="Unidade"><button data-modo-hist="min" aria-pressed="${E.modoHist === 'min'}">Minutos</button><button data-modo-hist="pct" aria-pressed="${E.modoHist === 'pct'}">%</button></div></div>
-      ${legendaZonas(Z)}${linhasPilhas(dados.slice(0, 40).map(d => ({ id: d.t.id, rotulo: d.t.tipo, sub: `${fmtData(d.t.inicioMs, d.t.fusoMin)} · FC média ${fmtN(d.t.resumo.fcMed)}`, zt: d.zt, total: d.total, alta: d.alta })), E.modoHist)}
-      ${dados.length > 40 ? '<p class="nota">Mostrando os 40 treinos mais recentes do período.</p>' : ''}</section>
-    <section class="card"><div class="card-topo"><div><p class="sobretitulo">Volume</p><h2>Tempo de treino por semana</h2></div></div><div class="graf" id="g-sem"></div><p class="nota">Minutos por semana (segunda a domingo), divididos por zona.</p>${legendaZonas(Z)}</section>
-    <section class="card"><div class="barra-comparar"><div><p class="sobretitulo">Todos os treinos</p><h2>Lista de treinos</h2></div>
-      <button class="btn btn-escuro" id="h-comparar" ${marcados < 2 ? 'disabled' : ''}>Comparar selecionados (${marcados})</button></div>
-      <p class="nota">Marque 2 a ${MAX_CMP} treinos para comparar.</p>
-      <ul class="lista-treinos">${dados.map(d => `<li class="lt"><input type="checkbox" data-cmp="${esc(d.t.id)}" ${E.cmp.includes(d.t.id) ? 'checked' : ''} aria-label="Comparar ${esc(rotuloTreino(d.t))}">
-        <button class="lt-abrir" data-abrir="${esc(d.t.id)}"><span><span class="lt-tipo">${esc(d.t.tipo)}</span><span class="lt-data">${esc(fmtData(d.t.inicioMs, d.t.fusoMin))} · ${esc(fmtHora(d.t.inicioMs, d.t.fusoMin))}</span></span>
-        <span class="pilha" aria-hidden="true">${pilhaZonas(d.zt, d.total, d.t.tipo)}</span>
-        <span class="lt-metr">${esc(fmtDur(d.t.resumo.duracaoS))} · média ${fmtN(d.t.resumo.fcMed)} · máx. ${d.t.resumo.fcMax} bpm${d.t.totais?.calorias != null ? ` · ${fmtN(d.t.totais.calorias)} kcal` : ''}${d.t.pse != null ? ` · PSE ${d.t.pse}` : ''}</span></button></li>`).join('')}</ul></section>`;
-  ligarFiltros();
-  // evolução
+  raiz.innerHTML = `${avisoBackup()}${filtros}
+    <section class="card"><div class="stats">${stat(fmtN(lista.length), lista.length === 1 ? 'treino' : 'treinos')}${stat(durCurta(soma(d => d.t.resumo.duracaoS)), 'tempo total')}${stat(fmtN(fcMedia), 'FC média')}${stat(durCurta(soma(d => d.alta)), 'em Z4–Z5')}</div></section>
+    <section class="card"><div class="card-topo"><h2>FC por treino</h2><div class="legenda"><span><i class="lk" style="background:var(--s1)"></i>média</span><span><i class="lk" style="background:var(--s2)"></i>máxima</span></div></div><div class="graf" id="g-evol"></div></section>
+    <section class="card"><div class="card-topo"><h2>Treinos</h2><button class="btn" id="h-comparar" ${marcados < 2 ? 'disabled' : ''}>Comparar (${marcados})</button></div>
+      <ul class="lista-treinos">${dados.map(d => `<li class="lt"><input type="checkbox" data-cmp="${esc(d.t.id)}" ${E.cmp.includes(d.t.id) ? 'checked' : ''} aria-label="Marcar para comparar: ${esc(rotuloTreino(d.t))}">
+        <button class="lt-abrir" data-abrir="${esc(d.t.id)}"><span class="lt-l1"><span class="lt-tipo">${esc(d.t.tipo)}</span><span class="lt-data">${esc(fmtDataCurta(d.t.inicioMs, d.t.fusoMin))} · ${esc(fmtHora(d.t.inicioMs, d.t.fusoMin))}</span></span>
+        <span class="lt-metr">${esc(durCurta(d.t.resumo.duracaoS))} · média ${fmtN(d.t.resumo.fcMed)} · máx. ${d.t.resumo.fcMax}${d.t.totais?.calorias != null ? ` · ${fmtN(d.t.totais.calorias)} kcal` : ''}</span>
+        <span class="pilha" aria-hidden="true">${pilhaZonas(d.zt, d.total, d.t.tipo)}</span></button></li>`).join('')}</ul></section>
+    <section class="card mais">${secao('semanas', 'Tempo por semana', 'por zona', `<div class="graf" id="g-sem"></div>${legendaZonas(Z)}`)}</section>`;
+  ligarFiltros(); ligarSecoes(raiz);
   const cron = lista.slice().reverse(), xsE = cron.map(t => t.inicioMs);
   const umDia = 86400000, xMin = xsE.length > 1 ? xsE[0] : xsE[0] - 3 * umDia, xMax = xsE.length > 1 ? xsE[xsE.length - 1] : xsE[0] + 3 * umDia;
   const folga = (xMax - xMin) * 0.04;
   graficoLinha($('#g-evol'), {
-    rotulo: 'FC média e máxima de cada treino ao longo do tempo', xMin: xMin - folga, xMax: xMax + folga, yPad: 6, altura: 260,
-    series: [{ nome: 'FC média', cor: 'var(--s1)', x: xsE, y: cron.map(t => Math.round(t.resumo.fcMed)), pontos: true }, { nome: 'FC máxima', cor: 'var(--s2)', x: xsE, y: cron.map(t => t.resumo.fcMax), pontos: true }],
-    xTicks: pw => { const n = Math.max(2, Math.min(cron.length, Math.floor(pw / 90))); const out = []; for (let i = 0; i < n; i++) { const v = n === 1 ? xsE[0] : xMin + (xMax - xMin) * i / (n - 1); out.push({ v, rotulo: fmtDataCurta(v, fusoLocal(v)) }); } return cron.length === 1 ? [{ v: xsE[0], rotulo: fmtDataCurta(xsE[0], cron[0].fusoMin) }] : out; },
-    dica: (x, ls) => { const t = cron[ls[0]?.i ?? 0]; return { titulo: `${fmtData(t.inicioMs, t.fusoMin)} · ${t.tipo}`, linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y)} bpm`, nome: l.nome })) }; },
+    rotulo: 'FC média e máxima de cada treino ao longo do tempo', xMin: xMin - folga, xMax: xMax + folga, yPad: 6, altura: 170,
+    series: [{ nome: 'média', cor: 'var(--s1)', x: xsE, y: cron.map(t => Math.round(t.resumo.fcMed)), pontos: true }, { nome: 'máxima', cor: 'var(--s2)', x: xsE, y: cron.map(t => t.resumo.fcMax), pontos: true }],
+    xTicks: pw => { if (cron.length === 1) return [{ v: xsE[0], rotulo: fmtDataCurta(xsE[0], cron[0].fusoMin) }]; const n = Math.max(2, Math.min(cron.length, Math.floor(pw / 80))); const out = []; for (let i = 0; i < n; i++) { const v = xMin + (xMax - xMin) * i / (n - 1); out.push({ v, rotulo: fmtDataCurta(v, fusoLocal(v)) }); } return out; },
+    dica: (x, ls) => { const t = cron[ls[0]?.i ?? 0]; return { titulo: `${fmtDataCurta(t.inicioMs, t.fusoMin)} · ${t.tipo}`, linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y)} bpm`, nome: l.nome })) }; },
     aoClicar: x => { const i = maisProximo(xsE, x); if (i >= 0) abrirTreino(cron[i].id); }
   });
-  // semanas
   const semanas = new Map();
   const inicioSemana = (ms, fuso) => { const d = parede(ms, fuso); const dia = (d.getUTCDay() + 6) % 7; return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - dia); };
   for (const d of dados) { const k = inicioSemana(d.t.inicioMs, d.t.fusoMin); const s = semanas.get(k) || { zt: [0, 0, 0, 0, 0, 0], n: 0, dur: 0 }; d.zt.forEach((v, z) => { s.zt[z] += v; }); s.n++; s.dur += d.t.resumo.duracaoS; semanas.set(k, s); }
-  const kmax = Math.max(...semanas.keys()), kmin = Math.max(Math.min(...semanas.keys()), kmax - 25 * 7 * umDia), ks = [];
+  const kmax = Math.max(...semanas.keys()), kmin = Math.max(Math.min(...semanas.keys()), kmax - 15 * 7 * umDia), ks = [];
   for (let k = kmin; k <= kmax; k += 7 * umDia) ks.push(k);
   const vaz = { zt: [0, 0, 0, 0, 0, 0], n: 0, dur: 0 };
   const rotSem = k => { const d = new Date(k); return `${p2(d.getUTCDate())}/${p2(d.getUTCMonth() + 1)}`; };
   graficoColunas($('#g-sem'), {
-    rotulo: 'Minutos de treino por semana, por zona', cats: ks.map(rotSem), camadas: [0, 1, 2, 3, 4, 5].map(z => ({ cor: corZona(z), v: ks.map(k => (semanas.get(k) || vaz).zt[z] / 60) })), yFmt: v => fmtN(v), largRotulo: 44,
-    dica: i => { const s = semanas.get(ks[i]) || vaz; return { titulo: `Semana de ${rotSem(ks[i])} · ${s.n} ${s.n === 1 ? 'treino' : 'treinos'} · ${fmtDur(s.dur)}`, linhas: [5, 4, 3, 2, 1, 0].filter(z => s.zt[z] > 0).map(z => ({ cor: corZona(z), valor: fmtMin(s.zt[z]), nome: z ? 'Z' + z : 'Abaixo da Z1' })) }; }
+    rotulo: 'Minutos de treino por semana, por zona', cats: ks.map(rotSem), camadas: [0, 1, 2, 3, 4, 5].map(z => ({ cor: corZona(z), v: ks.map(k => (semanas.get(k) || vaz).zt[z] / 60) })), yFmt: v => fmtN(v), largRotulo: 40,
+    dica: i => { const s = semanas.get(ks[i]) || vaz; return { titulo: `Semana de ${rotSem(ks[i])} · ${s.n} ${s.n === 1 ? 'treino' : 'treinos'} · ${durCurta(s.dur)}`, linhas: [5, 4, 3, 2, 1, 0].filter(z => s.zt[z] > 0).map(z => ({ cor: corZona(z), valor: fmtMin(s.zt[z]), nome: z ? 'Z' + z : 'abaixo da Z1' })) }; }
   });
-  $$('[data-modo-hist]', raiz).forEach(b => b.addEventListener('click', () => { E.modoHist = b.dataset.modoHist; renderHistorico(); }));
-  $$('[data-cmp]', raiz).forEach(c => c.addEventListener('change', () => { alternarCmp(c.dataset.cmp, c.checked); if (!c.checked || E.cmp.includes(c.dataset.cmp)) { const b = $('#h-comparar'); b.textContent = `Comparar selecionados (${E.cmp.length})`; b.disabled = E.cmp.length < 2; } else c.checked = false; }));
+  $$('[data-cmp]', raiz).forEach(c => c.addEventListener('change', () => { alternarCmp(c.dataset.cmp, c.checked); if (c.checked && !E.cmp.includes(c.dataset.cmp)) c.checked = false; const b = $('#h-comparar'); b.textContent = `Comparar (${E.cmp.length})`; b.disabled = E.cmp.length < 2; }));
   $('#h-comparar').addEventListener('click', () => mostrarAba('comparar'));
 }
 function ligarFiltros() {
   const per = $('#h-per'), tipo = $('#h-tipo');
-  per.value = E.periodo; tipo.value = E.filtroTipo;
-  per.addEventListener('change', () => { E.periodo = per.value; renderHistorico(); });
-  tipo.addEventListener('change', () => { E.filtroTipo = tipo.value; renderHistorico(); });
+  per.value = E.periodo; per.addEventListener('change', () => { E.periodo = per.value; renderHistorico(); });
+  if (tipo) { tipo.value = E.filtroTipo; tipo.addEventListener('change', () => { E.filtroTipo = tipo.value; renderHistorico(); }); }
+  else E.filtroTipo = '';
 }
 function alternarCmp(id, ligado) {
   if (ligado) {
@@ -1558,137 +1439,137 @@ function alternarCmp(id, ligado) {
 // ----- comparação -----
 async function renderComparar() {
   const raiz = $('#aba-comparar'), tok = ++E.tok;
-  if (E.treinos.length < 2) { raiz.innerHTML = vazioHistorico(E.treinos.length ? 'Importe mais um treino para comparar' : 'Seu histórico ainda está vazio'); return; }
+  if (E.treinos.length < 2) { raiz.innerHTML = vazio(E.treinos.length ? 'Importe mais um treino para comparar' : 'Seu histórico está vazio'); return; }
   E.cmp = E.cmp.filter(id => E.treinos.some(t => t.id === id));
-  if (!E.cmp.length) { const ids = E.treinos.slice(0, Math.min(3, E.treinos.length)).map(t => t.id); ids.forEach(id => alternarCmp(id, true)); }
+  if (!E.cmp.length) E.treinos.slice(0, 2).forEach(t => alternarCmp(t.id, true));
   const Z = zonasAtuais();
-  const escolha = `<section class="card"><div class="card-topo"><div><p class="sobretitulo">Escolha</p><h2>Treinos para comparar</h2></div><span class="nota">${E.cmp.length} de até ${MAX_CMP}</span></div>
-    <div class="escolha">${E.treinos.map(t => { const on = E.cmp.includes(t.id); return `<label><input type="checkbox" data-cmp="${esc(t.id)}" ${on ? 'checked' : ''}><i ${on ? `style="background:${CORES_CMP[E.corCmp.get(t.id)]};border:0"` : ''}></i><span>${esc(t.tipo)}${t.titulo ? ` · ${esc(t.titulo)}` : ''}</span><small>${esc(fmtData(t.inicioMs, t.fusoMin))}<br>${esc(fmtDur(t.resumo.duracaoS))} · média ${fmtN(t.resumo.fcMed)}</small></label>`; }).join('')}</div></section>`;
   const sel = E.cmp.map(id => E.treinos.find(t => t.id === id)).filter(Boolean);
-  if (sel.length < 2) {
-    raiz.innerHTML = escolha + `<section class="card vazio"><h2>Marque pelo menos 2 treinos</h2><p class="texto">A comparação mostra as curvas de FC sobrepostas, o tempo em cada zona e uma tabela com as métricas lado a lado.</p></section>`;
-    ligarEscolha(raiz); return;
-  }
-  raiz.innerHTML = escolha + '<section class="card"><p class="nota">Carregando os registros…</p></section>';
-  ligarEscolha(raiz);
+  const rot = t => `${fmtDataCurta(t.inicioMs, t.fusoMin)} · ${t.tipo}`;
+  const escolha = `<section class="card"><div class="chips-cmp">${sel.map(t => `<span class="chip-cmp"><i style="background:${CORES_CMP[E.corCmp.get(t.id)]}"></i>${esc(rot(t))}<button data-tirar="${esc(t.id)}" aria-label="Tirar ${esc(rot(t))} da comparação">×</button></span>`).join('')}</div></section>
+    <section class="card mais">${secao('escolher', 'Escolher treinos', `${sel.length} de até ${MAX_CMP}`, `<div class="escolha">${E.treinos.map(t => `<label><input type="checkbox" data-cmp="${esc(t.id)}" ${E.cmp.includes(t.id) ? 'checked' : ''}><span>${esc(t.tipo)}</span><small>${esc(fmtDataCurta(t.inicioMs, t.fusoMin))} · ${esc(durCurta(t.resumo.duracaoS))}</small></label>`).join('')}</div>`)}</section>`;
+  if (sel.length < 2) { raiz.innerHTML = escolha + `<section class="card"><p class="texto">Marque pelo menos 2 treinos para comparar.</p></section>`; ligarEscolha(raiz); return; }
   const series = await Promise.all(sel.map(t => obterSerie(t.id).catch(() => null)));
   if (E.aba !== 'comparar' || tok !== E.tok) return;
   const itens = sel.map((t, i) => {
     const s = series[i], zt = temposZona(t.resumo.hist, Z.limites), total = zt.reduce((a, b) => a + b, 0);
-    const an = s ? analisar(t, s, Z) : null;
-    return { t, s, zt, total, an, cor: CORES_CMP[E.corCmp.get(t.id)], rot: `${fmtDataCurta(t.inicioMs, t.fusoMin)} · ${t.tipo}` };
+    return { t, s, zt, total, an: s ? analisar(t, s, Z) : null, cor: CORES_CMP[E.corCmp.get(t.id)], rot: rot(t) };
   });
-  const legenda = `<div class="legenda">${itens.map(it => `<span><i class="lk" style="background:${it.cor}"></i>${esc(it.rot)}</span>`).join('')}</div>`;
   const durMax = Math.max(...itens.map(it => it.t.resumo.duracaoS)) / 60;
-  const linhaM = (rot, f, dif, fmt = v => fmtN(v)) => {
+  const linhaM = (nome, f, fmt = v => fmtN(v)) => {
     const vals = itens.map(f), base = vals[0];
-    return `<tr><td>${esc(rot)}</td>${vals.map((v, i) => `<td class="num">${v == null ? '–' : esc(fmt(v))}${dif && i > 0 && v != null && base != null && Math.round(v - base) !== 0 ? `<span class="dif">${v > base ? '+' : '−'}${esc(fmt(Math.abs(v - base)))}</span>` : ''}</td>`).join('')}</tr>`;
+    return `<tr><td>${esc(nome)}</td>${vals.map((v, i) => `<td class="num">${v == null ? '–' : esc(fmt(v))}${i > 0 && v != null && base != null && Math.round((v - base) * 10) !== 0 ? `<span class="dif">${v > base ? '+' : '−'}${esc(fmt(Math.abs(v - base)))}</span>` : ''}</td>`).join('')}</tr>`;
   };
-  const tabela = `<div class="rolagem"><table class="tabela"><thead><tr><th>Métrica</th>${itens.map(it => `<th class="num"><span class="sw" style="background:${it.cor}"></span>${esc(it.rot)}</th>`).join('')}</tr></thead><tbody>
-    ${linhaM('Horário', it => `${fmtHora(it.t.inicioMs, it.t.fusoMin)}`, false, v => v)}
-    ${linhaM('Duração (min)', it => it.t.resumo.duracaoS / 60, true)}
-    ${linhaM('Gasto estimado (kcal)', it => it.t.totais?.calorias ?? null, true)}
-    ${linhaM('FC média (bpm)', it => it.t.resumo.fcMed, true)}
-    ${linhaM('FC mediana (bpm)', it => it.t.resumo.fcMediana, true)}
-    ${linhaM('FC máxima (bpm)', it => it.t.resumo.fcMax, true)}
-    ${linhaM('FC mínima (bpm)', it => it.t.resumo.fcMin, true)}
-    ${linhaM('FC média em % da FC máx.', it => it.t.resumo.fcMed / Z.fcmax * 100, true, v => fmtN(v) + '%')}
-    ${[1, 2, 3, 4, 5].map(z => linhaM(`Z${z} · ${NOMES_ZONA[z]} (min)`, it => it.zt[z] / 60, true, v => fmtN(v, 1))).join('')}
-    ${linhaM('Z4 + Z5 (min)', it => (it.zt[4] + it.zt[5]) / 60, true, v => fmtN(v, 1))}
-    ${linhaM('Carga por zonas', it => cargaZonas(it.zt), true)}
-    ${linhaM('Blocos de esforço', it => it.an ? it.an.blocos.length : null, true)}
-    ${linhaM('Tempo em blocos (min)', it => it.an ? it.an.blocos.reduce((a, b) => a + b.dur, 0) / 60 : null, true, v => fmtN(v, 1))}
-    ${linhaM('Queda da FC 1 min após o pico (bpm)', it => it.an?.recPico?.queda ?? null, true)}
-    ${linhaM('PSE (0–10)', it => it.t.pse, true)}
-    ${linhaM('Carga pela PSE (UA)', it => it.t.pse != null ? it.t.pse * it.t.resumo.duracaoS / 60 : null, true)}
-    ${linhaM('Rounds', it => it.t.rounds, true)}
-    </tbody></table></div><p class="nota">Abaixo de cada valor, a diferença em relação ao primeiro treino da lista.</p>`;
-  const pilhas = linhasPilhas(itens.map(it => ({ id: it.t.id, rotulo: it.t.tipo, sub: fmtData(it.t.inicioMs, it.t.fusoMin), zt: it.zt, total: it.total, alta: it.zt[4] + it.zt[5], cor: it.cor })), E.modoCmp);
+  const tabela = `<div class="rolagem"><table class="tabela"><thead><tr><th></th>${itens.map(it => `<th class="num"><span class="sw" style="background:${it.cor}"></span>${esc(fmtDataCurta(it.t.inicioMs, it.t.fusoMin))}</th>`).join('')}</tr></thead><tbody>
+    ${linhaM('Duração (min)', it => it.t.resumo.duracaoS / 60)}
+    ${linhaM('kcal', it => it.t.totais?.calorias ?? null)}
+    ${linhaM('FC média', it => it.t.resumo.fcMed)}
+    ${linhaM('FC máxima', it => it.t.resumo.fcMax)}
+    ${[1, 2, 3, 4, 5].map(z => linhaM(`Z${z} (min)`, it => it.zt[z] / 60, v => fmtN(v, 1))).join('')}
+    ${linhaM('Carga por zonas', it => cargaZonas(it.zt))}
+    ${linhaM('Queda 1 min após o pico', it => it.an?.recPico?.queda ?? null)}
+    ${linhaM('PSE', it => it.t.pse)}
+    </tbody></table></div><p class="nota">Embaixo de cada valor, a diferença para o primeiro treino.</p>`;
   raiz.innerHTML = escolha + `
-    <section class="card"><div class="card-topo"><div><p class="sobretitulo">Frequência cardíaca</p><h2>Curvas sobrepostas</h2></div>${legenda}</div><div class="graf" id="g-cmp"></div><p class="nota">Média de 30 s, contando o tempo desde o início de cada treino.</p></section>
-    <section class="card"><div class="card-topo"><div><p class="sobretitulo">Intensidade</p><h2>Tempo em cada zona</h2></div>
-      <div class="alternar" role="group" aria-label="Unidade"><button data-modo-cmp="min" aria-pressed="${E.modoCmp === 'min'}">Minutos</button><button data-modo-cmp="pct" aria-pressed="${E.modoCmp === 'pct'}">%</button></div></div>
-      ${legendaZonas(Z)}${pilhas}</section>
-    <section class="card"><div class="card-topo"><div><p class="sobretitulo">Lado a lado</p><h2>Métricas</h2></div></div>${tabela}</section>`;
+    <section class="card"><h2>Frequência cardíaca</h2><div class="graf" id="g-cmp"></div><p class="nota">Média de 30 s, contando desde o início de cada treino.</p></section>
+    <section class="card"><div class="card-topo"><h2>Tempo em cada zona</h2>
+      <div class="alternar" role="group" aria-label="Unidade"><button data-modo-cmp="min" aria-pressed="${E.modoCmp === 'min'}">min</button><button data-modo-cmp="pct" aria-pressed="${E.modoCmp === 'pct'}">%</button></div></div>
+      ${linhasPilhas(itens.map(it => ({ id: it.t.id, rotulo: it.t.tipo, sub: fmtDataCurta(it.t.inicioMs, it.t.fusoMin), zt: it.zt, total: it.total, alta: it.zt[4] + it.zt[5], cor: it.cor })), E.modoCmp)}${legendaZonas(Z)}</section>
+    <section class="card"><h2>Lado a lado</h2>${tabela}</section>`;
   ligarEscolha(raiz);
-  const comS = itens.filter(it => it.s);
   graficoLinha($('#g-cmp'), {
-    rotulo: 'Frequência cardíaca dos treinos selecionados, sobrepostas desde o início', xMin: 0, xMax: durMax, yPad: 4, toleranciaX: 1.5,
-    series: comS.map(it => ({ nome: it.rot, cor: it.cor, x: it.s.t.map(v => v / 60), y: suavizar(it.s.t, it.s.fc, 30) })),
-    xTicks: pw => ticksMinutos(durMax, pw), dica: (x, ls) => ({ titulo: `${fmtRelogio(x * 60)} do treino`, linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y)} bpm`, nome: l.nome })) })
+    rotulo: 'Frequência cardíaca dos treinos selecionados, desde o início', xMin: 0, xMax: durMax, yPad: 4, toleranciaX: 1.5,
+    series: itens.filter(it => it.s).map(it => ({ nome: it.rot, cor: it.cor, x: it.s.t.map(v => v / 60), y: suavizar(it.s.t, it.s.fc, 30) })),
+    xTicks: pw => ticksMinutos(durMax, pw), dica: (x, ls) => ({ titulo: fmtRelogio(x * 60), linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y)} bpm`, nome: l.nome })) })
   });
   $$('[data-modo-cmp]', raiz).forEach(b => b.addEventListener('click', () => { E.modoCmp = b.dataset.modoCmp; renderComparar(); }));
 }
 function ligarEscolha(raiz) {
+  ligarSecoes(raiz);
   $$('.escolha [data-cmp]', raiz).forEach(c => c.addEventListener('change', () => { alternarCmp(c.dataset.cmp, c.checked); renderComparar(); }));
+  $$('[data-tirar]', raiz).forEach(b => b.addEventListener('click', () => { alternarCmp(b.dataset.tirar, false); renderComparar(); }));
 }
 
-// ----- zonas -----
-function renderZonas() {
-  const raiz = $('#aba-zonas'), c = E.cfg, Z = zonasAtuais(), obs = fcMaxObservada();
+// ----- ajustes: zonas, backup e instalação -----
+function textoFcmax(Z) {
+  return Z.origem === 'definida' ? `Usando FC máxima de ${Z.fcmax} bpm, informada por você.` : Z.origem === 'idade' ? `Usando ${Z.fcmax} bpm, estimada pela idade (208 − 0,7 × ${E.cfg.idade}).` : `Usando ${Z.fcmax} bpm, a maior FC registrada (provisório).`;
+}
+function renderAjustes() {
+  const raiz = $('#aba-ajustes'), c = E.cfg, Z = zonasAtuais(), obs = fcMaxObservada();
   const metodo = c.metodo === 'manual' ? 'manual' : c.metodo === 'reserva' ? 'reserva' : 'fcmax';
-  const info = Z.origem === 'definida' ? `Usando FC máxima de ${Z.fcmax} bpm, informada por você.` : Z.origem === 'idade' ? `Usando FC máxima de ${Z.fcmax} bpm, estimada pela idade (208 − 0,7 × ${c.idade}).` : `Usando ${Z.fcmax} bpm, a maior FC registrada nos seus treinos. É um valor provisório: informe sua FC máxima ou sua idade.`;
-  raiz.innerHTML = `<section class="card"><div class="card-topo"><div><p class="sobretitulo">Suas zonas</p><h2>Zonas de frequência cardíaca</h2></div><span class="nota" id="z-status"></span></div>
-    <p class="texto">As zonas valem para todos os treinos do histórico: ao mudar aqui, o tempo em cada zona, a carga e as comparações são recalculados.</p>
+  const n = E.treinos.length, ult = c.ultimoBackup;
+  const onde = Armazem?.tipo === 'nuvem' ? 'na sua conta do Claude' : Armazem?.tipo === 'local' ? 'neste aparelho' : 'só até fechar a página';
+  raiz.innerHTML = `<section class="card"><div class="card-topo"><h2>Zonas de frequência cardíaca</h2><span class="nota" id="z-status"></span></div>
     <div class="form-grade">
       <label class="campo"><span>Idade</span><input type="number" id="z-idade" min="10" max="100" inputmode="numeric" value="${c.idade ?? ''}" placeholder="anos"></label>
-      <label class="campo"><span>FC máxima (bpm)</span><input type="number" id="z-fcmax" min="120" max="230" inputmode="numeric" value="${c.fcmax ?? ''}" placeholder="${Z.fcmax}"></label>
-      <label class="campo"><span>FC de repouso (bpm)</span><input type="number" id="z-fcrep" min="30" max="110" inputmode="numeric" value="${c.fcrep ?? ''}" placeholder="opcional"></label>
+      <label class="campo"><span>FC máxima</span><input type="number" id="z-fcmax" min="120" max="230" inputmode="numeric" value="${c.fcmax ?? ''}" placeholder="${Z.fcmax}"></label>
+      <label class="campo"><span>FC repouso</span><input type="number" id="z-fcrep" min="30" max="110" inputmode="numeric" value="${c.fcrep ?? ''}" placeholder="opcional"></label>
     </div>
-    <p class="nota" id="z-info">${esc(info)}</p>
-    ${obs ? `<div class="botoes"><button class="btn btn-sm" id="z-obs">Usar a maior FC registrada (${obs} bpm)</button></div>` : ''}
-    <fieldset class="metodo"><legend>Como calcular as zonas</legend>
-      <label><input type="radio" name="z-met" value="fcmax" ${metodo === 'fcmax' ? 'checked' : ''}>% da FC máxima</label>
-      <label><input type="radio" name="z-met" value="reserva" ${metodo === 'reserva' ? 'checked' : ''}>% da FC de reserva (Karvonen)</label>
-      <label><input type="radio" name="z-met" value="manual" ${metodo === 'manual' ? 'checked' : ''}>Limites em bpm, definidos por mim</label></fieldset>
-    ${metodo === 'reserva' && !c.fcrep ? '<p class="aviso">Para usar a FC de reserva, informe sua FC de repouso. Enquanto isso, as zonas usam % da FC máxima.</p>' : ''}
+    <p class="nota" id="z-info">${esc(textoFcmax(Z))}${obs && c.fcmax !== obs ? ` <button class="btn-link" id="z-obs">Usar ${obs} bpm</button>` : ''}</p>
+    <label class="campo"><span>Cálculo das zonas</span><select id="z-met"><option value="fcmax">% da FC máxima</option><option value="reserva">% da FC de reserva (Karvonen)</option><option value="manual">Limites em bpm, definidos por mim</option></select></label>
+    ${metodo === 'reserva' && !c.fcrep ? '<p class="aviso">Informe a FC de repouso para usar a FC de reserva. Até lá, vale o % da FC máxima.</p>' : ''}
     <div class="rolagem"><table class="tabela tz"><thead><tr><th>Zona</th><th>${metodo === 'manual' ? 'Começa em (bpm)' : 'Começa em (%)'}</th><th>Faixa</th></tr></thead><tbody>
       ${[1, 2, 3, 4, 5].map(z => `<tr><td><span class="sw-z" style="background:${corZona(z)}"></span>Z${z} · ${NOMES_ZONA[z]}</td>
         <td>${metodo === 'manual' ? `<input type="number" data-lim="${z - 1}" min="40" max="230" value="${Z.limites[z - 1]}" aria-label="Início da Z${z} em bpm">` : `<input type="number" data-pct="${z - 1}" min="30" max="100" value="${Z.pcts[z - 1]}" aria-label="Início da Z${z} em %">`}</td>
         <td data-faixa="${z}">${esc(faixaZona(z, Z.limites))}</td></tr>`).join('')}
     </tbody></table></div>
-    <div class="botoes"><button class="btn btn-sm" id="z-padrao">Voltar ao padrão (50, 60, 70, 80 e 90%)</button></div></section>
+    <div><button class="btn-link" id="z-padrao">Voltar ao padrão (50, 60, 70, 80 e 90%)</button></div></section>
+    <section class="card"><div class="card-topo"><h2>Backup</h2><span class="nota">${ult ? `último: ${esc(fmtData(ult))}` : 'nenhum feito ainda'}</span></div>
+      <p class="texto">${n ? `${n} ${n === 1 ? 'treino guardado' : 'treinos guardados'} ${onde}.` : 'Nenhum treino guardado ainda.'} O backup é um arquivo .json com todos os treinos, anotações e zonas. Guarde no Drive ou no computador para não perder o histórico.</p>
+      <div class="botoes"><button class="btn btn-acento" data-backup ${n ? '' : 'disabled'}>Fazer backup</button>${podeCompartilhar() && n ? '<button class="btn" data-backup-enviar>Enviar…</button>' : ''}<label class="btn" for="restaurar">Restaurar backup</label></div>
+      <p class="nota">Restaurar junta os treinos do arquivo aos que já estão aqui, sem duplicar.</p>
+      ${n ? `<div class="confirmar">${E.confirmarApagar ? `<span>Apagar os ${n} treinos? Isso não pode ser desfeito.</span><button class="btn btn-perigo-cheio" id="b-apagar-sim">Apagar tudo</button><button class="btn" id="b-apagar-nao">Cancelar</button>` : '<button class="btn-link btn-perigo" id="b-apagar">Apagar todos os treinos</button>'}</div>` : ''}</section>
     ${comoApp()}
-    <section class="card"><div class="card-topo"><div><p class="sobretitulo">Seus dados</p><h2>Backup do histórico</h2></div></div>
-      <p class="texto">${Armazem?.tipo === 'nuvem' ? 'Os treinos estão guardados neste app, na sua conta do Claude, e aparecem em qualquer aparelho em que você abrir este link.' : Armazem?.tipo === 'local' ? 'Os treinos estão guardados neste navegador. Se você limpar os dados do navegador ou trocar de aparelho, eles somem: exporte um backup de vez em quando.' : 'Este navegador não permite guardar dados. Os treinos ficam só até fechar a página: exporte um backup.'}</p>
-      <p class="texto">O backup é um arquivo .json com todos os treinos e as zonas. Para restaurar, use o botão Importar treino e escolha o arquivo do backup.</p>
-      <div class="botoes"><button class="btn" id="b-exportar">Exportar backup (.json)</button><label class="btn" for="arquivo">Importar backup</label></div>
-      <div class="confirmar" id="b-apagar-area">${E.treinos.length ? (E.confirmarApagar ? `<span>Apagar os ${E.treinos.length} treinos do histórico? Isso não pode ser desfeito.</span><button class="btn btn-perigo-cheio btn-sm" id="b-apagar-sim">Apagar tudo</button><button class="btn btn-sm" id="b-apagar-nao">Cancelar</button>` : '<button class="btn btn-perigo btn-sm" id="b-apagar">Apagar todos os treinos</button>') : ''}</div></section>
-    <section class="card"><div class="card-topo"><div><p class="sobretitulo">De onde vêm os cálculos</p><h2>Referências</h2></div></div>
-      <ul class="refs">
+    <section class="card mais">${secao('refs', 'De onde vêm os cálculos', '', `<ul class="refs">
         <li>FC máxima pela idade (208 − 0,7 × idade): Tanaka H, Monahan KD, Seals DR. Age-predicted maximal heart rate revisited. J Am Coll Cardiol. 2001;37(1):153-6.</li>
         <li>Zonas pela FC de reserva: Karvonen MJ, Kentala E, Mustala O. The effects of training on heart rate; a longitudinal study. Ann Med Exp Biol Fenn. 1957;35(3):307-15.</li>
         <li>Carga pela PSE da sessão: Foster C, Florhaug JA, Franklin J, et al. A new approach to monitoring exercise training. J Strength Cond Res. 2001;15(1):109-15.</li>
-        <li>Precisão de sensores de pulso: Wang R, Blackburn G, Desai M, et al. Accuracy of wrist-worn heart rate monitors. JAMA Cardiol. 2017;2(1):104-6.</li>
-      </ul>
-      <p class="nota">A estimativa pela idade tem margem de erro de vários bpm para cada pessoa; um teste de esforço dá o valor real. A carga por zonas soma os minutos de cada zona multiplicados pelo número da zona.</p></section>`;
+        <li>Precisão de sensores de pulso: Wang R, Blackburn G, Desai M, et al. Accuracy of wrist-worn heart rate monitors. JAMA Cardiol. 2017;2(1):104-6.</li></ul>
+      <p class="nota">A estimativa pela idade erra vários bpm de pessoa para pessoa; um teste de esforço dá o valor real. A carga por zonas soma os minutos de cada zona multiplicados pelo número da zona.</p>`)}</section>`;
+  ligarSecoes(raiz);
+  $('#z-met').value = metodo;
   const st = () => { const s = $('#z-status'); if (s) s.textContent = 'Salvo'; };
-  const reaplicar = () => {
-    const Zn = zonasAtuais();
-    $$('[data-faixa]', raiz).forEach(td => { td.textContent = faixaZona(+td.dataset.faixa, Zn.limites); });
-    $('#z-info').textContent = Zn.origem === 'definida' ? `Usando FC máxima de ${Zn.fcmax} bpm, informada por você.` : Zn.origem === 'idade' ? `Usando FC máxima de ${Zn.fcmax} bpm, estimada pela idade (208 − 0,7 × ${E.cfg.idade}).` : `Usando ${Zn.fcmax} bpm, a maior FC registrada nos seus treinos. É um valor provisório: informe sua FC máxima ou sua idade.`;
-    salvarConfig(); st();
-  };
+  const reaplicar = () => { const Zn = zonasAtuais(); $$('[data-faixa]', raiz).forEach(td => { td.textContent = faixaZona(+td.dataset.faixa, Zn.limites); }); salvarConfig(); st(); };
   const num = (el, a, b) => { const v = el.value === '' ? null : Math.round(+el.value); return v != null && v >= a && v <= b ? v : null; };
-  $('#z-idade').addEventListener('input', e => { E.cfg.idade = num(e.target, 10, 100); reaplicar(); });
-  $('#z-fcmax').addEventListener('input', e => { E.cfg.fcmax = num(e.target, 120, 230); reaplicar(); });
+  const atualizarInfo = () => { const i = $('#z-info'); if (i) i.firstChild.textContent = textoFcmax(zonasAtuais()); };
+  $('#z-idade').addEventListener('input', e => { E.cfg.idade = num(e.target, 10, 100); reaplicar(); atualizarInfo(); });
+  $('#z-fcmax').addEventListener('input', e => { E.cfg.fcmax = num(e.target, 120, 230); reaplicar(); atualizarInfo(); });
   $('#z-fcrep').addEventListener('input', e => { E.cfg.fcrep = num(e.target, 30, 110); reaplicar(); });
-  const obsB = $('#z-obs'); if (obsB) obsB.addEventListener('click', () => { E.cfg.fcmax = obs; salvarConfig(); renderZonas(); st(); });
-  $$('[name="z-met"]', raiz).forEach(r => r.addEventListener('change', () => {
-    if (r.value === 'manual' && !(Array.isArray(E.cfg.limites) && E.cfg.limites.length === 5)) E.cfg.limites = zonasAtuais().limites;
-    E.cfg.metodo = r.value; salvarConfig(); renderZonas(); st();
-  }));
+  const obsB = $('#z-obs'); if (obsB) obsB.addEventListener('click', () => { E.cfg.fcmax = obs; salvarConfig(); renderAjustes(); st(); });
+  $('#z-met').addEventListener('change', e => {
+    if (e.target.value === 'manual' && !(Array.isArray(E.cfg.limites) && E.cfg.limites.length === 5)) E.cfg.limites = zonasAtuais().limites;
+    E.cfg.metodo = e.target.value; salvarConfig(); renderAjustes(); st();
+  });
   $$('[data-pct]', raiz).forEach(inp => inp.addEventListener('input', () => { const v = num(inp, 30, 100); if (v == null) return; E.cfg.pcts = (E.cfg.pcts || PCTS_PADRAO).slice(); E.cfg.pcts[+inp.dataset.pct] = v; reaplicar(); }));
   $$('[data-lim]', raiz).forEach(inp => inp.addEventListener('input', () => { const v = num(inp, 40, 230); if (v == null) return; E.cfg.limites = (E.cfg.limites || zonasAtuais().limites).slice(); E.cfg.limites[+inp.dataset.lim] = v; reaplicar(); }));
-  $('#z-padrao').addEventListener('click', () => { E.cfg.pcts = PCTS_PADRAO.slice(); E.cfg.limites = null; if (E.cfg.metodo === 'manual') E.cfg.metodo = 'fcmax'; salvarConfig(); renderZonas(); st(); });
-  $('#b-exportar').addEventListener('click', exportarBackup);
-  const ap = $('#b-apagar'); if (ap) ap.addEventListener('click', () => { E.confirmarApagar = true; renderZonas(); });
-  const apN = $('#b-apagar-nao'); if (apN) apN.addEventListener('click', () => { E.confirmarApagar = false; renderZonas(); });
+  $('#z-padrao').addEventListener('click', () => { E.cfg.pcts = PCTS_PADRAO.slice(); E.cfg.limites = null; if (E.cfg.metodo === 'manual') E.cfg.metodo = 'fcmax'; salvarConfig(); renderAjustes(); st(); });
+  const ap = $('#b-apagar'); if (ap) ap.addEventListener('click', () => { E.confirmarApagar = true; renderAjustes(); });
+  const apN = $('#b-apagar-nao'); if (apN) apN.addEventListener('click', () => { E.confirmarApagar = false; renderAjustes(); });
   const apS = $('#b-apagar-sim'); if (apS) apS.addEventListener('click', async () => {
     try { for (const t of E.treinos.slice()) { await Armazem.excluir(t.id); E.treinos = E.treinos.filter(x => x.id !== t.id); } } catch (e) { toast('Parte dos treinos não foi apagada: ' + (e.message || e.code || 'erro')); }
     E.series.clear(); E.cmp = []; E.corCmp.clear(); E.atual = null; E.confirmarApagar = false;
-    toast('Histórico apagado.'); renderZonas(); atualizarSelo();
+    toast('Histórico apagado.'); renderAjustes();
   });
+}
+
+// backup: um arquivo .json com treinos, séries, anotações e zonas
+async function fazerBackup(enviar) {
+  if (!E.treinos.length) { toast('Ainda não há treinos para o backup.'); return; }
+  const treinos = [];
+  for (const m of E.treinos) treinos.push({ meta: m, series: await obterSerie(m.id) });
+  const hoje = new Date();
+  const nome = `pulso-do-treino-backup-${hoje.getFullYear()}-${p2(hoje.getMonth() + 1)}-${p2(hoje.getDate())}.json`;
+  const json = JSON.stringify({ app: 'pulso-do-treino', versao: 1, exportadoEm: hoje.toISOString(), config: E.cfg, treinos });
+  const ok = enviar ? await enviarArquivo(nome, json) : await salvarArquivo(nome, json);
+  if (!ok) return;
+  E.cfg.ultimoBackup = Date.now(); salvarConfig();
+  if (E.aba === 'ajustes') renderAjustes(); else if (E.aba === 'historico') renderHistorico();
+}
+function podeCompartilhar() {
+  try { return ehSite() && !!navigator.canShare && navigator.canShare({ files: [new File(['{}'], 'teste.json', { type: 'application/json' })] }); } catch (e) { return false; }
+}
+async function enviarArquivo(nome, conteudo) {
+  try { await navigator.share({ files: [new File([conteudo], nome, { type: 'application/json' })], title: 'Backup do Pulso do Treino' }); toast('Backup enviado.'); return true; }
+  catch (e) { if (e && e.name !== 'AbortError') toast('Não consegui enviar. Use "Fazer backup" para salvar o arquivo.'); return false; }
 }
 
 // ================= aplicativo instalável =================
@@ -1697,9 +1578,8 @@ const ehSite = () => /^https?:$/.test(location.protocol) && !!$('link[rel="manif
 const instalado = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 function comoApp() {
   if (!ehSite() || instalado()) return '';
-  return `<section class="card"><div class="card-topo"><div><p class="sobretitulo">Na tela inicial</p><h2>Usar como aplicativo</h2></div></div>
-    <p class="texto">Instale o Pulso do Treino para abrir pelo ícone, em tela cheia e mesmo sem internet. Os treinos continuam guardados neste aparelho.</p>
-    <ul class="refs" style="font-size:14px;color:var(--ink-2)"><li>Android (Chrome): menu ⋮ › <b>Instalar app</b> ou <b>Adicionar à tela inicial</b>.</li><li>iPhone (Safari): botão Compartilhar › <b>Adicionar à Tela de Início</b>.</li><li>Computador (Chrome ou Edge): ícone de instalar na barra de endereço.</li></ul>
+  return `<section class="card"><h2>Usar como aplicativo</h2>
+    <p class="texto">Instale para abrir pelo ícone, em tela cheia e sem internet. No Android: menu ⋮ › <b>Instalar app</b>. No iPhone: Compartilhar › <b>Adicionar à Tela de Início</b>.</p>
     ${pedidoInstalacao ? '<div class="botoes"><button class="btn btn-acento" data-instalar>Instalar agora</button></div>' : ''}</section>`;
 }
 async function instalar() {
@@ -1711,37 +1591,35 @@ function ligarInstalacao() {
   window.addEventListener('beforeinstallprompt', ev => { ev.preventDefault(); pedidoInstalacao = ev; $('#instalar').hidden = false; });
   window.addEventListener('appinstalled', () => { pedidoInstalacao = null; $('#instalar').hidden = true; toast('Pulso do Treino instalado. O ícone está na tela inicial.'); });
   $('#instalar').addEventListener('click', instalar);
-  document.addEventListener('click', ev => { if (ev.target.closest('[data-instalar]')) instalar(); });
   if (ehSite() && 'serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => { /* segue sem modo offline */ });
 }
 
 // ================= navegação e eventos =================
+const ABAS = ['treino', 'historico', 'comparar', 'ajustes'];
 function mostrarAba(aba) {
   E.aba = aba;
   $$('.aba').forEach(b => b.setAttribute('aria-selected', String(b.dataset.aba === aba)));
-  for (const n of ['treino', 'historico', 'comparar', 'zonas']) $('#aba-' + n).hidden = n !== aba;
+  for (const n of ABAS) $('#aba-' + n).hidden = n !== aba;
   if (E.carregando) return;
-  ({ treino: renderTreino, historico: renderHistorico, comparar: renderComparar, zonas: renderZonas })[aba]();
-}
-function atualizarSelo() {
-  const s = $('#selo'), n = E.treinos.length, tipo = Armazem?.tipo || 'carregando';
-  s.dataset.tipo = tipo;
-  const qtd = n ? `${n} ${n === 1 ? 'treino' : 'treinos'}` : 'nenhum treino';
-  s.textContent = tipo === 'nuvem' ? `${qtd} · salvo na sua conta` : tipo === 'local' ? `${qtd} · salvo neste navegador` : `${qtd} · não está sendo salvo`;
+  ({ treino: renderTreino, historico: renderHistorico, comparar: renderComparar, ajustes: renderAjustes })[aba]();
 }
 let toastId;
 function toast(msg, ms = 4500) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastId); toastId = setTimeout(() => { t.hidden = true; }, ms); }
 
 function ligarEventos() {
-  $$('.aba').forEach(b => b.addEventListener('click', () => mostrarAba(b.dataset.aba)));
+  $$('.aba').forEach(b => b.addEventListener('click', () => { mostrarAba(b.dataset.aba); window.scrollTo({ top: 0 }); }));
   $('.abas').addEventListener('keydown', ev => {
     if (ev.key !== 'ArrowRight' && ev.key !== 'ArrowLeft') return;
     const abas = $$('.aba'), i = abas.findIndex(b => b.dataset.aba === E.aba), j = (i + (ev.key === 'ArrowRight' ? 1 : -1) + abas.length) % abas.length;
     abas[j].focus(); mostrarAba(abas[j].dataset.aba);
   });
   $('#arquivo').addEventListener('change', e => { const f = e.target.files; importarArquivos(f).finally(() => { e.target.value = ''; }); });
+  $('#restaurar').addEventListener('change', e => { const f = e.target.files; importarArquivos(f).finally(() => { e.target.value = ''; if (E.aba === 'ajustes') renderAjustes(); }); });
   document.addEventListener('click', ev => {
     const ir = ev.target.closest('[data-ir]'); if (ir) { mostrarAba(ir.dataset.ir); return; }
+    if (ev.target.closest('[data-backup]')) { fazerBackup(false); return; }
+    if (ev.target.closest('[data-backup-enviar]')) { fazerBackup(true); return; }
+    if (ev.target.closest('[data-instalar]')) { instalar(); return; }
     const ab = ev.target.closest('[data-abrir]'); if (ab) abrirTreino(ab.dataset.abrir);
   });
   // arrastar e soltar
@@ -1753,7 +1631,7 @@ function ligarEventos() {
   window.addEventListener('drop', ev => { if (!temArquivo(ev)) return; ev.preventDefault(); prof = 0; soltar.hidden = true; importarArquivos(ev.dataTransfer.files); });
   // dica das barras empilhadas
   const dica = $('#dica');
-  const posicionar = ev => { const w = dica.offsetWidth, h = dica.offsetHeight; let x = ev.clientX + 14, y = ev.clientY + 14; if (x + w > innerWidth - 8) x = ev.clientX - 14 - w; if (y + h > innerHeight - 8) y = ev.clientY - 14 - h; dica.style.left = Math.max(8, x) + 'px'; dica.style.top = Math.max(8, y) + 'px'; };
+  const posicionar = ev => { const w = dica.offsetWidth, h = dica.offsetHeight; let x = ev.clientX + 12, y = ev.clientY + 12; if (x + w > innerWidth - 8) x = ev.clientX - 12 - w; if (y + h > innerHeight - 8) y = ev.clientY - 12 - h; dica.style.left = Math.max(8, x) + 'px'; dica.style.top = Math.max(8, y) + 'px'; };
   document.addEventListener('pointerover', ev => { const el = ev.target.closest?.('[data-dica]'); if (!el) return; dica.textContent = el.dataset.dica; dica.hidden = false; posicionar(ev); });
   document.addEventListener('pointermove', ev => { if (!dica.hidden && ev.target.closest?.('[data-dica]')) posicionar(ev); });
   document.addEventListener('pointerout', ev => { if (ev.target.closest?.('[data-dica]')) dica.hidden = true; });
@@ -1764,7 +1642,7 @@ async function iniciar() {
   ligarEventos();
   ligarInstalacao();
   const h = (location.hash || '').slice(1);
-  if (['historico', 'comparar', 'zonas'].includes(h)) mostrarAba(h);
+  if (h === 'zonas') mostrarAba('ajustes'); else if (ABAS.includes(h)) mostrarAba(h);
   try {
     Armazem = await escolherArmazem();
     const cfg = await Armazem.config().catch(() => null);
@@ -1777,7 +1655,6 @@ async function iniciar() {
   ordenar();
   E.atual = E.treinos[0]?.id || null;
   E.carregando = false;
-  atualizarSelo();
   mostrarAba(E.aba);
 }
 iniciar();

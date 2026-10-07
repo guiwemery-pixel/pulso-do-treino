@@ -3,9 +3,9 @@
 Aplicativo web para analisar treinos pela frequência cardíaca. Importe o arquivo exportado do relógio
 ou do app (TCX, FIT, GPX ou CSV) e veja a curva da FC, o tempo em cada zona, os blocos de esforço, a
 recuperação e todos os dados do arquivo. Cada treino fica guardado no histórico, para comparar treinos
-entre si. As zonas (Z1 a Z5) são definidas por você na aba **Zonas**.
+entre si. As zonas (Z1 a Z5) são definidas por você na aba **Ajustes**.
 
-**Endereço:** https://guiwemery-pixel.github.io/pulso-de-treino/
+**Endereço:** https://guiwemery-pixel.github.io/pulso-do-treino/
 
 ![Capa do Pulso do Treino](capa.png)
 
@@ -14,9 +14,14 @@ entre si. As zonas (Z1 a Z5) são definidas por você na aba **Zonas**.
 - **Android (Chrome):** abra o endereço, toque no menu ⋮ e em **Instalar app** (ou **Adicionar à tela inicial**).
 - **iPhone (Safari):** abra o endereço, toque em Compartilhar e em **Adicionar à Tela de Início**.
 
-Depois de instalado, o app abre pelo ícone, em tela cheia, e funciona sem internet. Os treinos ficam
-guardados no próprio aparelho (no navegador). Use **Zonas › Exportar backup** de vez em quando para ter
-uma cópia, e **Importar treino** com o arquivo do backup para restaurar ou levar para outro aparelho.
+Depois de instalado, o app abre pelo ícone, em tela cheia, e funciona sem internet.
+
+## Backup
+
+Os treinos ficam guardados no próprio aparelho (no navegador). Em **Ajustes › Backup**, **Fazer backup**
+salva um arquivo `.json` com todos os treinos, anotações e zonas (no celular, **Enviar…** manda o arquivo
+direto para o Drive, WhatsApp ou e-mail). **Restaurar backup** junta os treinos do arquivo aos que já estão
+no aparelho, sem duplicar. O app avisa no Histórico quando há treinos novos fora do backup.
 
 ## Publicação
 
