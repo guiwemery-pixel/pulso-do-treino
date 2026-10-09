@@ -133,6 +133,16 @@ h3 { font-size: 13px; font-weight: 700; }
 .resumo-topo { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
 .btn-compart { display: inline-flex; align-items: center; gap: 6px; flex: none; border: 0; background: var(--hero-2); color: var(--hero-ink); border-radius: 999px; padding: 7px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
 .btn-compart svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.resumo-nome { flex: 1; min-width: 0; }
+.resumo-topo.editando .btn-compart { display: none; }
+@media (max-width: 420px) { .btn-compart { padding: 8px; } .btn-compart span { display: none; } .btn-compart svg { width: 18px; height: 18px; } }
+.nome-linha { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.btn-lapis { display: inline-flex; align-items: center; gap: 4px; flex: none; border: 0; background: transparent; color: var(--hero-muted); cursor: pointer; padding: 4px 6px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+.btn-lapis:hover { background: var(--hero-2); color: var(--hero-ink); }
+.btn-lapis svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.nome-in { flex: 1; min-width: 0; background: var(--hero-2) !important; color: var(--hero-ink) !important; border: 1px solid rgba(255,255,255,.22) !important; font-size: 16px !important; font-weight: 700; border-radius: 10px; padding: 6px 10px; }
+.nome-in::placeholder { color: var(--hero-muted); font-weight: 400; }
+.btn-nome-ok { flex: none; border: 0; background: var(--accent); color: var(--on-accent); border-radius: 999px; padding: 7px 12px; font-size: 12.5px; font-weight: 700; cursor: pointer; }
 .resumo h1 { font-size: 20px; font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
 .resumo h1 span { font-weight: 400; color: var(--hero-muted); }
 .resumo-sub { font-size: 12.5px; color: var(--hero-muted); margin-top: 2px; }
@@ -1289,7 +1299,8 @@ function legendaZonas(Z, comAbaixo = true) {
 }
 
 // ================= vistas =================
-function rotuloTreino(m) { return `${fmtData(m.inicioMs, m.fusoMin)} · ${m.tipo}${m.titulo ? ' · ' + m.titulo : ''}`; }
+const nomeTreino = m => m.titulo || m.tipo || 'Treino';
+function rotuloTreino(m) { return `${fmtData(m.inicioMs, m.fusoMin)} · ${nomeTreino(m)}`; }
 const durCurta = s => { const m = Math.round((s || 0) / 60); return m < 60 ? `${m} min` : `${Math.floor(m / 60)}h${p2(m % 60)}`; };
 const stat = (valor, rot) => `<div class="stat"><b>${esc(valor)}</b><span>${esc(rot)}</span></div>`;
 // seção recolhível; lembra quais estavam abertas entre uma renderização e outra
@@ -1325,9 +1336,9 @@ async function renderTreino() {
     : Z.provisoria ? `<div class="aviso"><span>Zonas provisórias, pela maior FC registrada (${Z.fcmax} bpm).</span><button class="btn-link" data-ir="ajustes">Ajustar</button></div>` : '';
   const quarto = tot.calorias != null ? stat(fmtN(tot.calorias), 'kcal') : dist ? stat(`${fmtN(dist / 1000, 1)} km`, 'distância') : stat(fmtN(r.fcMin), 'FC mín.');
   const resumo = `<section class="resumo">
-    <div class="resumo-topo"><div><h1>${esc(meta.tipo || 'Treino')}${meta.titulo ? ` <span>· ${esc(meta.titulo)}</span>` : ''}</h1>
-    <p class="resumo-sub">${esc(fmtDiaSemana(meta.inicioMs, meta.fusoMin))}, ${esc(fmtData(meta.inicioMs, meta.fusoMin))} · ${esc(fmtHora(meta.inicioMs, meta.fusoMin))}–${esc(fmtHora(fim, meta.fusoMin))}</p></div>
-    <button class="btn-compart" id="t-compartilhar" aria-label="Compartilhar a imagem do treino"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>Compartilhar</button></div>
+    <div class="resumo-topo"><div class="resumo-nome"><div class="nome-linha" id="t-nome-linha"><h1>${esc(nomeTreino(meta))}</h1>${demo ? '' : `<button class="btn-lapis" id="t-renomear" aria-label="Dar nome ao treino"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4"/></svg>${meta.titulo ? '' : '<span>Dar nome</span>'}</button>`}</div>
+    <p class="resumo-sub">${meta.titulo ? `${esc(meta.tipo)} · ` : ''}${esc(fmtDiaSemana(meta.inicioMs, meta.fusoMin))}, ${esc(fmtData(meta.inicioMs, meta.fusoMin))} · ${esc(fmtHora(meta.inicioMs, meta.fusoMin))}–${esc(fmtHora(fim, meta.fusoMin))}</p></div>
+    <button class="btn-compart" id="t-compartilhar" aria-label="Compartilhar a imagem do treino"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg><span>Compartilhar</span></button></div>
     <div class="stats">${stat(durCurta(r.duracaoS), 'duração')}${stat(fmtN(r.fcMed), 'FC média')}${stat(fmtN(r.fcMax), 'FC máx.')}${quarto}</div></section>`;
   const zonasMax = Math.max(1, ...an.zt);
   const listaZonas = [0, 1, 2, 3, 4, 5].filter(z => z > 0 || an.zt[0] > 0).map(z => `<div class="zl">
@@ -1363,7 +1374,7 @@ async function renderTreino() {
     <div class="graf" id="g-parc"></div><p class="nota">Coluna: FC média, na cor da zona. Traço: FC máxima. O número embaixo é o minuto em que a parte começa.</p>`;
   const anotacoes = `<div class="form-grade form-2">
       <label class="campo"><span>Modalidade</span><input type="text" id="n-tipo" list="tipos" value="${esc(meta.tipo)}" ${demo ? 'disabled' : ''}></label>
-      <label class="campo"><span>Título</span><input type="text" id="n-titulo" value="${esc(meta.titulo)}" placeholder="opcional" ${demo ? 'disabled' : ''}></label>
+      <label class="campo"><span>Nome do treino</span><input type="text" id="n-titulo" maxlength="80" value="${esc(meta.titulo)}" placeholder="opcional" ${demo ? 'disabled' : ''}></label>
       <label class="campo"><span>Esforço percebido (0–10)</span><select id="n-pse" ${demo ? 'disabled' : ''}><option value="">–</option>${PSE.map((t, i) => `<option value="${i}" ${meta.pse === i ? 'selected' : ''}>${i} · ${t}</option>`).join('')}</select></label>
       <label class="campo"><span>Rounds</span><input type="number" id="n-rounds" min="0" max="99" inputmode="numeric" value="${meta.rounds ?? ''}" ${demo ? 'disabled' : ''}></label></div>
     <label class="campo"><span>Notas</span><textarea id="n-notas" placeholder="Como foi o treino" ${demo ? 'disabled' : ''}>${esc(meta.notas)}</textarea></label>
@@ -1416,6 +1427,7 @@ async function renderTreino() {
   if (series.lat) desenharMapa($('#g-mapa'), series);
   ligarSeletor();
   $('#t-compartilhar').addEventListener('click', () => abrirCartao(meta, series));
+  const ren = $('#t-renomear'); if (ren) ren.addEventListener('click', () => renomearTreino(meta));
   $('#c-parc').addEventListener('change', e => { E.tamParcial = +e.target.value; renderTreino(); });
   $('#c-picos').addEventListener('change', e => { E.cfg.mostrarPicos = e.target.checked; salvarConfig(); renderTreino(); });
   const esf = $('#c-esf');
@@ -1499,6 +1511,28 @@ function ligarTrechos(raiz, meta, series, an, trechos, W) {
   const limpar = $('#r-limpar'); if (limpar) limpar.addEventListener('click', () => { E.confirmarTrechos = true; abertos.add('picos'); renderTreino(); });
   const nao = $('#r-limpar-nao'); if (nao) nao.addEventListener('click', () => { E.confirmarTrechos = false; renderTreino(); });
   const sim = $('#r-limpar-sim'); if (sim) sim.addEventListener('click', () => { meta.momentos = []; E.confirmarTrechos = false; salvarTrechos(meta); renderTreino(); });
+}
+// dar nome ao treino direto no topo; em branco, volta a mostrar a modalidade
+function renomearTreino(meta) {
+  const linha = $('#t-nome-linha'); if (!linha) return;
+  linha.closest('.resumo-topo').classList.add('editando');
+  linha.innerHTML = `<input type="text" id="t-nome-in" class="nome-in" maxlength="80" value="${esc(meta.titulo || '')}" placeholder="Ex.: rola pesado com o João" aria-label="Nome do treino"><button class="btn-nome-ok" id="t-nome-ok">Salvar</button>`;
+  const inp = $('#t-nome-in'); inp.focus(); inp.select();
+  let feito = false;
+  const salvar = async () => {
+    if (feito) return; feito = true;
+    const titulo = inp.value.trim().slice(0, 80);
+    if (titulo !== (meta.titulo || '')) {
+      meta.titulo = titulo;
+      try { await Armazem.atualizar(meta.id, { titulo }); toast(titulo ? 'Nome salvo.' : 'Nome removido. Aparece a modalidade.'); }
+      catch (e) { toast('Não consegui salvar o nome: ' + (e.message || e.code || 'erro')); }
+    }
+    renderTreino();
+  };
+  inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); salvar(); } else if (ev.key === 'Escape') { feito = true; renderTreino(); } });
+  inp.addEventListener('blur', () => setTimeout(() => { if (!feito) salvar(); }, 150));
+  $('#t-nome-ok').addEventListener('mousedown', ev => ev.preventDefault());
+  $('#t-nome-ok').addEventListener('click', salvar);
 }
 function ligarSeletor() {
   const sel = $('#t-sel'); if (!sel) return;
@@ -1599,8 +1633,8 @@ function renderHistorico() {
     <section class="card"><div class="card-topo"><h2>FC por treino</h2><div class="legenda"><span><i class="lk" style="background:var(--s1)"></i>média</span><span><i class="lk" style="background:var(--s2)"></i>máxima</span></div></div><div class="graf" id="g-evol"></div></section>
     <section class="card"><div class="card-topo"><h2>Treinos</h2><button class="btn" id="h-comparar" ${marcados < 2 ? 'disabled' : ''}>Comparar (${marcados})</button></div>
       <ul class="lista-treinos">${dados.map(d => `<li class="lt"><input type="checkbox" data-cmp="${esc(d.t.id)}" ${E.cmp.includes(d.t.id) ? 'checked' : ''} aria-label="Marcar para comparar: ${esc(rotuloTreino(d.t))}">
-        <button class="lt-abrir" data-abrir="${esc(d.t.id)}"><span class="lt-l1"><span class="lt-tipo">${esc(d.t.tipo)}</span><span class="lt-data">${esc(fmtDataCurta(d.t.inicioMs, d.t.fusoMin))} · ${esc(fmtHora(d.t.inicioMs, d.t.fusoMin))}</span></span>
-        <span class="lt-metr">${esc(durCurta(d.t.resumo.duracaoS))} · média ${fmtN(d.t.resumo.fcMed)} · máx. ${d.t.resumo.fcMax}${d.t.totais?.calorias != null ? ` · ${fmtN(d.t.totais.calorias)} kcal` : ''}${(() => { const n = (d.t.momentos || []).filter(m => m.origem === 'rola').length, Wd = palavraTrecho(d.t.tipo); return n ? ` · ${n} ${n === 1 ? Wd.um : Wd.varios}` : ''; })()}</span>
+        <button class="lt-abrir" data-abrir="${esc(d.t.id)}"><span class="lt-l1"><span class="lt-tipo">${esc(nomeTreino(d.t))}</span><span class="lt-data">${esc(fmtDataCurta(d.t.inicioMs, d.t.fusoMin))} · ${esc(fmtHora(d.t.inicioMs, d.t.fusoMin))}</span></span>
+        <span class="lt-metr">${d.t.titulo ? `${esc(d.t.tipo)} · ` : ''}${esc(durCurta(d.t.resumo.duracaoS))} · média ${fmtN(d.t.resumo.fcMed)} · máx. ${d.t.resumo.fcMax}${d.t.totais?.calorias != null ? ` · ${fmtN(d.t.totais.calorias)} kcal` : ''}${(() => { const n = (d.t.momentos || []).filter(m => m.origem === 'rola').length, Wd = palavraTrecho(d.t.tipo); return n ? ` · ${n} ${n === 1 ? Wd.um : Wd.varios}` : ''; })()}</span>
         <span class="pilha" aria-hidden="true">${pilhaZonas(d.zt, d.total, d.t.tipo)}</span></button></li>`).join('')}</ul></section>
     <section class="card mais">${secao('semanas', 'Tempo por semana', 'por zona', `<div class="graf" id="g-sem"></div>${legendaZonas(Z)}`)}</section>`;
   ligarFiltros(); ligarSecoes(raiz);
@@ -1611,7 +1645,7 @@ function renderHistorico() {
     rotulo: 'FC média e máxima de cada treino ao longo do tempo', xMin: xMin - folga, xMax: xMax + folga, yPad: 6, altura: 170,
     series: [{ nome: 'média', cor: 'var(--s1)', x: xsE, y: cron.map(t => Math.round(t.resumo.fcMed)), pontos: true }, { nome: 'máxima', cor: 'var(--s2)', x: xsE, y: cron.map(t => t.resumo.fcMax), pontos: true }],
     xTicks: pw => { if (cron.length === 1) return [{ v: xsE[0], rotulo: fmtDataCurta(xsE[0], cron[0].fusoMin) }]; const n = Math.max(2, Math.min(cron.length, Math.floor(pw / 80))); const out = []; for (let i = 0; i < n; i++) { const v = xMin + (xMax - xMin) * i / (n - 1); out.push({ v, rotulo: fmtDataCurta(v, fusoLocal(v)) }); } return out; },
-    dica: (x, ls) => { const t = cron[ls[0]?.i ?? 0]; return { titulo: `${fmtDataCurta(t.inicioMs, t.fusoMin)} · ${t.tipo}`, linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y)} bpm`, nome: l.nome })) }; },
+    dica: (x, ls) => { const t = cron[ls[0]?.i ?? 0]; return { titulo: `${fmtDataCurta(t.inicioMs, t.fusoMin)} · ${nomeTreino(t)}`, linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y)} bpm`, nome: l.nome })) }; },
     aoClicar: x => { const i = maisProximo(xsE, x); if (i >= 0) abrirTreino(cron[i].id); }
   });
   const semanas = new Map();
@@ -1651,7 +1685,7 @@ async function renderComparar() {
   if (!E.cmp.length) E.treinos.slice(0, 2).forEach(t => alternarCmp(t.id, true));
   const Z = zonasAtuais();
   const sel = E.cmp.map(id => E.treinos.find(t => t.id === id)).filter(Boolean);
-  const rot = t => `${fmtDataCurta(t.inicioMs, t.fusoMin)} · ${t.tipo}`;
+  const rot = t => `${fmtDataCurta(t.inicioMs, t.fusoMin)} · ${nomeTreino(t)}`;
   const escolha = `<section class="card"><div class="chips-cmp">${sel.map(t => `<span class="chip-cmp"><i style="background:${CORES_CMP[E.corCmp.get(t.id)]}"></i>${esc(rot(t))}<button data-tirar="${esc(t.id)}" aria-label="Tirar ${esc(rot(t))} da comparação">×</button></span>`).join('')}</div></section>
     <section class="card mais">${secao('escolher', 'Escolher treinos', `${sel.length} de até ${MAX_CMP}`, `<div class="escolha">${E.treinos.map(t => `<label><input type="checkbox" data-cmp="${esc(t.id)}" ${E.cmp.includes(t.id) ? 'checked' : ''}><span>${esc(t.tipo)}</span><small>${esc(fmtDataCurta(t.inicioMs, t.fusoMin))} · ${esc(durCurta(t.resumo.duracaoS))}</small></label>`).join('')}</div>`)}</section>`;
   if (sel.length < 2) { raiz.innerHTML = escolha + `<section class="card"><p class="texto">Marque pelo menos 2 treinos para comparar.</p></section>`; ligarEscolha(raiz); return; }
@@ -1681,7 +1715,7 @@ async function renderComparar() {
     <section class="card"><h2>Frequência cardíaca</h2><div class="graf" id="g-cmp"></div><p class="nota">Média de 30 s, contando desde o início de cada treino.</p></section>
     <section class="card"><div class="card-topo"><h2>Tempo em cada zona</h2>
       <div class="alternar" role="group" aria-label="Unidade"><button data-modo-cmp="min" aria-pressed="${E.modoCmp === 'min'}">min</button><button data-modo-cmp="pct" aria-pressed="${E.modoCmp === 'pct'}">%</button></div></div>
-      ${linhasPilhas(itens.map(it => ({ id: it.t.id, rotulo: it.t.tipo, sub: fmtDataCurta(it.t.inicioMs, it.t.fusoMin), zt: it.zt, total: it.total, alta: it.zt[4] + it.zt[5], cor: it.cor })), E.modoCmp)}${legendaZonas(Z)}</section>
+      ${linhasPilhas(itens.map(it => ({ id: it.t.id, rotulo: nomeTreino(it.t), sub: fmtDataCurta(it.t.inicioMs, it.t.fusoMin), zt: it.zt, total: it.total, alta: it.zt[4] + it.zt[5], cor: it.cor })), E.modoCmp)}${legendaZonas(Z)}</section>
     <section class="card"><h2>Lado a lado</h2>${tabela}</section>`;
   ligarEscolha(raiz);
   graficoLinha($('#g-cmp'), {
@@ -1862,11 +1896,11 @@ async function desenharCartao(cv, meta, series) {
 
   // título e data
   const fim = meta.inicioMs + r.duracaoS * 1000;
-  escrever(ctx, meta.tipo || 'Treino', pad, y + 92, W - 2 * pad, 96, 700, P.tinta);
+  escrever(ctx, nomeTreino(meta), pad, y + 92, W - 2 * pad, 96, 700, P.tinta);
   const Wt = palavraTrecho(meta.tipo), mom = Array.isArray(meta.momentos) ? meta.momentos : [];
   const rolas = mom.filter(m => m.origem === 'rola'), d0 = rolas.length ? rolas[0].fim - rolas[0].ini : 0;
   const resumoRolas = rolas.length ? ` · ${rolas.length} ${rolas.length === 1 ? Wt.um : Wt.varios}${rolas.every(m => m.fim - m.ini === d0) ? ` de ${durTexto(d0)}` : ''}` : '';
-  const sub = `${meta.titulo ? meta.titulo + ' · ' : ''}${fmtDiaSemana(meta.inicioMs, meta.fusoMin)}, ${fmtData(meta.inicioMs, meta.fusoMin)} · ${fmtHora(meta.inicioMs, meta.fusoMin)}${resumoRolas || `–${fmtHora(fim, meta.fusoMin)}`}`;
+  const sub = `${meta.titulo ? meta.tipo + ' · ' : ''}${fmtDiaSemana(meta.inicioMs, meta.fusoMin)}, ${fmtData(meta.inicioMs, meta.fusoMin)} · ${fmtHora(meta.inicioMs, meta.fusoMin)}${resumoRolas || `–${fmtHora(fim, meta.fusoMin)}`}`;
   escrever(ctx, sub, pad, y + 142, W - 2 * pad, 34, 400, P.suave);
   y += blocos[2] + blocos[3];
 
@@ -2019,7 +2053,7 @@ function abrirCartao(meta, series) {
   const btE = $('#cartao-enviar');
   if (btE) btE.addEventListener('click', async () => {
     const { blob, ext, tipo } = await gerar();
-    try { await navigator.share({ files: [new File([blob], nomeArq(ext), { type: tipo })], title: `${meta.tipo} · ${fmtData(meta.inicioMs, meta.fusoMin)}` }); }
+    try { await navigator.share({ files: [new File([blob], nomeArq(ext), { type: tipo })], title: `${nomeTreino(meta)} · ${fmtData(meta.inicioMs, meta.fusoMin)}` }); }
     catch (err) { if (err && err.name !== 'AbortError') toast('Não consegui compartilhar. Use Salvar imagem.'); }
   });
   $('#cartao-salvar').addEventListener('click', async () => {
