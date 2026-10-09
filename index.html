@@ -270,6 +270,21 @@ h3 { font-size: 13px; font-weight: 700; }
 .btn-mini.btn-perigo { color: var(--bad); margin-left: auto; }
 .leg-trechos { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--ink-2); }
 .leg-trechos b { color: var(--accent-ink); margin-right: 2px; }
+.nova-pasta { display: flex; gap: 8px; align-items: center; }
+.nova-pasta input { flex: 1; min-width: 0; }
+.pastas { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.pasta { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; text-align: left; cursor: pointer; min-width: 0; color: var(--ink); }
+.pasta:hover { border-color: var(--axis); }
+.pasta-ic { display: inline-flex; }
+.pasta-ic svg { width: 30px; height: 30px; fill: currentColor; fill-opacity: .2; stroke: currentColor; stroke-width: 1.8; stroke-linejoin: round; }
+.pasta-nome { font-weight: 700; font-size: 14.5px; overflow-wrap: anywhere; }
+.pasta-titulo { font-size: 18px; flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.sel-pasta { flex: none; width: 112px; font-size: 12.5px !important; min-height: 32px; padding: 4px 6px; }
+.pasta-linha { margin-top: 8px; }
+.chip-pasta { display: inline-flex; align-items: center; gap: 6px; border: 1px dashed rgba(255,255,255,.24); background: transparent; color: var(--hero-muted); border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.chip-pasta.tem { border-style: solid; color: var(--hero-ink); background: var(--hero-2); }
+.chip-pasta svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; }
+.pasta-linha select, .pasta-linha input { background: var(--hero-2) !important; color: var(--hero-ink) !important; border-color: rgba(255,255,255,.22) !important; }
 .refs { font-size: 12px; color: var(--muted); padding-left: 16px; margin: 0; display: flex; flex-direction: column; gap: 4px; }
 .confirmar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; }
 
@@ -310,6 +325,7 @@ h3 { font-size: 13px; font-weight: 700; }
   <nav class="abas" role="tablist" aria-label="Seções">
     <button class="aba" role="tab" id="t-treino" data-aba="treino" aria-selected="true" aria-controls="aba-treino"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2.5-6 4 12 2.5-6h5"/></svg><span>Treino</span></button>
     <button class="aba" role="tab" id="t-historico" data-aba="historico" aria-selected="false" aria-controls="aba-historico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span>Histórico</span></button>
+    <button class="aba" role="tab" id="t-pastas" data-aba="pastas" aria-selected="false" aria-controls="aba-pastas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Pastas</span></button>
     <button class="aba" role="tab" id="t-comparar" data-aba="comparar" aria-selected="false" aria-controls="aba-comparar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 20V11M12 20V5M18 20v-6"/></svg><span>Comparar</span></button>
     <button class="aba" role="tab" id="t-ajustes" data-aba="ajustes" aria-selected="false" aria-controls="aba-ajustes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg><span>Ajustes</span></button>
   </nav>
@@ -318,6 +334,7 @@ h3 { font-size: 13px; font-weight: 700; }
       <div class="card"><p class="nota">Carregando seus treinos…</p></div>
     </section>
     <section id="aba-historico" class="vista" role="tabpanel" aria-labelledby="t-historico" hidden></section>
+    <section id="aba-pastas" class="vista" role="tabpanel" aria-labelledby="t-pastas" hidden></section>
     <section id="aba-comparar" class="vista" role="tabpanel" aria-labelledby="t-comparar" hidden></section>
     <section id="aba-ajustes" class="vista" role="tabpanel" aria-labelledby="t-ajustes" hidden></section>
   </main>
@@ -882,7 +899,8 @@ const MAX_CMP = 6;
 const E = {
   carregando: true, cfg: { ...CONFIG_PADRAO }, treinos: [], series: new Map(), atual: null, demo: null, aba: 'treino',
   suav: 10, mostrarZonas: true, mostrarBlocos: true, tamParcial: 600, modoHist: 'min', modoCmp: 'min', periodo: '90', filtroTipo: '',
-  cmp: [], corCmp: new Map(), confirmarExclusao: false, confirmarApagar: false, tok: 0
+  cmp: [], corCmp: new Map(), confirmarExclusao: false, confirmarApagar: false, tok: 0,
+  pastaAberta: null, addPasta: false, confirmarPasta: false, filtroPasta: ''
 };
 
 const fcMaxObservada = () => E.treinos.reduce((m, t) => Math.max(m, t.resumo?.fcMax || 0), 0) || null;
@@ -994,7 +1012,13 @@ async function obterSerie(id) {
   if (s) E.series.set(id, s);
   return s;
 }
-const salvarConfig = debounce(async () => { try { await Armazem.salvarConfig(E.cfg); } catch (e) { toast('Não consegui salvar as zonas: ' + (e.message || e.code || 'erro')); } }, 500);
+// grava a configuração meio segundo depois da última mudança; gravarConfig() grava na hora
+let cfgPendente = null;
+async function gravarConfig() { clearTimeout(cfgPendente); cfgPendente = null; try { await Armazem.salvarConfig(E.cfg); } catch (e) { toast('Não consegui salvar os ajustes: ' + (e.message || e.code || 'erro')); } }
+const salvarConfig = () => { clearTimeout(cfgPendente); cfgPendente = setTimeout(gravarConfig, 500); };
+const gravarPendente = () => { if (cfgPendente) gravarConfig(); };
+window.addEventListener('pagehide', gravarPendente);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') gravarPendente(); });
 
 async function salvarArquivo(nome, conteudo, tipo = 'application/json', aviso = 'Backup salvo em Downloads.') {
   const claude = window.claude;
@@ -1019,6 +1043,7 @@ async function importarArquivos(lista) {
   if (E.carregando) { toast('Aguarde o histórico terminar de carregar.'); return; }
   let novos = 0, repetidos = 0, ultimo = null;
   const erros = [];
+  const pastaDestino = E.aba === 'pastas' && E.pastaAberta && pastaDe(E.pastaAberta) ? E.pastaAberta : null;
   for (const f of arquivos) {
     try {
       const buf = await f.arrayBuffer();
@@ -1030,6 +1055,7 @@ async function importarArquivos(lista) {
       for (const a of ativs) {
         const { meta, series } = montarTreino(a, f.name);
         if (E.treinos.some(x => x.id === meta.id)) { repetidos++; ultimo = meta.id; continue; }
+        if (pastaDestino) meta.pasta = pastaDestino;
         await Armazem.salvar(meta, series);
         E.treinos.push(meta); E.series.set(meta.id, series); novos++; ultimo = meta.id;
       }
@@ -1037,7 +1063,7 @@ async function importarArquivos(lista) {
   }
   ordenar();
   const partes = [];
-  if (novos) partes.push(novos === 1 ? 'Treino importado.' : `${novos} treinos importados.`);
+  if (novos) partes.push((novos === 1 ? 'Treino importado' : `${novos} treinos importados`) + (pastaDestino ? ` para a pasta ${pastaDe(pastaDestino).nome}.` : '.'));
   if (repetidos) partes.push(repetidos === 1 ? 'Esse treino já estava no histórico.' : `${repetidos} treinos já estavam no histórico.`);
   if (erros.length) partes.push('Não consegui ler ' + erros.join('; '));
   toast(partes.join('\n'), erros.length && !novos ? 9000 : 5000);
@@ -1053,7 +1079,11 @@ async function importarBackup(txt) {
     if (E.treinos.some(x => x.id === m.id)) { repetidos++; continue; }
     await Armazem.salvar(m, s); E.treinos.push(m); E.series.set(m.id, s); novos++; ultimo = m.id;
   }
+  const pastasAntes = pastas();
   if (dados.config && !E.cfg.fcmax && !E.cfg.idade && E.cfg.metodo !== 'manual') { E.cfg = { ...CONFIG_PADRAO, ...dados.config }; salvarConfig(); }
+  const pastasBackup = Array.isArray(dados.config?.pastas) ? dados.config.pastas.filter(p => p && p.id && p.nome) : [];
+  const juntas = [...pastasAntes, ...pastasBackup.filter(p => !pastasAntes.some(a => a.id === p.id))];
+  if (juntas.length !== pastas().length || juntas.some(p => !pastas().some(a => a.id === p.id))) { E.cfg.pastas = juntas; salvarConfig(); }
   return { novos, repetidos, ultimo };
 }
 const ordenar = () => E.treinos.sort((a, b) => b.inicioMs - a.inicioMs);
@@ -1337,7 +1367,8 @@ async function renderTreino() {
   const quarto = tot.calorias != null ? stat(fmtN(tot.calorias), 'kcal') : dist ? stat(`${fmtN(dist / 1000, 1)} km`, 'distância') : stat(fmtN(r.fcMin), 'FC mín.');
   const resumo = `<section class="resumo">
     <div class="resumo-topo"><div class="resumo-nome"><div class="nome-linha" id="t-nome-linha"><h1>${esc(nomeTreino(meta))}</h1>${demo ? '' : `<button class="btn-lapis" id="t-renomear" aria-label="Dar nome ao treino"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4"/></svg>${meta.titulo ? '' : '<span>Dar nome</span>'}</button>`}</div>
-    <p class="resumo-sub">${meta.titulo ? `${esc(meta.tipo)} · ` : ''}${esc(fmtDiaSemana(meta.inicioMs, meta.fusoMin))}, ${esc(fmtData(meta.inicioMs, meta.fusoMin))} · ${esc(fmtHora(meta.inicioMs, meta.fusoMin))}–${esc(fmtHora(fim, meta.fusoMin))}</p></div>
+    <p class="resumo-sub">${meta.titulo ? `${esc(meta.tipo)} · ` : ''}${esc(fmtDiaSemana(meta.inicioMs, meta.fusoMin))}, ${esc(fmtData(meta.inicioMs, meta.fusoMin))} · ${esc(fmtHora(meta.inicioMs, meta.fusoMin))}–${esc(fmtHora(fim, meta.fusoMin))}</p>
+    ${demo ? '' : `<div class="pasta-linha" id="t-pasta-linha"><button class="chip-pasta${pastaDe(meta.pasta) ? ' tem' : ''}" id="t-pasta" aria-label="Pasta do treino">${ICONE_PASTA}<span>${esc(pastaDe(meta.pasta)?.nome || 'Pôr numa pasta')}</span></button></div>`}</div>
     <button class="btn-compart" id="t-compartilhar" aria-label="Compartilhar a imagem do treino"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg><span>Compartilhar</span></button></div>
     <div class="stats">${stat(durCurta(r.duracaoS), 'duração')}${stat(fmtN(r.fcMed), 'FC média')}${stat(fmtN(r.fcMax), 'FC máx.')}${quarto}</div></section>`;
   const zonasMax = Math.max(1, ...an.zt);
@@ -1428,6 +1459,7 @@ async function renderTreino() {
   ligarSeletor();
   $('#t-compartilhar').addEventListener('click', () => abrirCartao(meta, series));
   const ren = $('#t-renomear'); if (ren) ren.addEventListener('click', () => renomearTreino(meta));
+  ligarChipPasta(meta);
   $('#c-parc').addEventListener('change', e => { E.tamParcial = +e.target.value; renderTreino(); });
   $('#c-picos').addEventListener('change', e => { E.cfg.mostrarPicos = e.target.checked; salvarConfig(); renderTreino(); });
   const esf = $('#c-esf');
@@ -1598,10 +1630,153 @@ function desenharMapa(el, series) {
   });
 }
 
+// ----- pastas -----
+// As pastas ficam na configuração (vão junto no backup e na conta); cada treino guarda o id da sua pasta.
+const ICONE_PASTA = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+const pastas = () => Array.isArray(E.cfg.pastas) ? E.cfg.pastas : [];
+const pastaDe = id => id ? pastas().find(p => p.id === id) || null : null;
+const corPasta = p => p ? CORES_CMP[(p.cor ?? 0) % CORES_CMP.length] : 'var(--muted)';
+const opcoesPasta = atual => `<option value="">Sem pasta</option>${pastas().map(p => `<option value="${esc(p.id)}" ${p.id === atual ? 'selected' : ''}>${esc(p.nome)}</option>`).join('')}`;
+function criarPasta(nome) {
+  nome = String(nome || '').trim().slice(0, 40);
+  if (!nome) { toast('Escreva o nome da pasta.'); return null; }
+  if (pastas().some(p => p.nome.toLowerCase() === nome.toLowerCase())) { toast('Já existe uma pasta com esse nome.'); return null; }
+  const usadas = pastas().map(p => p.cor);
+  let cor = 0; while (usadas.includes(cor) && cor < CORES_CMP.length) cor++;
+  if (cor >= CORES_CMP.length) cor = pastas().length % CORES_CMP.length;
+  const p = { id: 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5), nome, cor, criadaEm: new Date().toISOString() };
+  E.cfg.pastas = [...pastas(), p]; gravarConfig();
+  return p;
+}
+async function moverParaPasta(ids, pastaId) {
+  const alvo = pastaId || null; let n = 0;
+  for (const id of ids) {
+    const t = E.treinos.find(x => x.id === id);
+    if (!t || (t.pasta || null) === alvo) continue;
+    t.pasta = alvo;
+    try { await Armazem.atualizar(id, { pasta: alvo }); n++; } catch (e) { toast('Não consegui mover: ' + (e.message || e.code || 'erro')); }
+  }
+  return n;
+}
+function linhaTreino(t, zt, total, extra = '') {
+  return `<li class="lt"><button class="lt-abrir" data-abrir="${esc(t.id)}"><span class="lt-l1"><span class="lt-tipo">${esc(nomeTreino(t))}</span><span class="lt-data">${esc(fmtDataCurta(t.inicioMs, t.fusoMin))} · ${esc(fmtHora(t.inicioMs, t.fusoMin))}</span></span>
+    <span class="lt-metr">${t.titulo ? `${esc(t.tipo)} · ` : ''}${esc(durCurta(t.resumo.duracaoS))} · média ${fmtN(t.resumo.fcMed)} · máx. ${t.resumo.fcMax}${t.totais?.calorias != null ? ` · ${fmtN(t.totais.calorias)} kcal` : ''}</span>
+    <span class="pilha" aria-hidden="true">${pilhaZonas(zt, total, nomeTreino(t))}</span></button>${extra}</li>`;
+}
+function renderPastas() {
+  const raiz = $('#aba-pastas');
+  if (E.pastaAberta) return renderPasta(E.pastaAberta);
+  const lista = pastas();
+  const daPasta = id => E.treinos.filter(t => (t.pasta || null) === id);
+  const semPasta = daPasta(null);
+  const cartaoPasta = (chave, nome, cor, itens) => { const ult = itens[0]; return `<button class="pasta" data-abrir-pasta="${esc(chave)}"><span class="pasta-ic" style="color:${cor}">${ICONE_PASTA}</span><span class="pasta-nome">${esc(nome)}</span><span class="nota">${itens.length} ${itens.length === 1 ? 'treino' : 'treinos'}${ult ? ` · último ${esc(fmtDataCurta(ult.inicioMs, ult.fusoMin))}` : ''}</span></button>`; };
+  raiz.innerHTML = `<section class="card"><h2>Nova pasta</h2><div class="nova-pasta"><input type="text" id="p-nova" maxlength="40" placeholder="Ex.: Jiu-jitsu, Pelada" aria-label="Nome da nova pasta"><button class="btn btn-acento" id="p-criar">Criar</button></div>
+      ${lista.length ? '' : '<p class="texto">Crie pastas para separar os treinos, por exemplo Jiu-jitsu e Pelada. Em cada pasta você vê os números e a evolução só daqueles treinos.</p>'}</section>
+    ${lista.length || semPasta.length ? `<div class="pastas">${lista.map(p => cartaoPasta(p.id, p.nome, corPasta(p), daPasta(p.id))).join('')}${semPasta.length && lista.length ? cartaoPasta('sem', 'Sem pasta', 'var(--muted)', semPasta) : ''}</div>` : ''}`;
+  const criar = () => { const p = criarPasta($('#p-nova').value); if (p) { toast(`Pasta “${p.nome}” criada.`); E.pastaAberta = p.id; E.addPasta = !!E.treinos.length; renderPastas(); } };
+  $('#p-criar').addEventListener('click', criar);
+  $('#p-nova').addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); criar(); } });
+  $$('[data-abrir-pasta]', raiz).forEach(b => b.addEventListener('click', () => { E.pastaAberta = b.dataset.abrirPasta; E.addPasta = false; E.confirmarPasta = false; renderPastas(); window.scrollTo({ top: 0 }); }));
+}
+function renderPasta(chave) {
+  const raiz = $('#aba-pastas'), sem = chave === 'sem', p = sem ? null : pastaDe(chave);
+  if (!sem && !p) { E.pastaAberta = null; return renderPastas(); }
+  const Z = zonasAtuais(), alvo = sem ? null : p.id, nome = sem ? 'Sem pasta' : p.nome;
+  const itens = E.treinos.filter(t => (t.pasta || null) === alvo);
+  const dados = itens.map(t => { const zt = temposZona(t.resumo.hist, Z.limites); return { t, zt, total: zt.reduce((a, b) => a + b, 0) }; });
+  const soma = f => dados.reduce((a, d) => a + (f(d) || 0), 0);
+  const fcMedia = soma(d => d.t.resumo.fcMed * d.t.resumo.tempoFcS) / (soma(d => d.t.resumo.tempoFcS) || 1);
+  const outros = E.treinos.filter(t => (t.pasta || null) !== alvo);
+  const painelAdd = E.addPasta && !sem ? `<section class="card"><div class="card-topo"><h2>Adicionar treinos à pasta</h2><button class="btn-link" id="p-add-fechar">Fechar</button></div>
+      ${outros.length ? `<div class="escolha">${outros.map(t => `<label><input type="checkbox" data-add="${esc(t.id)}"><span>${esc(nomeTreino(t))}</span><small>${esc(fmtDataCurta(t.inicioMs, t.fusoMin))}${t.pasta && pastaDe(t.pasta) ? ` · ${esc(pastaDe(t.pasta).nome)}` : ''}</small></label>`).join('')}</div>
+        <div class="botoes"><button class="btn btn-acento" id="p-add-ok">Colocar na pasta</button><span class="nota" id="p-add-n"></span></div>` : '<p class="texto">Todos os treinos já estão nesta pasta.</p>'}</section>` : '';
+  raiz.innerHTML = `<div><button class="btn-link" id="p-voltar">‹ Pastas</button></div>
+    <section class="card"><div class="nome-linha" id="p-nome-linha"><span class="pasta-ic" style="color:${corPasta(p)}">${ICONE_PASTA}</span><h2 class="pasta-titulo">${esc(nome)}</h2>${sem ? '' : '<button class="btn-link" id="p-renomear">Renomear</button>'}</div>
+      ${itens.length ? `<div class="stats">${stat(fmtN(itens.length), itens.length === 1 ? 'treino' : 'treinos')}${stat(durCurta(soma(d => d.t.resumo.duracaoS)), 'tempo total')}${stat(fmtN(fcMedia), 'FC média')}${stat(durCurta(soma(d => d.zt[4] + d.zt[5])), 'em Z4–Z5')}</div>`
+        : `<p class="texto">${sem ? 'Todos os treinos estão em pastas.' : 'A pasta está vazia. Coloque treinos que já estão no app ou importe um arquivo direto para ela.'}</p>`}
+      <div class="botoes">${sem ? '' : `<label class="btn btn-acento" for="arquivo">+ Importar para esta pasta</label><button class="btn" id="p-add">Adicionar treinos</button>`}${itens.length >= 2 ? '<button class="btn" id="p-comparar">Comparar</button>' : ''}</div></section>
+    ${painelAdd}
+    ${itens.length >= 2 ? `<section class="card"><div class="card-topo"><h2>FC por treino</h2><div class="legenda"><span><i class="lk" style="background:var(--s1)"></i>média</span><span><i class="lk" style="background:var(--s2)"></i>máxima</span></div></div><div class="graf" id="g-pasta"></div></section>` : ''}
+    ${itens.length ? `<section class="card"><div class="card-topo"><h2>Treinos</h2><span class="nota">para mudar de pasta, use a lista ao lado</span></div>
+      <ul class="lista-treinos">${dados.map(d => linhaTreino(d.t, d.zt, d.total, `<select class="sel-pasta" data-mover-pasta="${esc(d.t.id)}" aria-label="Mudar ${esc(nomeTreino(d.t))} de pasta">${opcoesPasta(d.t.pasta)}</select>`)).join('')}</ul></section>` : ''}
+    ${sem ? '' : `<div class="confirmar">${E.confirmarPasta ? `<span>Excluir a pasta? Os treinos não são apagados, só ficam sem pasta.</span><button class="btn btn-perigo-cheio" id="p-excluir-sim">Excluir pasta</button><button class="btn" id="p-excluir-nao">Cancelar</button>` : '<button class="btn-link btn-perigo" id="p-excluir">Excluir pasta</button>'}</div>`}`;
+  if (itens.length >= 2) graficoEvolucao($('#g-pasta'), itens);
+  $('#p-voltar').addEventListener('click', () => { E.pastaAberta = null; E.addPasta = false; E.confirmarPasta = false; renderPastas(); });
+  $$('[data-mover-pasta]', raiz).forEach(sel => sel.addEventListener('change', async () => {
+    const t = E.treinos.find(x => x.id === sel.dataset.moverPasta);
+    await moverParaPasta([sel.dataset.moverPasta], sel.value);
+    toast(`“${nomeTreino(t)}” foi para ${sel.value ? `a pasta ${pastaDe(sel.value).nome}` : 'Sem pasta'}.`);
+    renderPasta(chave);
+  }));
+  const cmp = $('#p-comparar');
+  if (cmp) cmp.addEventListener('click', () => { E.cmp = []; E.corCmp.clear(); itens.slice(0, MAX_CMP).forEach(t => alternarCmp(t.id, true)); mostrarAba('comparar'); });
+  if (sem) return;
+  $('#p-add').addEventListener('click', () => { E.addPasta = !E.addPasta; renderPasta(chave); });
+  const fechar = $('#p-add-fechar'); if (fechar) fechar.addEventListener('click', () => { E.addPasta = false; renderPasta(chave); });
+  const ok = $('#p-add-ok');
+  if (ok) {
+    const contar = () => { const n = $$('[data-add]:checked', raiz).length; $('#p-add-n').textContent = n ? `${n} ${n === 1 ? 'marcado' : 'marcados'}` : ''; };
+    $$('[data-add]', raiz).forEach(c => c.addEventListener('change', contar));
+    ok.addEventListener('click', async () => {
+      const ids = $$('[data-add]:checked', raiz).map(c => c.dataset.add);
+      if (!ids.length) { toast('Marque os treinos que vão para a pasta.'); return; }
+      const n = await moverParaPasta(ids, p.id);
+      toast(`${n} ${n === 1 ? 'treino colocado' : 'treinos colocados'} em ${p.nome}.`);
+      E.addPasta = false; renderPasta(chave);
+    });
+  }
+  $('#p-renomear').addEventListener('click', () => {
+    const linha = $('#p-nome-linha');
+    linha.innerHTML = `<input type="text" id="p-nome-in" maxlength="40" value="${esc(p.nome)}" aria-label="Nome da pasta" style="flex:1"><button class="btn btn-acento" id="p-nome-ok">Salvar</button>`;
+    const inp = $('#p-nome-in'); inp.focus(); inp.select();
+    const salvar = () => {
+      const novo = inp.value.trim().slice(0, 40);
+      if (novo && novo !== p.nome) {
+        if (pastas().some(o => o.id !== p.id && o.nome.toLowerCase() === novo.toLowerCase())) { toast('Já existe uma pasta com esse nome.'); return; }
+        E.cfg.pastas = pastas().map(o => o.id === p.id ? { ...o, nome: novo } : o); gravarConfig(); toast('Pasta renomeada.');
+      }
+      renderPasta(chave);
+    };
+    inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); salvar(); } else if (ev.key === 'Escape') renderPasta(chave); });
+    $('#p-nome-ok').addEventListener('click', salvar);
+  });
+  const ex = $('#p-excluir'); if (ex) ex.addEventListener('click', () => { E.confirmarPasta = true; renderPasta(chave); });
+  const exN = $('#p-excluir-nao'); if (exN) exN.addEventListener('click', () => { E.confirmarPasta = false; renderPasta(chave); });
+  const exS = $('#p-excluir-sim'); if (exS) exS.addEventListener('click', async () => {
+    await moverParaPasta(itens.map(t => t.id), null);
+    E.cfg.pastas = pastas().filter(o => o.id !== p.id); gravarConfig();
+    E.pastaAberta = null; E.confirmarPasta = false;
+    toast(`Pasta “${p.nome}” excluída. Os treinos dela ficaram sem pasta.`); renderPastas();
+  });
+}
+// no topo do treino: em qual pasta ele está, com troca rápida
+function ligarChipPasta(meta) {
+  const bt = $('#t-pasta'); if (!bt) return;
+  bt.addEventListener('click', () => {
+    const linha = $('#t-pasta-linha');
+    linha.innerHTML = `<select id="t-pasta-sel" aria-label="Pasta do treino">${opcoesPasta(meta.pasta)}<option value="__nova">+ Nova pasta…</option></select>`;
+    const sel = $('#t-pasta-sel'); sel.focus();
+    sel.addEventListener('change', async () => {
+      if (sel.value === '__nova') {
+        linha.innerHTML = `<div class="nova-pasta"><input type="text" id="t-pasta-nova" maxlength="40" placeholder="Nome da pasta, ex.: Pelada" aria-label="Nome da nova pasta"><button class="btn-nome-ok" id="t-pasta-criar">Criar</button></div>`;
+        const inp = $('#t-pasta-nova'); inp.focus();
+        const criar = async () => { const p = criarPasta(inp.value); if (!p) return; await moverParaPasta([meta.id], p.id); toast(`Treino colocado na pasta ${p.nome}.`); renderTreino(); };
+        inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); criar(); } else if (ev.key === 'Escape') renderTreino(); });
+        $('#t-pasta-criar').addEventListener('click', criar);
+        return;
+      }
+      await moverParaPasta([meta.id], sel.value);
+      toast(sel.value ? `Treino colocado na pasta ${pastaDe(sel.value).nome}.` : 'Treino tirado da pasta.');
+      renderTreino();
+    });
+  });
+}
+
 // ----- histórico -----
 function treinosFiltrados() {
   const dias = E.periodo === 'tudo' ? null : +E.periodo, corte = dias ? Date.now() - dias * 86400000 : -Infinity;
-  return E.treinos.filter(t => t.inicioMs >= corte && (!E.filtroTipo || t.tipo === E.filtroTipo));
+  if (E.filtroPasta && E.filtroPasta !== 'sem' && !pastaDe(E.filtroPasta)) E.filtroPasta = '';
+  return E.treinos.filter(t => t.inicioMs >= corte && (!E.filtroTipo || t.tipo === E.filtroTipo) && (!E.filtroPasta || (E.filtroPasta === 'sem' ? !pastaDe(t.pasta) : t.pasta === E.filtroPasta)));
 }
 function vazio(titulo) {
   return `<section class="card"><h2>${esc(titulo)}</h2><p class="texto">Importe o arquivo do treino exportado do relógio ou do app (TCX, FIT, GPX ou CSV). Cada treino fica guardado no histórico para comparar.</p><div class="botoes"><label class="btn btn-acento" for="arquivo">+ Importar treino</label></div></section>`;
@@ -1613,13 +1788,27 @@ function avisoBackup() {
   if (!novos || (ult && Date.now() - ult < 7 * 86400000)) return '';
   return `<div class="aviso"><span>${novos === 1 ? '1 treino ainda não está' : `${novos} treinos ainda não estão`} no backup.</span><button class="btn-link" data-backup>Fazer backup</button></div>`;
 }
+// FC média e máxima de cada treino ao longo do tempo (lista em ordem do mais recente)
+function graficoEvolucao(el, lista) {
+  const cron = lista.slice().reverse(), xsE = cron.map(t => t.inicioMs);
+  const umDia = 86400000, xMin = xsE.length > 1 ? xsE[0] : xsE[0] - 3 * umDia, xMax = xsE.length > 1 ? xsE[xsE.length - 1] : xsE[0] + 3 * umDia;
+  const folga = (xMax - xMin) * 0.04;
+  graficoLinha(el, {
+    rotulo: 'FC média e máxima de cada treino ao longo do tempo', xMin: xMin - folga, xMax: xMax + folga, yPad: 6, altura: 170,
+    series: [{ nome: 'média', cor: 'var(--s1)', x: xsE, y: cron.map(t => Math.round(t.resumo.fcMed)), pontos: true }, { nome: 'máxima', cor: 'var(--s2)', x: xsE, y: cron.map(t => t.resumo.fcMax), pontos: true }],
+    xTicks: pw => { if (cron.length === 1) return [{ v: xsE[0], rotulo: fmtDataCurta(xsE[0], cron[0].fusoMin) }]; const n = Math.max(2, Math.min(cron.length, Math.floor(pw / 80))); const out = []; for (let i = 0; i < n; i++) { const v = xMin + (xMax - xMin) * i / (n - 1); out.push({ v, rotulo: fmtDataCurta(v, fusoLocal(v)) }); } return out; },
+    dica: (x, ls) => { const t = cron[ls[0]?.i ?? 0]; return { titulo: `${fmtDataCurta(t.inicioMs, t.fusoMin)} · ${nomeTreino(t)}`, linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y)} bpm`, nome: l.nome })) }; },
+    aoClicar: x => { const i = maisProximo(xsE, x); if (i >= 0) abrirTreino(cron[i].id); }
+  });
+}
 function renderHistorico() {
   const raiz = $('#aba-historico');
   if (!E.treinos.length) { raiz.innerHTML = vazio('Seu histórico está vazio'); return; }
   const Z = zonasAtuais(), lista = treinosFiltrados();
   const tipos = [...new Set(E.treinos.map(t => t.tipo))].sort((a, b) => a.localeCompare(b, 'pt-BR'));
   const filtros = `<div class="filtros"><select id="h-per" aria-label="Período"><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="365">Últimos 12 meses</option><option value="tudo">Todo o histórico</option></select>
-    ${tipos.length > 1 ? `<select id="h-tipo" aria-label="Modalidade"><option value="">Todas</option>${tipos.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('')}</select>` : ''}</div>`;
+    ${tipos.length > 1 ? `<select id="h-tipo" aria-label="Modalidade"><option value="">Todas</option>${tipos.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join('')}</select>` : ''}
+    ${pastas().length ? `<select id="h-pasta" aria-label="Pasta"><option value="">Todas as pastas</option>${pastas().map(p => `<option value="${esc(p.id)}">${esc(p.nome)}</option>`).join('')}<option value="sem">Sem pasta</option></select>` : ''}</div>`;
   if (!lista.length) {
     raiz.innerHTML = avisoBackup() + filtros + `<section class="card"><h2>Nenhum treino nesse período</h2><p class="texto">O mais recente é de ${esc(fmtData(E.treinos[0].inicioMs, E.treinos[0].fusoMin))}.</p></section>`;
     ligarFiltros(); return;
@@ -1638,17 +1827,8 @@ function renderHistorico() {
         <span class="pilha" aria-hidden="true">${pilhaZonas(d.zt, d.total, d.t.tipo)}</span></button></li>`).join('')}</ul></section>
     <section class="card mais">${secao('semanas', 'Tempo por semana', 'por zona', `<div class="graf" id="g-sem"></div>${legendaZonas(Z)}`)}</section>`;
   ligarFiltros(); ligarSecoes(raiz);
-  const cron = lista.slice().reverse(), xsE = cron.map(t => t.inicioMs);
-  const umDia = 86400000, xMin = xsE.length > 1 ? xsE[0] : xsE[0] - 3 * umDia, xMax = xsE.length > 1 ? xsE[xsE.length - 1] : xsE[0] + 3 * umDia;
-  const folga = (xMax - xMin) * 0.04;
-  graficoLinha($('#g-evol'), {
-    rotulo: 'FC média e máxima de cada treino ao longo do tempo', xMin: xMin - folga, xMax: xMax + folga, yPad: 6, altura: 170,
-    series: [{ nome: 'média', cor: 'var(--s1)', x: xsE, y: cron.map(t => Math.round(t.resumo.fcMed)), pontos: true }, { nome: 'máxima', cor: 'var(--s2)', x: xsE, y: cron.map(t => t.resumo.fcMax), pontos: true }],
-    xTicks: pw => { if (cron.length === 1) return [{ v: xsE[0], rotulo: fmtDataCurta(xsE[0], cron[0].fusoMin) }]; const n = Math.max(2, Math.min(cron.length, Math.floor(pw / 80))); const out = []; for (let i = 0; i < n; i++) { const v = xMin + (xMax - xMin) * i / (n - 1); out.push({ v, rotulo: fmtDataCurta(v, fusoLocal(v)) }); } return out; },
-    dica: (x, ls) => { const t = cron[ls[0]?.i ?? 0]; return { titulo: `${fmtDataCurta(t.inicioMs, t.fusoMin)} · ${nomeTreino(t)}`, linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y)} bpm`, nome: l.nome })) }; },
-    aoClicar: x => { const i = maisProximo(xsE, x); if (i >= 0) abrirTreino(cron[i].id); }
-  });
-  const semanas = new Map();
+  graficoEvolucao($('#g-evol'), lista);
+  const umDia = 86400000, semanas = new Map();
   const inicioSemana = (ms, fuso) => { const d = parede(ms, fuso); const dia = (d.getUTCDay() + 6) % 7; return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - dia); };
   for (const d of dados) { const k = inicioSemana(d.t.inicioMs, d.t.fusoMin); const s = semanas.get(k) || { zt: [0, 0, 0, 0, 0, 0], n: 0, dur: 0 }; d.zt.forEach((v, z) => { s.zt[z] += v; }); s.n++; s.dur += d.t.resumo.duracaoS; semanas.set(k, s); }
   const kmax = Math.max(...semanas.keys()), kmin = Math.max(Math.min(...semanas.keys()), kmax - 15 * 7 * umDia), ks = [];
@@ -1667,6 +1847,9 @@ function ligarFiltros() {
   per.value = E.periodo; per.addEventListener('change', () => { E.periodo = per.value; renderHistorico(); });
   if (tipo) { tipo.value = E.filtroTipo; tipo.addEventListener('change', () => { E.filtroTipo = tipo.value; renderHistorico(); }); }
   else E.filtroTipo = '';
+  const pas = $('#h-pasta');
+  if (pas) { pas.value = E.filtroPasta || ''; pas.addEventListener('change', () => { E.filtroPasta = pas.value; renderHistorico(); }); }
+  else E.filtroPasta = '';
 }
 function alternarCmp(id, ligado) {
   if (ligado) {
@@ -2087,19 +2270,22 @@ function ligarInstalacao() {
 }
 
 // ================= navegação e eventos =================
-const ABAS = ['treino', 'historico', 'comparar', 'ajustes'];
+const ABAS = ['treino', 'historico', 'pastas', 'comparar', 'ajustes'];
 function mostrarAba(aba) {
   E.aba = aba;
   $$('.aba').forEach(b => b.setAttribute('aria-selected', String(b.dataset.aba === aba)));
   for (const n of ABAS) $('#aba-' + n).hidden = n !== aba;
   if (E.carregando) return;
-  ({ treino: renderTreino, historico: renderHistorico, comparar: renderComparar, ajustes: renderAjustes })[aba]();
+  ({ treino: renderTreino, historico: renderHistorico, pastas: renderPastas, comparar: renderComparar, ajustes: renderAjustes })[aba]();
 }
 let toastId;
 function toast(msg, ms = 4500) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastId); toastId = setTimeout(() => { t.hidden = true; }, ms); }
 
 function ligarEventos() {
-  $$('.aba').forEach(b => b.addEventListener('click', () => { mostrarAba(b.dataset.aba); window.scrollTo({ top: 0 }); }));
+  $$('.aba').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.aba === 'pastas' && E.aba === 'pastas') { E.pastaAberta = null; E.addPasta = false; E.confirmarPasta = false; }
+    mostrarAba(b.dataset.aba); window.scrollTo({ top: 0 });
+  }));
   $('.abas').addEventListener('keydown', ev => {
     if (ev.key !== 'ArrowRight' && ev.key !== 'ArrowLeft') return;
     const abas = $$('.aba'), i = abas.findIndex(b => b.dataset.aba === E.aba), j = (i + (ev.key === 'ArrowRight' ? 1 : -1) + abas.length) % abas.length;

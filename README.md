@@ -10,6 +10,9 @@ durou cada rola ou partida: o app encontra os trechos dessa duração em que a F
 marca cada um no gráfico, com média, máxima e queda da FC no minuto seguinte. O treino também pode
 virar uma imagem para compartilhar (Stories, Feed ou Quadrado).
 
+Na aba **Pastas** você cria pastas (por exemplo Jiu-jitsu e Pelada) e coloca os treinos nelas. Cada
+pasta mostra os números somados e a FC treino a treino, e dá para importar um arquivo direto para ela.
+
 **Endereço:** https://guiwemery-pixel.github.io/pulso-do-treino/
 
 ![Capa do Pulso do Treino](capa.png)
