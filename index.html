@@ -246,6 +246,20 @@ h3 { font-size: 13px; font-weight: 700; }
 .chave input::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform .15s; }
 .chave input:checked { background: var(--accent); }
 .chave input:checked::after { transform: translateX(12px); }
+.achar { background: var(--surface-2); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.achar-campos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.trechos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.trecho { border: 1px solid var(--line); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.trecho-l1 { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; font-size: 13px; }
+.trecho-l1 b { font-size: 14px; }
+.trecho-num { color: var(--ink-2); font-size: 12px; font-variant-numeric: tabular-nums; }
+.trecho-nome { width: 100%; }
+.trecho-acoes { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.trecho-acoes input { width: 72px; text-align: center; }
+.btn-mini { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; min-width: 36px; min-height: 34px; padding: 0 8px; cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.btn-mini.btn-perigo { color: var(--bad); margin-left: auto; }
+.leg-trechos { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--ink-2); }
+.leg-trechos b { color: var(--accent-ink); margin-right: 2px; }
 .refs { font-size: 12px; color: var(--muted); padding-left: 16px; margin: 0; display: flex; flex-direction: column; gap: 4px; }
 .confirmar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; }
 
@@ -760,6 +774,77 @@ function mediaEntre(series, P, a, b) {
   return peso ? soma / peso : null;
 }
 
+// estatísticas de um trecho marcado (rola, partida ou pico com nome)
+function estatTrecho(series, P, s10, ini, fim) {
+  const { t, fc } = series;
+  let soma = 0, peso = 0, max = -Infinity, iMax = -1;
+  for (let i = 0; i < t.length; i++) {
+    if (t[i] < ini) continue; if (t[i] > fim) break;
+    const v = fc[i]; if (v == null) continue;
+    soma += v * P.w[i]; peso += P.w[i];
+    if (v > max) { max = v; iMax = i; }
+  }
+  return { fcMed: peso ? soma / peso : null, fcMax: iMax >= 0 ? max : null, tMax: iMax >= 0 ? t[iMax] : null, rec: iMax >= 0 ? quedaApos(series, iMax, s10) : null };
+}
+// acha os trechos de duração fixa (rola, partida) com a FC média mais alta, sem sobrepor;
+// sem quantidade definida, pega todos com média acima do limite de esforço
+function acharRounds(series, durS, quantos, limiar) {
+  const { t, fc } = series, pts = [];
+  for (let i = 0; i < t.length; i++) if (fc[i] != null) pts.push([t[i], fc[i]]);
+  if (pts.length < 2) return [];
+  const T = Math.floor(pts[pts.length - 1][0]), D = Math.round(durS);
+  if (D < 30 || D > T) return [];
+  const soma = new Float64Array(T + 2);
+  let j = 0;
+  for (let s = 0; s <= T; s++) {
+    while (j < pts.length - 2 && pts[j + 1][0] < s) j++;
+    const [t0, v0] = pts[j], [t1, v1] = pts[Math.min(j + 1, pts.length - 1)];
+    const v = s <= t0 ? v0 : s >= t1 ? v1 : v0 + (v1 - v0) * (s - t0) / (t1 - t0);
+    soma[s + 1] = soma[s] + v;
+  }
+  const n = T - D + 1, medias = new Float64Array(n);
+  for (let s = 0; s < n; s++) medias[s] = (soma[s + D] - soma[s]) / D;
+  const ordem = Array.from({ length: n }, (_, i) => i).sort((a, b) => medias[b] - medias[a]);
+  const folga = 20, escolhidos = [], limite = quantos || 20;
+  for (const s of ordem) {
+    if (escolhidos.length >= limite) break;
+    if (!quantos && medias[s] < limiar) break;
+    if (escolhidos.some(c => s < c.fim + folga && s + D > c.ini - folga)) continue;
+    escolhidos.push({ ini: s, fim: s + D, media: medias[s] });
+  }
+  return escolhidos.sort((a, b) => a.ini - b.ini);
+}
+// palavra usada para os trechos, conforme a modalidade
+function palavraTrecho(tipo) {
+  const t = String(tipo || '').toLowerCase();
+  if (/futebol|pelada|futsal|society|soccer|handebol|basquete|v[oô]lei/.test(t)) return { um: 'partida', varios: 'partidas', f: true };
+  if (/jiu|bjj|grappling|jud[oô]|wrestling|luta livre|submission/.test(t)) return { um: 'rola', varios: 'rolas', f: false };
+  if (/corrida|ciclismo|bike|nata[cç][aã]o|remo/.test(t)) return { um: 'tiro', varios: 'tiros', f: false };
+  return { um: 'round', varios: 'rounds', f: false };
+}
+const ordinalG = (i, f) => `${i + 1}${f ? 'ª' : 'º'}`;
+const maiuscula = t => t ? t[0].toUpperCase() + t.slice(1) : t;
+const durTexto = d => d % 60 ? fmtRelogio(d) : `${fmtN(d / 60)} min`;
+function lerTempo(txt) {
+  const v = String(txt || '').trim().replace(',', '.');
+  if (/^\d+(:\d{1,2}){1,2}$/.test(v)) { const ps = v.split(':').map(Number); return ps.length === 3 ? ps[0] * 3600 + ps[1] * 60 + ps[2] : ps[0] * 60 + ps[1]; }
+  const n = parseFloat(v); return isFinite(n) ? Math.round(n * 60) : null;
+}
+// trechos que aparecem no treino: os marcados pelo usuário ou, sem eles, os picos automáticos
+function trechosDoTreino(meta, series, an) {
+  const momentos = Array.isArray(meta.momentos) ? meta.momentos : [];
+  const lista = momentos.length ? momentos.map(m => ({ ...m, dur: m.fim - m.ini, ...estatTrecho(series, an.P, an.s10, m.ini, m.fim) }))
+    : an.blocos.map(b => ({ ini: b.ini, fim: b.fim, dur: b.dur, fcMed: b.fcMed, fcMax: b.fcMax, tMax: b.tMax, rec: b.rec, nome: '', origem: 'auto' }));
+  const W = palavraTrecho(meta.tipo), misto = lista.some(t => t.origem === 'rola') && lista.some(t => t.origem !== 'rola');
+  let nr = 0, np = 0;
+  for (const t of lista) {
+    if (t.origem === 'rola') { t.curto = ordinalG(nr, W.f); t.rotulo = `${t.curto} ${W.um}`; nr++; }
+    else { t.curto = misto ? `P${np + 1}` : ordinal(np); t.rotulo = `${ordinal(np)} pico`; np++; }
+  }
+  return lista;
+}
+function rotuloTrecho(tr) { return tr.rotulo; }
+
 function analisar(meta, series, Z) {
   const P = pesos(series.t);
   const zt = temposZona(meta.resumo.hist, Z.limites);
@@ -769,14 +854,14 @@ function analisar(meta, series, Z) {
   const iPico = series.t.indexOf(meta.resumo.tFcMax);
   const dur = meta.resumo.duracaoS;
   return {
-    P, zt, totalZ: zt.reduce((a, b) => a + b, 0), carga: cargaZonas(zt), altaS: zt[4] + zt[5], limiar, blocos,
+    P, s10, zt, totalZ: zt.reduce((a, b) => a + b, 0), carga: cargaZonas(zt), altaS: zt[4] + zt[5], limiar, blocos,
     recPico: iPico >= 0 ? quedaApos(series, iPico, s10) : null,
     metades: [mediaEntre(series, P, 0, dur / 2), mediaEntre(series, P, dur / 2, dur + 1)]
   };
 }
 
 // ================= estado e configuração =================
-const TIPOS_PADRAO = ['Jiu-jitsu', 'Musculação', 'Corrida', 'Ciclismo', 'Natação', 'Caminhada', 'Funcional', 'Muay thai', 'Judô', 'Boxe', 'Wrestling', 'Mobilidade'];
+const TIPOS_PADRAO = ['Jiu-jitsu', 'Futebol', 'Musculação', 'Corrida', 'Ciclismo', 'Natação', 'Caminhada', 'Funcional', 'Muay thai', 'Judô', 'Boxe', 'Wrestling', 'Mobilidade'];
 const NOMES_ZONA = ['Abaixo da Z1', 'Muito leve', 'Leve', 'Moderada', 'Intensa', 'Máxima'];
 const PSE = ['Repouso', 'Muito, muito leve', 'Leve', 'Moderado', 'Um pouco difícil', 'Difícil', 'Difícil+', 'Muito difícil', 'Muito difícil+', 'Quase máximo', 'Máximo'];
 const PCTS_PADRAO = [50, 60, 70, 80, 90];
@@ -1251,12 +1336,29 @@ async function renderTreino() {
       <span class="zl-val"><b>${esc(fmtMin(an.zt[z]))}</b> · ${esc(fmtPct(an.zt[z] / (an.totalZ || 1)))}</span></div>`).join('');
   // detalhes recolhidos
   const nBlocos = an.blocos.length, picos = E.cfg.mostrarPicos !== false;
-  const blocos = `<div class="botoes"><span class="nota">Contar a partir de</span><select id="c-esf" aria-label="Início dos blocos de esforço"><option value="z2">Z2 · ${Z.limites[1]} bpm</option><option value="z3">Z3 · ${Z.limites[2]} bpm</option><option value="z4">Z4 · ${Z.limites[3]} bpm</option><option value="z5">Z5 · ${Z.limites[4]} bpm</option><option value="bpm">Valor fixo</option></select>
-      <input type="number" id="c-esf-bpm" min="60" max="230" value="${E.cfg.esforcoBpm || 140}" aria-label="FC mínima do bloco (bpm)" ${E.cfg.esforco === 'bpm' ? '' : 'hidden'} style="width:76px"></div>
-    ${nBlocos ? `<div class="rolagem"><table class="tabela"><thead><tr><th></th><th>Minutos</th><th class="num">Duração</th><th class="num">Média</th><th class="num">Máx.</th><th class="num">Queda 1 min</th></tr></thead><tbody>${an.blocos.map((b, i) => `<tr><td>${ordinal(i)}</td><td>${fmtN(b.ini / 60)}–${fmtN(b.fim / 60)}</td><td class="num">${esc(fmtMin(b.dur))}</td><td class="num">${fmtN(b.fcMed)}</td><td class="num">${b.fcMax}</td><td class="num">${b.rec ? b.rec.queda : '–'}</td></tr>`).join('')}</tbody></table></div>`
-      : `<p class="texto">Nenhum trecho acima de ${fmtN(an.limiar)} bpm por mais de 1 minuto.</p>`}
-    ${an.recPico ? `<p class="texto">No pico de ${r.fcMax} bpm (aos ${fmtN(r.tFcMax / 60)} min), a FC caiu ${an.recPico.queda} bpm no minuto seguinte.</p>` : ''}
-    <p class="nota">Bloco: FC média de 20 s acima do limite por mais de 1 min. Queda 1 min: FC no pico menos a FC 60 s depois. É uma leitura do sensor, não um teste clínico.</p>`;
+  const W = palavraTrecho(meta.tipo), trechos = trechosDoTreino(meta, series, an), marcados = !!(meta.momentos && meta.momentos.length);
+  const durPadrao = (marcados && meta.momentos[0].origem === 'rola' ? meta.momentos[0].fim - meta.momentos[0].ini : null) || E.cfg.roundDur?.[meta.tipo] || ({ rola: 300, partida: 480, tiro: 120 }[W.um] || 180);
+  const nomeados = trechos.filter(t => t.nome).length;
+  const soRolas = trechos.filter(t => t.origem === 'rola'), nRolas = soRolas.length, nPicosM = trechos.length - nRolas;
+  const durIguais = nRolas && soRolas.every(t => t.dur === soRolas[0].dur) ? soRolas[0].dur : null;
+  const contagem = [nRolas ? `${nRolas} ${nRolas === 1 ? W.um : W.varios}${durIguais ? ` de ${durTexto(durIguais)}` : ''}` : '', nPicosM ? `${nPicosM} ${nPicosM === 1 ? 'pico' : 'picos'}` : ''].filter(Boolean).join(' e ');
+  const blocos = `<div class="achar">
+      <p class="texto">Diga quanto tempo durou cada ${W.um}. O app encontra ${W.f ? 'as' : 'os'} ${W.varios} pela FC: os trechos dessa duração em que ela ficou mais alta.</p>
+      <div class="achar-campos">
+        <label class="campo"><span>Duração de cada ${W.um} (min)</span><input type="text" id="r-dur" inputmode="decimal" value="${esc(fmtN(durPadrao / 60, durPadrao % 60 ? 1 : 0))}"></label>
+        <label class="campo"><span>Quantidade</span><select id="r-qtd"><option value="">Automático</option>${Array.from({ length: 15 }, (_, k) => `<option value="${k + 1}">${k + 1}</option>`).join('')}</select></label>
+      </div>
+      <button class="btn btn-acento" id="r-achar" ${demo ? 'disabled' : ''}>Encontrar ${W.varios}</button></div>
+    ${trechos.length ? `<ol class="trechos">${trechos.map((tr, k) => `<li class="trecho">
+      <div class="trecho-l1"><b>${esc(rotuloTrecho(tr, k, W))}</b><span class="nota">${fmtRelogio(tr.ini)}–${fmtRelogio(tr.fim)} · ${esc(durTexto(tr.dur))}</span>
+        <span class="trecho-num">média ${fmtN(tr.fcMed)} · máx. ${tr.fcMax ?? '–'}${tr.rec ? ` · caiu ${tr.rec.queda} bpm em 1 min` : ''}</span></div>
+      <input type="text" class="trecho-nome" data-i="${k}" value="${esc(tr.nome || '')}" placeholder="${k === 0 ? `Dê um nome. Ex.: aquecimento, ${W.um} com o João` : tr.origem === 'rola' ? `Dê um nome a ${W.f ? 'esta' : 'este'} ${W.um}` : 'Dê um nome a este pico'}" aria-label="Nome: ${esc(rotuloTrecho(tr))}" ${demo ? 'disabled' : ''}>
+      ${marcados ? `<div class="trecho-acoes"><span>Início</span><button class="btn-mini" data-mover="-10" data-i="${k}" aria-label="Começar 10 segundos antes">‹ 10 s</button><input type="text" class="trecho-ini" data-i="${k}" value="${fmtRelogio(tr.ini)}" aria-label="Início em minutos e segundos"><button class="btn-mini" data-mover="10" data-i="${k}" aria-label="Começar 10 segundos depois">10 s ›</button><button class="btn-mini btn-perigo" data-tirar-trecho="${k}" aria-label="Excluir este trecho">×</button></div>` : ''}
+    </li>`).join('')}</ol>` : `<p class="texto">Nenhum pico acima de ${fmtN(an.limiar)} bpm por mais de 1 minuto.</p>`}
+    ${marcados ? `<div class="botoes"><button class="btn-link" id="r-add">+ Adicionar ${W.um}</button>${E.confirmarTrechos ? `<span class="nota">Apagar os nomes e voltar aos picos automáticos?</span><button class="btn-link btn-perigo" id="r-limpar-sim">Sim</button><button class="btn-link" id="r-limpar-nao">Não</button>` : `<button class="btn-link btn-perigo" id="r-limpar">Voltar aos picos automáticos</button>`}</div>`
+      : `<div class="botoes"><span class="nota">Picos automáticos a partir de</span><select id="c-esf" aria-label="Início dos picos automáticos"><option value="z2">Z2 · ${Z.limites[1]} bpm</option><option value="z3">Z3 · ${Z.limites[2]} bpm</option><option value="z4">Z4 · ${Z.limites[3]} bpm</option><option value="z5">Z5 · ${Z.limites[4]} bpm</option><option value="bpm">Valor fixo</option></select>
+      <input type="number" id="c-esf-bpm" min="60" max="230" value="${E.cfg.esforcoBpm || 140}" aria-label="FC mínima do pico (bpm)" ${E.cfg.esforco === 'bpm' ? '' : 'hidden'} style="width:76px"></div>`}
+    <p class="nota">${marcados ? `A FC sobe alguns segundos depois do esforço começar; se ${W.f ? 'a' : 'o'} ${W.um} começou antes, ajuste o início.` : 'Pico: FC média de 20 s acima do limite por mais de 1 min.'} “Caiu em 1 min”: FC no ponto mais alto menos a FC 60 s depois. É uma leitura do sensor, não um teste clínico.</p>`;
   const partes = `<div class="botoes"><select id="c-parc" aria-label="Tamanho das partes"><option value="300">A cada 5 min</option><option value="600">A cada 10 min</option><option value="900">A cada 15 min</option></select></div>
     <div class="graf" id="g-parc"></div><p class="nota">Coluna: FC média, na cor da zona. Traço: FC máxima. O número embaixo é o minuto em que a parte começa.</p>`;
   const anotacoes = `<div class="form-grade form-2">
@@ -1274,10 +1376,11 @@ async function renderTreino() {
   const excluir = demo ? '' : `<div class="confirmar">${E.confirmarExclusao ? `<span>Excluir este treino do histórico?</span><button class="btn btn-perigo-cheio" id="excluir-sim">Excluir</button><button class="btn" id="excluir-nao">Cancelar</button>` : `<button class="btn-link btn-perigo" id="excluir">Excluir este treino</button>`}</div>`;
   raiz.innerHTML = `${aviso}${seletor}${resumo}
     <section class="card"><div class="card-topo"><h2>Frequência cardíaca</h2><label class="chave"><input type="checkbox" id="c-picos" ${picos ? 'checked' : ''}>Picos</label></div><div class="graf" id="g-fc"></div>
-      ${picos ? `<p class="nota">${nBlocos ? `Faixas: os ${nBlocos === 1 ? 'bloco' : `${nBlocos} blocos`} de esforço acima de ${fmtN(an.limiar)} bpm, com o pico de cada um.` : `Nenhum bloco de esforço acima de ${fmtN(an.limiar)} bpm.`}</p>` : ''}</section>
+      ${picos && nomeados ? `<ol class="leg-trechos">${trechos.map(tr => tr.nome ? `<li><b>${esc(tr.curto)}</b> ${esc(tr.nome)}</li>` : '').join('')}</ol>` : ''}
+      ${picos ? `<p class="nota">${marcados ? `Faixas: ${contagem}.` : nBlocos ? `Faixas: os ${nBlocos === 1 ? 'pico' : `${nBlocos} picos`} acima de ${fmtN(an.limiar)} bpm. Dê nomes a eles em “Picos e ${W.varios}”.` : `Nenhum pico acima de ${fmtN(an.limiar)} bpm.`}</p>` : ''}</section>
     <section class="card"><div class="card-topo"><h2>Tempo em cada zona</h2><span class="nota">carga ${fmtN(an.carga)}</span></div><div class="zonas-lista">${listaZonas}</div></section>
     <section class="card mais">
-      ${secao('blocos', 'Blocos de esforço', nBlocos ? `${nBlocos} ${nBlocos === 1 ? 'bloco' : 'blocos'}${an.recPico ? ` · queda de ${an.recPico.queda} bpm` : ''}` : 'nenhum', blocos)}
+      ${secao('picos', `Picos e ${W.varios}`, marcados ? `${contagem}${nomeados ? ` · ${nomeados} com nome` : ''}` : `${nBlocos} ${nBlocos === 1 ? 'pico' : 'picos'}${nomeados ? ` · ${nomeados} com nome` : ''}`, blocos)}
       ${secao('partes', 'FC por parte do treino', '', partes)}
       ${secao('anotacoes', 'Anotações', subAnot || 'modalidade, esforço, notas', anotacoes)}
       ${outros}
@@ -1290,10 +1393,13 @@ async function renderTreino() {
     rotulo: `Frequência cardíaca em bpm ao longo de ${fmtN(durMin)} minutos`, xMin: 0, xMax: durMin, yPad: 4, rotulosDireita: true,
     series: [{ nome: 'FC', cor: 'var(--accent)', x: xs, y: suavizar(series.t, series.fc, 10), area: true, areaOp: 0.16 }],
     faixas: [1, 2, 3, 4, 5].map(z => ({ y0: Z.limites[z - 1], y1: z < 5 ? Z.limites[z] : 400, cor: corZona(z), rotulo: 'Z' + z, op: 0.13 })),
-    blocos: picos ? an.blocos.map((b, i) => ({ x0: b.ini / 60, x1: b.fim / 60, rotulo: ordinal(i) })) : [],
-    marcas: [{ x: r.tFcMax / 60, y: r.fcMax, texto: `máx. ${r.fcMax}`, prioridade: 2 }].concat(picos ? an.blocos.filter(b => b.tMax !== r.tFcMax).map(b => ({ x: b.tMax / 60, y: b.fcMax, texto: String(b.fcMax), r: 4, prioridade: 1 })) : []),
+    blocos: picos ? trechos.map(tr => ({ x0: tr.ini / 60, x1: tr.fim / 60, rotulo: tr.curto })) : [],
+    marcas: [{ x: r.tFcMax / 60, y: r.fcMax, texto: `máx. ${r.fcMax}`, prioridade: 2 }].concat(picos ? trechos.filter(tr => tr.tMax != null && tr.tMax !== r.tFcMax).map(tr => ({ x: tr.tMax / 60, y: tr.fcMax, texto: String(tr.fcMax), r: 4, prioridade: 1 })) : []),
     xTicks: pw => ticksMinutos(durMin, pw), yFmt: v => fmtN(v),
-    dica: (x, ls) => ({ titulo: fmtRelogio(x * 60), linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y)} bpm`, nome: 'Z' + zonaDe(Math.round(l.y), Z.limites) })) })
+    dica: (x, ls) => {
+      const k = picos ? trechos.findIndex(tr => x * 60 >= tr.ini && x * 60 <= tr.fim) : -1, tr = trechos[k];
+      return { titulo: fmtRelogio(x * 60) + (tr ? ` · ${rotuloTrecho(tr, k, W)}${tr.nome ? ': ' + tr.nome : ''}` : ''), linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y)} bpm`, nome: 'Z' + zonaDe(Math.round(l.y), Z.limites) })) };
+    }
   });
   // FC por parte
   $('#c-parc').value = String(E.tamParcial);
@@ -1312,10 +1418,14 @@ async function renderTreino() {
   $('#t-compartilhar').addEventListener('click', () => abrirCartao(meta, series));
   $('#c-parc').addEventListener('change', e => { E.tamParcial = +e.target.value; renderTreino(); });
   $('#c-picos').addEventListener('change', e => { E.cfg.mostrarPicos = e.target.checked; salvarConfig(); renderTreino(); });
-  $('#c-esf').value = E.cfg.esforco || 'z3';
-  $('#c-esf').addEventListener('change', e => { E.cfg.esforco = e.target.value; salvarConfig(); renderTreino(); });
-  $('#c-esf-bpm').addEventListener('change', e => { const v = +e.target.value; if (v >= 60 && v <= 230) { E.cfg.esforcoBpm = v; salvarConfig(); renderTreino(); } });
+  const esf = $('#c-esf');
+  if (esf) {
+    esf.value = E.cfg.esforco || 'z3';
+    esf.addEventListener('change', e => { E.cfg.esforco = e.target.value; salvarConfig(); renderTreino(); });
+    $('#c-esf-bpm').addEventListener('change', e => { const v = +e.target.value; if (v >= 60 && v <= 230) { E.cfg.esforcoBpm = v; salvarConfig(); renderTreino(); } });
+  }
   if (demo) return;
+  ligarTrechos(raiz, meta, series, an, trechos, W);
   const salvar = debounce(async () => {
     const st = $('#n-status');
     const pse = $('#n-pse').value, rounds = $('#n-rounds').value;
@@ -1331,6 +1441,65 @@ async function renderTreino() {
   const nao = $('#excluir-nao'); if (nao) nao.addEventListener('click', () => { E.confirmarExclusao = false; renderTreino(); });
   const sim = $('#excluir-sim'); if (sim) sim.addEventListener('click', () => excluirTreino(meta.id));
 }
+// picos e rolas: nomear, encontrar pela duração, ajustar o início
+const salvarTrechos = debounce(async (meta) => {
+  try { await Armazem.atualizar(meta.id, { momentos: meta.momentos || [] }); }
+  catch (e) { toast('Não consegui salvar os nomes: ' + (e.message || e.code || 'erro')); }
+}, 600);
+function ligarTrechos(raiz, meta, series, an, trechos, W) {
+  const dur = series.t[series.t.length - 1];
+  const fixar = () => { if (!meta.momentos || !meta.momentos.length) meta.momentos = trechos.map(tr => ({ ini: tr.ini, fim: tr.fim, nome: tr.nome || '', origem: tr.origem === 'auto' ? 'pico' : tr.origem })); };
+  const refazer = () => { meta.momentos.sort((a, b) => a.ini - b.ini); salvarTrechos(meta); abertos.add('picos'); renderTreino(); };
+  $$('.trecho-nome', raiz).forEach(inp => {
+    inp.addEventListener('input', () => { fixar(); meta.momentos[+inp.dataset.i].nome = inp.value.trim(); salvarTrechos(meta); });
+    // ao terminar de digitar, atualiza o gráfico e a lista (se nenhum outro campo estiver em uso)
+    inp.addEventListener('change', () => setTimeout(() => { if (E.aba === 'treino' && E.atual === meta.id && !(document.activeElement && raiz.contains(document.activeElement) && document.activeElement.matches('input,textarea'))) renderTreino(); }, 400));
+  });
+  $$('[data-mover]', raiz).forEach(b => b.addEventListener('click', () => {
+    const m = meta.momentos[+b.dataset.i], d = m.fim - m.ini;
+    m.ini = clamp(m.ini + +b.dataset.mover, 0, Math.max(0, dur - d)); m.fim = m.ini + d; refazer();
+  }));
+  $$('.trecho-ini', raiz).forEach(inp => inp.addEventListener('change', () => {
+    const v = lerTempo(inp.value), m = meta.momentos[+inp.dataset.i], d = m.fim - m.ini;
+    if (v == null) { inp.value = fmtRelogio(m.ini); toast('Escreva o início como minutos:segundos, por exemplo 50:30.'); return; }
+    m.ini = clamp(v, 0, Math.max(0, dur - d)); m.fim = m.ini + d; refazer();
+  }));
+  $$('[data-tirar-trecho]', raiz).forEach(b => b.addEventListener('click', () => { meta.momentos.splice(+b.dataset.tirarTrecho, 1); refazer(); }));
+  const lerDur = () => { const v = parseFloat(String($('#r-dur').value).replace(',', '.')); return isFinite(v) && v >= 0.5 && v <= 120 ? Math.round(v * 60) : null; };
+  $('#r-achar').addEventListener('click', () => {
+    const D = lerDur();
+    if (!D) { toast(`Escreva a duração de cada ${W.um} em minutos, por exemplo 4 ou 5,5.`); return; }
+    const qtd = +$('#r-qtd').value || 0;
+    const achados = acharRounds(series, D, qtd, an.limiar);
+    if (!achados.length) { toast(`Não encontrei trechos de ${durTexto(D)} com FC média acima de ${fmtN(an.limiar)} bpm. Escolha a quantidade.`, 6000); return; }
+    // cada nome antigo vai para um só trecho novo (o que mais coincide com ele);
+    // um pico com nome que não coincide com nenhum trecho novo continua na lista
+    const antigos = (meta.momentos || []).filter(o => o.nome);
+    const novos = achados.map(a => ({ ini: a.ini, fim: a.fim, nome: '', origem: 'rola' }));
+    const comum = (a, b) => Math.max(0, Math.min(a.fim, b.fim) - Math.max(a.ini, b.ini));
+    const sobra = [];
+    for (const o of antigos) {
+      let melhor = null, mx = 0;
+      for (const nv of novos) { const c = comum(o, nv); if (!nv.nome && c > mx) { mx = c; melhor = nv; } }
+      if (melhor && mx >= Math.min(o.fim - o.ini, melhor.fim - melhor.ini) / 2) melhor.nome = o.nome;
+      else if (!novos.some(nv => comum(o, nv) > 0)) sobra.push({ ini: o.ini, fim: o.fim, nome: o.nome, origem: o.origem === 'rola' ? 'rola' : 'pico' });
+    }
+    meta.momentos = novos.concat(sobra);
+    E.cfg.roundDur = { ...(E.cfg.roundDur || {}), [meta.tipo]: D }; salvarConfig();
+    E.confirmarTrechos = false; refazer();
+    const n = achados.length;
+    toast(`${n} ${n === 1 ? W.um : W.varios} de ${durTexto(D)} ${W.f ? (n === 1 ? 'encontrada' : 'encontradas') : (n === 1 ? 'encontrado' : 'encontrados')}. Dê um nome a cada ${W.f ? 'uma' : 'um'}, se quiser.`);
+  });
+  const add = $('#r-add');
+  if (add) add.addEventListener('click', () => {
+    const D = lerDur() || 240, ult = meta.momentos[meta.momentos.length - 1];
+    const ini = clamp(ult ? ult.fim + 60 : 0, 0, Math.max(0, dur - D));
+    meta.momentos.push({ ini, fim: ini + D, nome: '', origem: 'rola' }); refazer();
+  });
+  const limpar = $('#r-limpar'); if (limpar) limpar.addEventListener('click', () => { E.confirmarTrechos = true; abertos.add('picos'); renderTreino(); });
+  const nao = $('#r-limpar-nao'); if (nao) nao.addEventListener('click', () => { E.confirmarTrechos = false; renderTreino(); });
+  const sim = $('#r-limpar-sim'); if (sim) sim.addEventListener('click', () => { meta.momentos = []; E.confirmarTrechos = false; salvarTrechos(meta); renderTreino(); });
+}
 function ligarSeletor() {
   const sel = $('#t-sel'); if (!sel) return;
   sel.addEventListener('change', () => abrirTreino(sel.value));
@@ -1338,7 +1507,7 @@ function ligarSeletor() {
   $('#t-ant').addEventListener('click', () => { if (E.treinos[i + 1]) abrirTreino(E.treinos[i + 1].id); });
   $('#t-prox').addEventListener('click', () => { if (E.treinos[i - 1]) abrirTreino(E.treinos[i - 1].id); });
 }
-function abrirTreino(id) { E.atual = id; E.confirmarExclusao = false; mostrarAba('treino'); window.scrollTo({ top: 0 }); }
+function abrirTreino(id) { E.atual = id; E.confirmarExclusao = false; E.confirmarTrechos = false; mostrarAba('treino'); window.scrollTo({ top: 0 }); }
 async function excluirTreino(id) {
   try { await Armazem.excluir(id); } catch (e) { toast('Não consegui excluir: ' + (e.message || e.code || 'erro')); return; }
   E.treinos = E.treinos.filter(t => t.id !== id); E.series.delete(id);
@@ -1431,7 +1600,7 @@ function renderHistorico() {
     <section class="card"><div class="card-topo"><h2>Treinos</h2><button class="btn" id="h-comparar" ${marcados < 2 ? 'disabled' : ''}>Comparar (${marcados})</button></div>
       <ul class="lista-treinos">${dados.map(d => `<li class="lt"><input type="checkbox" data-cmp="${esc(d.t.id)}" ${E.cmp.includes(d.t.id) ? 'checked' : ''} aria-label="Marcar para comparar: ${esc(rotuloTreino(d.t))}">
         <button class="lt-abrir" data-abrir="${esc(d.t.id)}"><span class="lt-l1"><span class="lt-tipo">${esc(d.t.tipo)}</span><span class="lt-data">${esc(fmtDataCurta(d.t.inicioMs, d.t.fusoMin))} · ${esc(fmtHora(d.t.inicioMs, d.t.fusoMin))}</span></span>
-        <span class="lt-metr">${esc(durCurta(d.t.resumo.duracaoS))} · média ${fmtN(d.t.resumo.fcMed)} · máx. ${d.t.resumo.fcMax}${d.t.totais?.calorias != null ? ` · ${fmtN(d.t.totais.calorias)} kcal` : ''}</span>
+        <span class="lt-metr">${esc(durCurta(d.t.resumo.duracaoS))} · média ${fmtN(d.t.resumo.fcMed)} · máx. ${d.t.resumo.fcMax}${d.t.totais?.calorias != null ? ` · ${fmtN(d.t.totais.calorias)} kcal` : ''}${(() => { const n = (d.t.momentos || []).filter(m => m.origem === 'rola').length, Wd = palavraTrecho(d.t.tipo); return n ? ` · ${n} ${n === 1 ? Wd.um : Wd.varios}` : ''; })()}</span>
         <span class="pilha" aria-hidden="true">${pilhaZonas(d.zt, d.total, d.t.tipo)}</span></button></li>`).join('')}</ul></section>
     <section class="card mais">${secao('semanas', 'Tempo por semana', 'por zona', `<div class="graf" id="g-sem"></div>${legendaZonas(Z)}`)}</section>`;
   ligarFiltros(); ligarSecoes(raiz);
@@ -1505,6 +1674,7 @@ async function renderComparar() {
     ${[1, 2, 3, 4, 5].map(z => linhaM(`Z${z} (min)`, it => it.zt[z] / 60, v => fmtN(v, 1))).join('')}
     ${linhaM('Carga por zonas', it => cargaZonas(it.zt))}
     ${linhaM('Queda 1 min após o pico', it => it.an?.recPico?.queda ?? null)}
+    ${itens.some(it => (it.t.momentos || []).some(m => m.origem === 'rola')) ? (() => { const Wc = palavraTrecho(itens[0].t.tipo), rolasDe = it => (it.t.momentos || []).filter(m => m.origem === 'rola'); return linhaM(maiuscula(Wc.varios), it => rolasDe(it).length || null) + linhaM(`FC média ${Wc.f ? 'nas' : 'nos'} ${Wc.varios}`, it => { if (!it.s || !rolasDe(it).length) return null; let sm = 0, ps = 0; for (const m of rolasDe(it)) { const e = estatTrecho(it.s, it.an.P, it.an.s10, m.ini, m.fim); if (e.fcMed != null) { sm += e.fcMed * (m.fim - m.ini); ps += m.fim - m.ini; } } return ps ? sm / ps : null; }); })() : ''}
     ${linhaM('PSE', it => it.t.pse)}
     </tbody></table></div><p class="nota">Embaixo de cada valor, a diferença para o primeiro treino.</p>`;
   raiz.innerHTML = escolha + `
@@ -1693,7 +1863,10 @@ async function desenharCartao(cv, meta, series) {
   // título e data
   const fim = meta.inicioMs + r.duracaoS * 1000;
   escrever(ctx, meta.tipo || 'Treino', pad, y + 92, W - 2 * pad, 96, 700, P.tinta);
-  const sub = `${meta.titulo ? meta.titulo + ' · ' : ''}${fmtDiaSemana(meta.inicioMs, meta.fusoMin)}, ${fmtData(meta.inicioMs, meta.fusoMin)} · ${fmtHora(meta.inicioMs, meta.fusoMin)}–${fmtHora(fim, meta.fusoMin)}`;
+  const Wt = palavraTrecho(meta.tipo), mom = Array.isArray(meta.momentos) ? meta.momentos : [];
+  const rolas = mom.filter(m => m.origem === 'rola'), d0 = rolas.length ? rolas[0].fim - rolas[0].ini : 0;
+  const resumoRolas = rolas.length ? ` · ${rolas.length} ${rolas.length === 1 ? Wt.um : Wt.varios}${rolas.every(m => m.fim - m.ini === d0) ? ` de ${durTexto(d0)}` : ''}` : '';
+  const sub = `${meta.titulo ? meta.titulo + ' · ' : ''}${fmtDiaSemana(meta.inicioMs, meta.fusoMin)}, ${fmtData(meta.inicioMs, meta.fusoMin)} · ${fmtHora(meta.inicioMs, meta.fusoMin)}${resumoRolas || `–${fmtHora(fim, meta.fusoMin)}`}`;
   escrever(ctx, sub, pad, y + 142, W - 2 * pad, 34, 400, P.suave);
   y += blocos[2] + blocos[3];
 
@@ -1719,6 +1892,7 @@ async function desenharCartao(cv, meta, series) {
   vmin -= 6; vmax += 10;
   const GX = t => gx0 + t / dur * (gx1 - gx0), GY = v => gy1 - (v - vmin) / (vmax - vmin) * (gy1 - gy0);
   sombra(false);
+  for (const m of mom) { ctx.fillStyle = fundo === 'claro' ? 'rgba(242,140,74,.14)' : 'rgba(242,140,74,.12)'; ctx.fillRect(GX(m.ini), gy0 - 10, Math.max(3, GX(m.fim) - GX(m.ini)), gy1 - gy0 + 10); }
   const area = ctx.createLinearGradient(0, gy0, 0, gy1);
   area.addColorStop(0, fundo === 'claro' ? 'rgba(242,140,74,.30)' : 'rgba(242,140,74,.34)'); area.addColorStop(1, 'rgba(242,140,74,0)');
   ctx.beginPath(); ctx.moveTo(GX(pts[0][0]), gy1);

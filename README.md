@@ -5,6 +5,11 @@ ou do app (TCX, FIT, GPX ou CSV) e veja a curva da FC, o tempo em cada zona, os 
 recuperação e todos os dados do arquivo. Cada treino fica guardado no histórico, para comparar treinos
 entre si. As zonas (Z1 a Z5) são definidas por você na aba **Ajustes**.
 
+Em **Picos e rolas** (ou partidas, no futebol) você dá nome a cada pico de FC e informa quanto tempo
+durou cada rola ou partida: o app encontra os trechos dessa duração em que a FC ficou mais alta e
+marca cada um no gráfico, com média, máxima e queda da FC no minuto seguinte. O treino também pode
+virar uma imagem para compartilhar (Stories, Feed ou Quadrado).
+
 **Endereço:** https://guiwemery-pixel.github.io/pulso-do-treino/
 
 ![Capa do Pulso do Treino](capa.png)
