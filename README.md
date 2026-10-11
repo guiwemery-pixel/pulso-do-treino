@@ -45,4 +45,5 @@ entra no ar em cerca de um minuto.
 | `manifest.webmanifest`, `sw.js` | Instalação na tela inicial e funcionamento sem internet |
 | `icones/` | Ícone do app em vários tamanhos |
 | `capa.png` | Capa usada quando o link é compartilhado |
+| `codigo-secreto.html` | Código Secreto: mesa digital do jogo de tabuleiro, com tabuleiro jogável, sorteio das 25 palavras e gabarito |
 | `.nojekyll` | Faz o GitHub Pages servir os arquivos como estão |

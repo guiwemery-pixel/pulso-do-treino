@@ -16,6 +16,8 @@ self.addEventListener('fetch', ev => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (req.mode === 'navigate') {
+    // Só a página do app vai para o cache; outras páginas do site (como o Código Secreto) vêm direto da rede.
+    if (!url.pathname.endsWith('/') && !url.pathname.endsWith('/index.html')) return;
     ev.respondWith(fetch(req).then(r => {
       if (r.ok) { const copia = r.clone(); caches.open(CACHE).then(c => c.put('./', copia)); }
       return r;
