@@ -13,6 +13,16 @@ virar uma imagem para compartilhar (Stories, Feed ou Quadrado).
 Na aba **Pastas** você cria pastas (por exemplo Jiu-jitsu e Pelada) e coloca os treinos nelas. Cada
 pasta mostra os números somados e a FC treino a treino, e dá para importar um arquivo direto para ela.
 
+O **cronômetro** (botão ⏱ no topo) marca as rolas ou partidas durante o treino: você escolhe a duração,
+o descanso (fixo ou "até eu tocar", bom para pelada) e quantas serão. Ele toca, vibra e pisca a tela no
+começo e no fim de cada uma, mantém a tela acesa e guarda os horários. Quando o arquivo do relógio é
+importado, o treino daquele horário já vem com as rolas marcadas nos horários exatos.
+
+No **Histórico** (e em cada pasta) há o calendário de frequência, com os dias de treino e as semanas
+seguidas com treino. No topo de cada treino aparece a comparação com o treino anterior da mesma pasta (ou
+modalidade); tocar nela abre a comparação completa. Na tela de compartilhar, **Copiar como texto** copia o
+resumo do treino para colar no WhatsApp. Ao excluir um treino ou uma pasta, o aviso traz **Desfazer**.
+
 **Endereço:** https://guiwemery-pixel.github.io/pulso-do-treino/
 
 ![Capa do Pulso do Treino](capa.png)

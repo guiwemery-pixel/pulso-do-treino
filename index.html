@@ -301,10 +301,75 @@ h3 { font-size: 13px; font-weight: 700; }
 .segmentado button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
 
 /* avisos flutuantes */
-.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 20; background: var(--ink); color: var(--bg); padding: 10px 14px; border-radius: 10px; font-size: 13px; width: max-content; max-width: min(92vw, 520px); box-shadow: 0 8px 28px rgba(0,0,0,.25); white-space: pre-line; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 50; background: var(--ink); color: var(--bg); padding: 10px 14px; border-radius: 10px; font-size: 13px; width: max-content; max-width: min(92vw, 520px); box-shadow: 0 8px 28px rgba(0,0,0,.25); white-space: pre-line; }
 @media (min-width: 721px) { .toast { bottom: 20px; } }
 .soltar { position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center; background: rgba(20,24,31,.72); color: #F2EEE6; font-size: 22px; font-weight: 700; padding: 24px; text-align: center; }
 .soltar span { border: 2px dashed var(--accent); border-radius: 18px; padding: 32px 28px; }
+/* desfazer no aviso */
+.toast { pointer-events: none; }
+.toast-acao { pointer-events: auto; margin-left: 12px; border: 1px solid currentColor; background: none; color: inherit; border-radius: 999px; padding: 2px 10px; font-size: 12.5px; font-weight: 700; cursor: pointer; vertical-align: baseline; }
+body.com-crono .toast { bottom: calc(124px + env(safe-area-inset-bottom, 0px)); }
+
+/* comparação com o treino anterior, no resumo */
+.vs { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; font-size: 12px; color: var(--hero-muted); border-top: 1px solid rgba(255,255,255,.1); padding-top: 10px; font-variant-numeric: tabular-nums; }
+.vs-tit { flex-basis: 100%; border: 0; background: none; padding: 0 0 2px; text-align: left; color: var(--hero-muted); font-size: 12px; cursor: pointer; }
+.vs-tit b { color: var(--hero-ink); font-weight: 600; }
+.vs span b { color: var(--hero-ink); font-weight: 700; }
+
+/* calendário de frequência */
+.cal { display: grid; gap: 3px; }
+.cal-mes { font-size: 10.5px; color: var(--muted); white-space: nowrap; line-height: 1.3; grid-row: 1; }
+.cal-sem { font-size: 10px; color: var(--muted); line-height: 1; align-self: center; grid-column: 1; }
+.cal-d { display: block; aspect-ratio: 1; border-radius: 3px; background: var(--surface-2); border: 0; padding: 0; min-width: 0; }
+button.cal-d { cursor: pointer; }
+.cal-d.n1 { background: color-mix(in srgb, var(--accent) 32%, var(--surface-2)); }
+.cal-d.n2 { background: color-mix(in srgb, var(--accent) 62%, var(--surface-2)); }
+.cal-d.n3 { background: var(--accent); }
+.cal-d.n4 { background: var(--accent-ink); }
+.cal-d.hoje { outline: 1.5px solid var(--ink-2); outline-offset: 1px; }
+.cal-leg { display: flex; align-items: center; flex-wrap: wrap; gap: 3px; font-size: 11px; color: var(--muted); }
+.cal-leg .cal-d { width: 11px; }
+.cal-leg .cal-num { margin-left: auto; padding-left: 10px; }
+
+/* cronômetro */
+.btn-icone svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.crono-campos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.crono-campos .largo { grid-column: 1 / -1; }
+.crono-feito { background: var(--accent-soft); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.crono-feito ol { margin: 0; padding: 0; list-style: none; font-size: 12.5px; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.sessoes { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.sessoes li { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--grid); }
+.sessoes li:last-child { border-bottom: 0; }
+.sessoes .s-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.sessoes small { color: var(--muted); font-size: 11.5px; }
+.crono-tela { position: fixed; inset: 0; z-index: 45; display: flex; flex-direction: column; gap: 12px; padding: calc(12px + env(safe-area-inset-top, 0px)) 18px calc(14px + env(safe-area-inset-bottom, 0px)); background: var(--hero); color: var(--hero-ink); transition: background-color .25s; }
+.crono-tela.f-prep { background: var(--hero-2); }
+.crono-tela.f-luta { background: var(--accent); color: #14181F; }
+.crono-topo { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; font-weight: 600; }
+.crono-tit { opacity: .8; font-variant-numeric: tabular-nums; }
+.crono-min { border: 0; background: rgba(127,127,127,.2); color: inherit; border-radius: 999px; padding: 7px 12px; min-height: 36px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.crono-meio { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; }
+.crono-fase { font-size: clamp(24px, 7.5vw, 44px); font-weight: 700; line-height: 1.15; }
+.crono-tempo { font-size: min(27vw, 32vh); font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.crono-tempo.curto { font-size: min(34vw, 36vh); }
+.crono-tela.pausado .crono-tempo { opacity: .4; }
+.crono-sub { font-size: 14.5px; opacity: .85; max-width: 32em; }
+.crono-barra { width: min(100%, 520px); height: 6px; border-radius: 3px; background: rgba(127,127,127,.28); overflow: hidden; margin-top: 12px; }
+.crono-barra i { display: block; height: 100%; background: currentColor; border-radius: 3px; }
+.crono-botoes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 10px; width: 100%; max-width: 520px; margin: 0 auto; }
+.crono-botoes.um { grid-template-columns: minmax(0, 1fr); }
+.crono-bt { min-height: 58px; border-radius: 16px; border: 0; padding: 8px 12px; font-size: 16px; font-weight: 700; cursor: pointer; background: rgba(127,127,127,.22); color: inherit; }
+.crono-bt.forte { background: var(--accent); color: #14181F; }
+.f-luta .crono-bt.forte { background: #14181F; color: #F2EEE6; }
+.crono-parar { align-self: center; border: 0; background: none; color: inherit; font-size: 14px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; padding: 8px 14px; min-height: 40px; border-radius: 999px; }
+.crono-parar.confirmar { background: #B3261E; color: #fff; text-decoration: none; }
+.crono-tela.piscar { animation: piscar 1.2s steps(1, end) 1; }
+@keyframes piscar { 0% { filter: invert(1); } 25% { filter: none; } 50% { filter: invert(1); } 75%, 100% { filter: none; } }
+.crono-pilula { position: fixed; right: 12px; bottom: calc(70px + env(safe-area-inset-bottom, 0px)); z-index: 15; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 10px 14px; background: var(--hero); color: var(--hero-ink); font-weight: 700; font-size: 13.5px; font-variant-numeric: tabular-nums; box-shadow: 0 6px 20px rgba(0,0,0,.28); cursor: pointer; }
+.crono-pilula.f-luta { background: var(--accent); color: #14181F; }
+.crono-pilula i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: none; }
+@media (min-width: 721px) { .crono-pilula { bottom: 20px; } body.com-crono .toast { bottom: 76px; } }
+.texto-copiar { min-height: 140px; font-size: 13px !important; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 </head>
@@ -317,6 +382,7 @@ h3 { font-size: 13px; font-weight: 700; }
     </div>
     <div class="topo-acoes">
       <button class="btn" id="instalar" hidden>Instalar</button>
+      <button class="btn btn-icone" data-crono aria-label="Cronômetro de rolas e partidas" title="Cronômetro"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.5 2M9.5 2.5h5M12 2.5V6M18.5 6.5l1.5-1.5"/></svg></button>
       <label class="btn btn-acento" for="arquivo">+ Importar</label>
       <input id="arquivo" class="oculto-visual" type="file" multiple>
       <input id="restaurar" class="oculto-visual" type="file" accept=".json,application/json">
@@ -341,6 +407,7 @@ h3 { font-size: 13px; font-weight: 700; }
 </div>
 <div id="soltar" class="soltar" hidden><span>Solte o arquivo do treino</span></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<button id="crono-pilula" class="crono-pilula" data-crono hidden></button>
 <div id="dica" hidden></div>
 
 <script>
@@ -1041,7 +1108,7 @@ async function salvarArquivo(nome, conteudo, tipo = 'application/json', aviso = 
 async function importarArquivos(lista) {
   const arquivos = [...lista]; if (!arquivos.length) return;
   if (E.carregando) { toast('Aguarde o histórico terminar de carregar.'); return; }
-  let novos = 0, repetidos = 0, ultimo = null;
+  let novos = 0, repetidos = 0, ultimo = null, doCrono = 0, Wc = null;
   const erros = [];
   const pastaDestino = E.aba === 'pastas' && E.pastaAberta && pastaDe(E.pastaAberta) ? E.pastaAberta : null;
   for (const f of arquivos) {
@@ -1056,6 +1123,8 @@ async function importarArquivos(lista) {
         const { meta, series } = montarTreino(a, f.name);
         if (E.treinos.some(x => x.id === meta.id)) { repetidos++; ultimo = meta.id; continue; }
         if (pastaDestino) meta.pasta = pastaDestino;
+        const ses = sessaoDoTreino(meta), nc = ses ? aplicarSessao(meta, ses) : 0;
+        if (nc) { doCrono += nc; Wc = palavraTrecho(meta.tipo); }
         await Armazem.salvar(meta, series);
         E.treinos.push(meta); E.series.set(meta.id, series); novos++; ultimo = meta.id;
       }
@@ -1064,6 +1133,7 @@ async function importarArquivos(lista) {
   ordenar();
   const partes = [];
   if (novos) partes.push((novos === 1 ? 'Treino importado' : `${novos} treinos importados`) + (pastaDestino ? ` para a pasta ${pastaDe(pastaDestino).nome}.` : '.'));
+  if (doCrono) partes.push(`${maiuscula(marcadosTxt(doCrono, Wc))} com os horários do cronômetro.`);
   if (repetidos) partes.push(repetidos === 1 ? 'Esse treino já estava no histórico.' : `${repetidos} treinos já estavam no histórico.`);
   if (erros.length) partes.push('Não consegui ler ' + erros.join('; '));
   toast(partes.join('\n'), erros.length && !novos ? 9000 : 5000);
@@ -1079,11 +1149,14 @@ async function importarBackup(txt) {
     if (E.treinos.some(x => x.id === m.id)) { repetidos++; continue; }
     await Armazem.salvar(m, s); E.treinos.push(m); E.series.set(m.id, s); novos++; ultimo = m.id;
   }
-  const pastasAntes = pastas();
+  const pastasAntes = pastas(), sessoesAntes = sessoes();
   if (dados.config && !E.cfg.fcmax && !E.cfg.idade && E.cfg.metodo !== 'manual') { E.cfg = { ...CONFIG_PADRAO, ...dados.config }; salvarConfig(); }
   const pastasBackup = Array.isArray(dados.config?.pastas) ? dados.config.pastas.filter(p => p && p.id && p.nome) : [];
   const juntas = [...pastasAntes, ...pastasBackup.filter(p => !pastasAntes.some(a => a.id === p.id))];
   if (juntas.length !== pastas().length || juntas.some(p => !pastas().some(a => a.id === p.id))) { E.cfg.pastas = juntas; salvarConfig(); }
+  const sessoesBackup = Array.isArray(dados.config?.sessoes) ? dados.config.sessoes.filter(x => x && x.id && Array.isArray(x.rounds)) : [];
+  const todas = [...sessoesAntes, ...sessoesBackup.filter(x => !sessoesAntes.some(a => a.id === x.id))].sort((a, b) => b.inicioMs - a.inicioMs).slice(0, 40);
+  if (todas.length !== sessoes().length || todas.some(x => !sessoes().some(a => a.id === x.id))) { E.cfg.sessoes = todas; salvarConfig(); }
   return { novos, repetidos, ultimo };
 }
 const ordenar = () => E.treinos.sort((a, b) => b.inicioMs - a.inicioMs);
@@ -1370,7 +1443,7 @@ async function renderTreino() {
     <p class="resumo-sub">${meta.titulo ? `${esc(meta.tipo)} · ` : ''}${esc(fmtDiaSemana(meta.inicioMs, meta.fusoMin))}, ${esc(fmtData(meta.inicioMs, meta.fusoMin))} · ${esc(fmtHora(meta.inicioMs, meta.fusoMin))}–${esc(fmtHora(fim, meta.fusoMin))}</p>
     ${demo ? '' : `<div class="pasta-linha" id="t-pasta-linha"><button class="chip-pasta${pastaDe(meta.pasta) ? ' tem' : ''}" id="t-pasta" aria-label="Pasta do treino">${ICONE_PASTA}<span>${esc(pastaDe(meta.pasta)?.nome || 'Pôr numa pasta')}</span></button></div>`}</div>
     <button class="btn-compart" id="t-compartilhar" aria-label="Compartilhar a imagem do treino"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg><span>Compartilhar</span></button></div>
-    <div class="stats">${stat(durCurta(r.duracaoS), 'duração')}${stat(fmtN(r.fcMed), 'FC média')}${stat(fmtN(r.fcMax), 'FC máx.')}${quarto}</div></section>`;
+    <div class="stats">${stat(durCurta(r.duracaoS), 'duração')}${stat(fmtN(r.fcMed), 'FC média')}${stat(fmtN(r.fcMax), 'FC máx.')}${quarto}</div>${demo ? '' : linhaVs(meta, an, Z, palavraTrecho(meta.tipo))}</section>`;
   const zonasMax = Math.max(1, ...an.zt);
   const listaZonas = [0, 1, 2, 3, 4, 5].filter(z => z > 0 || an.zt[0] > 0).map(z => `<div class="zl">
       <span class="zl-rot"><b>${z ? 'Z' + z : 'Abaixo'}</b><small>${esc(faixaZona(z, Z.limites).replace(' bpm', ''))}</small></span>
@@ -1381,26 +1454,30 @@ async function renderTreino() {
   const W = palavraTrecho(meta.tipo), trechos = trechosDoTreino(meta, series, an), marcados = !!(meta.momentos && meta.momentos.length);
   const durPadrao = (marcados && meta.momentos[0].origem === 'rola' ? meta.momentos[0].fim - meta.momentos[0].ini : null) || E.cfg.roundDur?.[meta.tipo] || ({ rola: 300, partida: 480, tiro: 120 }[W.um] || 180);
   const nomeados = trechos.filter(t => t.nome).length;
+  const sessao = demo ? null : sessaoDoTreino(meta), doCrono = marcados && meta.momentos.some(m => m.fonte === 'cronometro');
+  const nSes = sessao && !doCrono ? momentosDaSessao(sessao, meta).length : 0, Ws = sessao ? palavraCrono(sessao.tipo) : W;
+  const avisoCrono = nSes ? `<div class="aviso"><span>O cronômetro gravou ${nSes} ${nSes === 1 ? Ws.um : Ws.varios} neste treino.</span><button class="btn-link" id="r-crono">Usar os horários</button></div>` : '';
+  const dicaCrono = sessao || demo ? '' : `<p class="nota">Dica: use o <button class="btn-link" data-crono>cronômetro</button> durante o treino e ${W.f ? 'as' : 'os'} ${W.varios} ficam ${W.f ? 'marcadas' : 'marcados'} na hora exata.</p>`;
   const soRolas = trechos.filter(t => t.origem === 'rola'), nRolas = soRolas.length, nPicosM = trechos.length - nRolas;
   const durIguais = nRolas && soRolas.every(t => t.dur === soRolas[0].dur) ? soRolas[0].dur : null;
   const contagem = [nRolas ? `${nRolas} ${nRolas === 1 ? W.um : W.varios}${durIguais ? ` de ${durTexto(durIguais)}` : ''}` : '', nPicosM ? `${nPicosM} ${nPicosM === 1 ? 'pico' : 'picos'}` : ''].filter(Boolean).join(' e ');
-  const blocos = `<div class="achar">
+  const blocos = `${avisoCrono}<div class="achar">
       <p class="texto">Diga quanto tempo durou cada ${W.um}. O app encontra ${W.f ? 'as' : 'os'} ${W.varios} pela FC: os trechos dessa duração em que ela ficou mais alta.</p>
       <div class="achar-campos">
         <label class="campo"><span>Duração de cada ${W.um} (min)</span><input type="text" id="r-dur" inputmode="decimal" value="${esc(fmtN(durPadrao / 60, durPadrao % 60 ? 1 : 0))}"></label>
         <label class="campo"><span>Quantidade</span><select id="r-qtd"><option value="">Automático</option>${Array.from({ length: 15 }, (_, k) => `<option value="${k + 1}">${k + 1}</option>`).join('')}</select></label>
       </div>
-      <button class="btn btn-acento" id="r-achar" ${demo ? 'disabled' : ''}>Encontrar ${W.varios}</button></div>
+      <button class="btn btn-acento" id="r-achar" ${demo ? 'disabled' : ''}>Encontrar ${W.varios}</button>${dicaCrono}</div>
     ${trechos.length ? `<ol class="trechos">${trechos.map((tr, k) => `<li class="trecho">
       <div class="trecho-l1"><b>${esc(rotuloTrecho(tr, k, W))}</b><span class="nota">${fmtRelogio(tr.ini)}–${fmtRelogio(tr.fim)} · ${esc(durTexto(tr.dur))}</span>
-        <span class="trecho-num">média ${fmtN(tr.fcMed)} · máx. ${tr.fcMax ?? '–'}${tr.rec ? ` · caiu ${tr.rec.queda} bpm em 1 min` : ''}</span></div>
+        <span class="trecho-num">média ${fmtN(tr.fcMed)} · máx. ${tr.fcMax ?? '–'}${tr.rec && tr.rec.queda > 0 ? ` · caiu ${tr.rec.queda} bpm em 1 min` : ''}</span></div>
       <input type="text" class="trecho-nome" data-i="${k}" value="${esc(tr.nome || '')}" placeholder="${k === 0 ? `Dê um nome. Ex.: aquecimento, ${W.um} com o João` : tr.origem === 'rola' ? `Dê um nome a ${W.f ? 'esta' : 'este'} ${W.um}` : 'Dê um nome a este pico'}" aria-label="Nome: ${esc(rotuloTrecho(tr))}" ${demo ? 'disabled' : ''}>
       ${marcados ? `<div class="trecho-acoes"><span>Início</span><button class="btn-mini" data-mover="-10" data-i="${k}" aria-label="Começar 10 segundos antes">‹ 10 s</button><input type="text" class="trecho-ini" data-i="${k}" value="${fmtRelogio(tr.ini)}" aria-label="Início em minutos e segundos"><button class="btn-mini" data-mover="10" data-i="${k}" aria-label="Começar 10 segundos depois">10 s ›</button><button class="btn-mini btn-perigo" data-tirar-trecho="${k}" aria-label="Excluir este trecho">×</button></div>` : ''}
     </li>`).join('')}</ol>` : `<p class="texto">Nenhum pico acima de ${fmtN(an.limiar)} bpm por mais de 1 minuto.</p>`}
-    ${marcados ? `<div class="botoes"><button class="btn-link" id="r-add">+ Adicionar ${W.um}</button>${E.confirmarTrechos ? `<span class="nota">Apagar os nomes e voltar aos picos automáticos?</span><button class="btn-link btn-perigo" id="r-limpar-sim">Sim</button><button class="btn-link" id="r-limpar-nao">Não</button>` : `<button class="btn-link btn-perigo" id="r-limpar">Voltar aos picos automáticos</button>`}</div>`
+    ${marcados ? `<div class="botoes"><button class="btn-link" id="r-add">+ Adicionar ${W.um}</button><button class="btn-link btn-perigo" id="r-limpar">Voltar aos picos automáticos</button></div>`
       : `<div class="botoes"><span class="nota">Picos automáticos a partir de</span><select id="c-esf" aria-label="Início dos picos automáticos"><option value="z2">Z2 · ${Z.limites[1]} bpm</option><option value="z3">Z3 · ${Z.limites[2]} bpm</option><option value="z4">Z4 · ${Z.limites[3]} bpm</option><option value="z5">Z5 · ${Z.limites[4]} bpm</option><option value="bpm">Valor fixo</option></select>
       <input type="number" id="c-esf-bpm" min="60" max="230" value="${E.cfg.esforcoBpm || 140}" aria-label="FC mínima do pico (bpm)" ${E.cfg.esforco === 'bpm' ? '' : 'hidden'} style="width:76px"></div>`}
-    <p class="nota">${marcados ? `A FC sobe alguns segundos depois do esforço começar; se ${W.f ? 'a' : 'o'} ${W.um} começou antes, ajuste o início.` : 'Pico: FC média de 20 s acima do limite por mais de 1 min.'} “Caiu em 1 min”: FC no ponto mais alto menos a FC 60 s depois. É uma leitura do sensor, não um teste clínico.</p>`;
+    <p class="nota">${doCrono ? 'Horários gravados pelo cronômetro. ' : ''}${marcados ? `A FC sobe alguns segundos depois do esforço começar; se ${W.f ? 'a' : 'o'} ${W.um} começou antes, ajuste o início.` : 'Pico: FC média de 20 s acima do limite por mais de 1 min.'} “Caiu em 1 min”: FC no ponto mais alto menos a FC 60 s depois. É uma leitura do sensor, não um teste clínico.</p>`;
   const partes = `<div class="botoes"><select id="c-parc" aria-label="Tamanho das partes"><option value="300">A cada 5 min</option><option value="600">A cada 10 min</option><option value="900">A cada 15 min</option></select></div>
     <div class="graf" id="g-parc"></div><p class="nota">Coluna: FC média, na cor da zona. Traço: FC máxima. O número embaixo é o minuto em que a parte começa.</p>`;
   const anotacoes = `<div class="form-grade form-2">
@@ -1415,11 +1492,11 @@ async function renderTreino() {
   const outros = canaisExtra.length || series.lat ? secao('outros', 'Outros registros', canaisExtra.map(c => c[1].toLowerCase()).concat(series.lat ? ['percurso'] : []).join(', '),
     canaisExtra.map(([k, nome, un]) => `<h3>${nome} <span class="nota">(${un})</span></h3><div class="graf" id="g-${k}"></div>`).join('') + (series.lat ? '<h3>Percurso</h3><div class="graf" id="g-mapa"></div>' : '')) : '';
   const subAnot = [meta.pse != null ? `PSE ${meta.pse}` : null, meta.rounds ? `${meta.rounds} rounds` : null, meta.notas ? 'com notas' : null].filter(Boolean).join(' · ');
-  const excluir = demo ? '' : `<div class="confirmar">${E.confirmarExclusao ? `<span>Excluir este treino do histórico?</span><button class="btn btn-perigo-cheio" id="excluir-sim">Excluir</button><button class="btn" id="excluir-nao">Cancelar</button>` : `<button class="btn-link btn-perigo" id="excluir">Excluir este treino</button>`}</div>`;
+  const excluir = demo ? '' : `<div class="confirmar"><button class="btn-link btn-perigo" id="excluir">Excluir este treino</button></div>`;
   raiz.innerHTML = `${aviso}${seletor}${resumo}
     <section class="card"><div class="card-topo"><h2>Frequência cardíaca</h2><label class="chave"><input type="checkbox" id="c-picos" ${picos ? 'checked' : ''}>Picos</label></div><div class="graf" id="g-fc"></div>
       ${picos && nomeados ? `<ol class="leg-trechos">${trechos.map(tr => tr.nome ? `<li><b>${esc(tr.curto)}</b> ${esc(tr.nome)}</li>` : '').join('')}</ol>` : ''}
-      ${picos ? `<p class="nota">${marcados ? `Faixas: ${contagem}.` : nBlocos ? `Faixas: os ${nBlocos === 1 ? 'pico' : `${nBlocos} picos`} acima de ${fmtN(an.limiar)} bpm. Dê nomes a eles em “Picos e ${W.varios}”.` : `Nenhum pico acima de ${fmtN(an.limiar)} bpm.`}</p>` : ''}</section>
+      ${picos ? `<p class="nota">${marcados ? `Faixas: ${contagem}.` : nBlocos ? `Faixas: ${nBlocos === 1 ? 'o pico' : `os ${nBlocos} picos`} acima de ${fmtN(an.limiar)} bpm. Dê nomes a ${nBlocos === 1 ? 'ele' : 'eles'} em “Picos e ${W.varios}”.` : `Nenhum pico acima de ${fmtN(an.limiar)} bpm.`}</p>` : ''}</section>
     <section class="card"><div class="card-topo"><h2>Tempo em cada zona</h2><span class="nota">carga ${fmtN(an.carga)}</span></div><div class="zonas-lista">${listaZonas}</div></section>
     <section class="card mais">
       ${secao('picos', `Picos e ${W.varios}`, marcados ? `${contagem}${nomeados ? ` · ${nomeados} com nome` : ''}` : `${nBlocos} ${nBlocos === 1 ? 'pico' : 'picos'}${nomeados ? ` · ${nomeados} com nome` : ''}`, blocos)}
@@ -1481,9 +1558,9 @@ async function renderTreino() {
   for (const id of ['n-tipo', 'n-titulo', 'n-pse', 'n-rounds', 'n-notas']) $('#' + id).addEventListener(id === 'n-pse' ? 'change' : 'input', () => { $('#n-status').textContent = 'Salvando…'; salvar(); });
   // ao sair de um campo, atualiza o resumo do topo (sem atrapalhar quem ainda está digitando)
   for (const id of ['n-tipo', 'n-titulo', 'n-pse', 'n-rounds']) $('#' + id).addEventListener('change', () => setTimeout(() => { if (E.aba === 'treino' && E.atual === meta.id && !raiz.contains(document.activeElement?.matches?.('input,textarea') ? document.activeElement : null)) renderTreino(); }, 900));
-  const ex = $('#excluir'); if (ex) ex.addEventListener('click', () => { E.confirmarExclusao = true; renderTreino(); });
-  const nao = $('#excluir-nao'); if (nao) nao.addEventListener('click', () => { E.confirmarExclusao = false; renderTreino(); });
-  const sim = $('#excluir-sim'); if (sim) sim.addEventListener('click', () => excluirTreino(meta.id));
+  $('#excluir').addEventListener('click', () => excluirTreino(meta.id));
+  const vs = $('#t-vs');
+  if (vs) vs.addEventListener('click', () => { const ant = treinoAnterior(meta); if (!ant) return; E.cmp = []; E.corCmp.clear(); alternarCmp(ant.id, true); alternarCmp(meta.id, true); mostrarAba('comparar'); window.scrollTo({ top: 0 }); });
 }
 // picos e rolas: nomear, encontrar pela duração, ajustar o início
 const salvarTrechos = debounce(async (meta) => {
@@ -1508,7 +1585,10 @@ function ligarTrechos(raiz, meta, series, an, trechos, W) {
     if (v == null) { inp.value = fmtRelogio(m.ini); toast('Escreva o início como minutos:segundos, por exemplo 50:30.'); return; }
     m.ini = clamp(v, 0, Math.max(0, dur - d)); m.fim = m.ini + d; refazer();
   }));
-  $$('[data-tirar-trecho]', raiz).forEach(b => b.addEventListener('click', () => { meta.momentos.splice(+b.dataset.tirarTrecho, 1); refazer(); }));
+  $$('[data-tirar-trecho]', raiz).forEach(b => b.addEventListener('click', () => {
+    const [tirado] = meta.momentos.splice(+b.dataset.tirarTrecho, 1); refazer();
+    toast('Trecho excluído.', 7000, { rotulo: 'Desfazer', fn: () => { meta.momentos = [...(meta.momentos || []), tirado]; refazer(); } });
+  }));
   const lerDur = () => { const v = parseFloat(String($('#r-dur').value).replace(',', '.')); return isFinite(v) && v >= 0.5 && v <= 120 ? Math.round(v * 60) : null; };
   $('#r-achar').addEventListener('click', () => {
     const D = lerDur();
@@ -1516,19 +1596,7 @@ function ligarTrechos(raiz, meta, series, an, trechos, W) {
     const qtd = +$('#r-qtd').value || 0;
     const achados = acharRounds(series, D, qtd, an.limiar);
     if (!achados.length) { toast(`Não encontrei trechos de ${durTexto(D)} com FC média acima de ${fmtN(an.limiar)} bpm. Escolha a quantidade.`, 6000); return; }
-    // cada nome antigo vai para um só trecho novo (o que mais coincide com ele);
-    // um pico com nome que não coincide com nenhum trecho novo continua na lista
-    const antigos = (meta.momentos || []).filter(o => o.nome);
-    const novos = achados.map(a => ({ ini: a.ini, fim: a.fim, nome: '', origem: 'rola' }));
-    const comum = (a, b) => Math.max(0, Math.min(a.fim, b.fim) - Math.max(a.ini, b.ini));
-    const sobra = [];
-    for (const o of antigos) {
-      let melhor = null, mx = 0;
-      for (const nv of novos) { const c = comum(o, nv); if (!nv.nome && c > mx) { mx = c; melhor = nv; } }
-      if (melhor && mx >= Math.min(o.fim - o.ini, melhor.fim - melhor.ini) / 2) melhor.nome = o.nome;
-      else if (!novos.some(nv => comum(o, nv) > 0)) sobra.push({ ini: o.ini, fim: o.fim, nome: o.nome, origem: o.origem === 'rola' ? 'rola' : 'pico' });
-    }
-    meta.momentos = novos.concat(sobra);
+    meta.momentos = juntarNomes(meta.momentos || [], achados.map(a => ({ ini: a.ini, fim: a.fim, nome: '', origem: 'rola' })));
     E.cfg.roundDur = { ...(E.cfg.roundDur || {}), [meta.tipo]: D }; salvarConfig();
     E.confirmarTrechos = false; refazer();
     const n = achados.length;
@@ -1540,9 +1608,19 @@ function ligarTrechos(raiz, meta, series, an, trechos, W) {
     const ini = clamp(ult ? ult.fim + 60 : 0, 0, Math.max(0, dur - D));
     meta.momentos.push({ ini, fim: ini + D, nome: '', origem: 'rola' }); refazer();
   });
-  const limpar = $('#r-limpar'); if (limpar) limpar.addEventListener('click', () => { E.confirmarTrechos = true; abertos.add('picos'); renderTreino(); });
-  const nao = $('#r-limpar-nao'); if (nao) nao.addEventListener('click', () => { E.confirmarTrechos = false; renderTreino(); });
-  const sim = $('#r-limpar-sim'); if (sim) sim.addEventListener('click', () => { meta.momentos = []; E.confirmarTrechos = false; salvarTrechos(meta); renderTreino(); });
+  const limpar = $('#r-limpar');
+  if (limpar) limpar.addEventListener('click', () => {
+    const antes = meta.momentos; meta.momentos = []; salvarTrechos(meta); abertos.add('picos'); renderTreino();
+    toast('De volta aos picos automáticos.', 7000, { rotulo: 'Desfazer', fn: () => { meta.momentos = antes; refazer(); } });
+  });
+  const usar = $('#r-crono');
+  if (usar) usar.addEventListener('click', async () => {
+    const s = sessaoDoTreino(meta), tipoAntes = meta.tipo, n = s ? aplicarSessao(meta, s) : 0;
+    if (!n) return;
+    if (meta.tipo !== tipoAntes) { try { await Armazem.atualizar(meta.id, { tipo: meta.tipo }); } catch (e) { /* a modalidade volta a ser salva nas anotações */ } }
+    refazer();
+    toast(`${maiuscula(marcadosTxt(n, palavraTrecho(meta.tipo)))} com os horários do cronômetro.`);
+  });
 }
 // dar nome ao treino direto no topo; em branco, volta a mostrar a modalidade
 function renomearTreino(meta) {
@@ -1574,12 +1652,22 @@ function ligarSeletor() {
   $('#t-prox').addEventListener('click', () => { if (E.treinos[i - 1]) abrirTreino(E.treinos[i - 1].id); });
 }
 function abrirTreino(id) { E.atual = id; E.confirmarExclusao = false; E.confirmarTrechos = false; mostrarAba('treino'); window.scrollTo({ top: 0 }); }
+// exclui na hora e oferece "Desfazer" (guarda o treino na memória para gravar de novo)
 async function excluirTreino(id) {
+  const meta = E.treinos.find(t => t.id === id); if (!meta) return;
+  let series = null; try { series = await obterSerie(id); } catch (e) { series = null; }
   try { await Armazem.excluir(id); } catch (e) { toast('Não consegui excluir: ' + (e.message || e.code || 'erro')); return; }
+  const i = E.treinos.indexOf(meta);
   E.treinos = E.treinos.filter(t => t.id !== id); E.series.delete(id);
   E.cmp = E.cmp.filter(x => x !== id); E.corCmp.delete(id);
-  E.confirmarExclusao = false; E.atual = E.treinos[0]?.id || null;
-  toast('Treino excluído.'); renderTreino();
+  E.confirmarExclusao = false; E.atual = (E.treinos[i] || E.treinos[i - 1])?.id || null;
+  renderTreino();
+  toast('Treino excluído.', 8000, series ? { rotulo: 'Desfazer', fn: async () => {
+    try { await Armazem.salvar(meta, series); } catch (e) { toast('Não consegui desfazer: ' + (e.message || e.code || 'erro')); return; }
+    if (!E.treinos.some(t => t.id === id)) E.treinos.push(meta);
+    E.series.set(id, series); ordenar(); E.atual = id;
+    toast('O treino voltou para o histórico.'); mostrarAba('treino');
+  } } : null);
 }
 
 function cartaoArquivo(meta) {
@@ -1696,10 +1784,11 @@ function renderPasta(chave) {
         : `<p class="texto">${sem ? 'Todos os treinos estão em pastas.' : 'A pasta está vazia. Coloque treinos que já estão no app ou importe um arquivo direto para ela.'}</p>`}
       <div class="botoes">${sem ? '' : `<label class="btn btn-acento" for="arquivo">+ Importar para esta pasta</label><button class="btn" id="p-add">Adicionar treinos</button>`}${itens.length >= 2 ? '<button class="btn" id="p-comparar">Comparar</button>' : ''}</div></section>
     ${painelAdd}
+    ${itens.length ? cartaoFrequencia(itens, raiz.clientWidth) : ''}
     ${itens.length >= 2 ? `<section class="card"><div class="card-topo"><h2>FC por treino</h2><div class="legenda"><span><i class="lk" style="background:var(--s1)"></i>média</span><span><i class="lk" style="background:var(--s2)"></i>máxima</span></div></div><div class="graf" id="g-pasta"></div></section>` : ''}
     ${itens.length ? `<section class="card"><div class="card-topo"><h2>Treinos</h2><span class="nota">para mudar de pasta, use a lista ao lado</span></div>
       <ul class="lista-treinos">${dados.map(d => linhaTreino(d.t, d.zt, d.total, `<select class="sel-pasta" data-mover-pasta="${esc(d.t.id)}" aria-label="Mudar ${esc(nomeTreino(d.t))} de pasta">${opcoesPasta(d.t.pasta)}</select>`)).join('')}</ul></section>` : ''}
-    ${sem ? '' : `<div class="confirmar">${E.confirmarPasta ? `<span>Excluir a pasta? Os treinos não são apagados, só ficam sem pasta.</span><button class="btn btn-perigo-cheio" id="p-excluir-sim">Excluir pasta</button><button class="btn" id="p-excluir-nao">Cancelar</button>` : '<button class="btn-link btn-perigo" id="p-excluir">Excluir pasta</button>'}</div>`}`;
+    ${sem ? '' : '<div class="confirmar"><button class="btn-link btn-perigo" id="p-excluir">Excluir pasta</button><span class="nota">Os treinos não são apagados, só ficam sem pasta.</span></div>'}`;
   if (itens.length >= 2) graficoEvolucao($('#g-pasta'), itens);
   $('#p-voltar').addEventListener('click', () => { E.pastaAberta = null; E.addPasta = false; E.confirmarPasta = false; renderPastas(); });
   $$('[data-mover-pasta]', raiz).forEach(sel => sel.addEventListener('change', async () => {
@@ -1740,13 +1829,18 @@ function renderPasta(chave) {
     inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); salvar(); } else if (ev.key === 'Escape') renderPasta(chave); });
     $('#p-nome-ok').addEventListener('click', salvar);
   });
-  const ex = $('#p-excluir'); if (ex) ex.addEventListener('click', () => { E.confirmarPasta = true; renderPasta(chave); });
-  const exN = $('#p-excluir-nao'); if (exN) exN.addEventListener('click', () => { E.confirmarPasta = false; renderPasta(chave); });
-  const exS = $('#p-excluir-sim'); if (exS) exS.addEventListener('click', async () => {
-    await moverParaPasta(itens.map(t => t.id), null);
+  $('#p-excluir').addEventListener('click', async () => {
+    const ids = itens.map(t => t.id), pos = pastas().findIndex(o => o.id === p.id);
+    await moverParaPasta(ids, null);
     E.cfg.pastas = pastas().filter(o => o.id !== p.id); gravarConfig();
-    E.pastaAberta = null; E.confirmarPasta = false;
-    toast(`Pasta “${p.nome}” excluída. Os treinos dela ficaram sem pasta.`); renderPastas();
+    E.pastaAberta = null; E.confirmarPasta = false; renderPastas();
+    toast(`Pasta “${p.nome}” excluída. Os treinos dela ficaram sem pasta.`, 8000, { rotulo: 'Desfazer', fn: async () => {
+      const lista = pastas().filter(o => o.id !== p.id); lista.splice(Math.min(pos, lista.length), 0, p);
+      E.cfg.pastas = lista; gravarConfig();
+      await moverParaPasta(ids, p.id);
+      E.pastaAberta = p.id; toast(`A pasta “${p.nome}” voltou.`);
+      if (E.aba === 'pastas') renderPastas(); else mostrarAba('pastas');
+    } });
   });
 }
 // no topo do treino: em qual pasta ele está, com troca rápida
@@ -1773,8 +1867,8 @@ function ligarChipPasta(meta) {
 }
 
 // ----- histórico -----
-function treinosFiltrados() {
-  const dias = E.periodo === 'tudo' ? null : +E.periodo, corte = dias ? Date.now() - dias * 86400000 : -Infinity;
+function treinosFiltrados(todoPeriodo) {
+  const dias = E.periodo === 'tudo' || todoPeriodo ? null : +E.periodo, corte = dias ? Date.now() - dias * 86400000 : -Infinity;
   if (E.filtroPasta && E.filtroPasta !== 'sem' && !pastaDe(E.filtroPasta)) E.filtroPasta = '';
   return E.treinos.filter(t => t.inicioMs >= corte && (!E.filtroTipo || t.tipo === E.filtroTipo) && (!E.filtroPasta || (E.filtroPasta === 'sem' ? !pastaDe(t.pasta) : t.pasta === E.filtroPasta)));
 }
@@ -1819,6 +1913,7 @@ function renderHistorico() {
   const marcados = E.cmp.length;
   raiz.innerHTML = `${avisoBackup()}${filtros}
     <section class="card"><div class="stats">${stat(fmtN(lista.length), lista.length === 1 ? 'treino' : 'treinos')}${stat(durCurta(soma(d => d.t.resumo.duracaoS)), 'tempo total')}${stat(fmtN(fcMedia), 'FC média')}${stat(durCurta(soma(d => d.alta)), 'em Z4–Z5')}</div></section>
+    ${cartaoFrequencia(treinosFiltrados(true), raiz.clientWidth)}
     <section class="card"><div class="card-topo"><h2>FC por treino</h2><div class="legenda"><span><i class="lk" style="background:var(--s1)"></i>média</span><span><i class="lk" style="background:var(--s2)"></i>máxima</span></div></div><div class="graf" id="g-evol"></div></section>
     <section class="card"><div class="card-topo"><h2>Treinos</h2><button class="btn" id="h-comparar" ${marcados < 2 ? 'disabled' : ''}>Comparar (${marcados})</button></div>
       <ul class="lista-treinos">${dados.map(d => `<li class="lt"><input type="checkbox" data-cmp="${esc(d.t.id)}" ${E.cmp.includes(d.t.id) ? 'checked' : ''} aria-label="Marcar para comparar: ${esc(rotuloTreino(d.t))}">
@@ -2204,7 +2299,8 @@ function abrirCartao(meta, series) {
     <div class="campo"><span>Fundo</span><div class="segmentado" data-grupo="cartaoFundo">${Object.entries(FUNDOS).map(([k, n]) => `<button data-valor="${k}">${n}</button>`).join('')}</div></div>
     <input type="file" id="cartao-foto" accept="image/*" class="oculto-visual">
     <p class="nota" id="cartao-nota"></p>
-    <div class="botoes">${enviar ? '<button class="btn btn-acento" id="cartao-enviar">Compartilhar</button>' : ''}<button class="btn${enviar ? '' : ' btn-acento'}" id="cartao-salvar">Salvar imagem</button></div></div>`;
+    <div class="botoes">${enviar ? '<button class="btn btn-acento" id="cartao-enviar">Compartilhar</button>' : ''}<button class="btn${enviar ? '' : ' btn-acento'}" id="cartao-salvar">Salvar imagem</button><button class="btn" id="cartao-texto">Copiar como texto</button></div>
+    <textarea id="cartao-txt" class="texto-copiar" readonly hidden aria-label="Texto do treino"></textarea></div>`;
   document.body.appendChild(el); document.body.style.overflow = 'hidden';
   const cv = $('#cartao-cv');
   const notas = { escuro: '', claro: '', foto: 'Toque em Foto de novo para trocar a imagem.', transparente: 'Imagem sem fundo, para colocar por cima de uma foto nos Stories.' };
@@ -2239,12 +2335,407 @@ function abrirCartao(meta, series) {
     try { await navigator.share({ files: [new File([blob], nomeArq(ext), { type: tipo })], title: `${nomeTreino(meta)} · ${fmtData(meta.inicioMs, meta.fusoMin)}` }); }
     catch (err) { if (err && err.name !== 'AbortError') toast('Não consegui compartilhar. Use Salvar imagem.'); }
   });
+  $('#cartao-texto').addEventListener('click', async () => {
+    const txt = textoTreino(meta, series), ta = $('#cartao-txt');
+    if (await copiarTexto(txt)) { ta.hidden = true; toast('Texto copiado. É só colar no WhatsApp ou onde quiser.'); return; }
+    ta.value = txt; ta.hidden = false; ta.focus(); ta.select();
+    toast('Não consegui copiar sozinho. O texto está abaixo: selecione e copie.');
+  });
   $('#cartao-salvar').addEventListener('click', async () => {
     const { blob, ext, tipo } = await gerar();
     await salvarArquivo(nomeArq(ext), blob, tipo, 'Imagem salva em Downloads.');
   });
   atualizar();
   $('#cartao-fechar').focus();
+}
+
+// ================= cronômetro de rolas e partidas =================
+// Toca e vibra no começo e no fim de cada rola e guarda os horários. Quando o arquivo do relógio
+// é importado, o treino que coincide com a sessão já vem com as rolas marcadas nesses horários.
+const CRONO_TIPOS = {
+  rola: { nome: 'Jiu-jitsu', tipo: 'Jiu-jitsu', dur: 300, desc: 60 },
+  partida: { nome: 'Futebol', tipo: 'Futebol', dur: 480, desc: 0 },
+  round: { nome: 'Outro', tipo: '', dur: 180, desc: 60 }
+};
+const DESCANSOS = [0, 30, 60, 90, 120, 180, 300];
+const PREPARO_S = 10;
+const C = { fase: null, n: 0, ini: 0, dur: null, pausa: 0, pausadoEm: null, sessao: null, relogio: null, wake: null, audio: null, aberto: false, ultBipe: null, confirmarParar: 0 };
+const sessoes = () => Array.isArray(E.cfg.sessoes) ? E.cfg.sessoes.filter(s => s && s.id && Array.isArray(s.rounds)) : [];
+const cronoAtivo = () => !!C.fase && C.fase !== 'fim';
+const palavraCrono = tipo => palavraTrecho(CRONO_TIPOS[tipo]?.tipo || '');
+const fmtSeg = s => s < 60 ? `${s} s` : s % 60 ? `${Math.floor(s / 60)} min ${s % 60} s` : `${s / 60} min`;
+const durCampo = s => s % 60 ? fmtRelogio(s) : String(s / 60);
+const marcadosTxt = (n, W) => `${n} ${n === 1 ? W.um : W.varios} ${W.f ? (n === 1 ? 'marcada' : 'marcadas') : (n === 1 ? 'marcado' : 'marcados')}`;
+function cronoCfg() {
+  const c = E.cfg.cronometro || {}, tipo = CRONO_TIPOS[c.tipo] ? c.tipo : 'rola', d = CRONO_TIPOS[tipo], k = c[tipo] || {};
+  return { tipo, dur: k.dur || d.dur, desc: DESCANSOS.includes(k.desc) ? k.desc : d.desc, qtd: k.qtd || 0, som: c.som !== false };
+}
+function guardarCronoCfg(patch, doTipo) {
+  const c = E.cfg.cronometro || {}, tipo = cronoCfg().tipo;
+  E.cfg.cronometro = doTipo ? { ...c, tipo, [tipo]: { ...(c[tipo] || {}), ...patch } } : { ...c, ...patch };
+  salvarConfig();
+}
+
+// ----- sessão gravada × treino importado -----
+const coincide = (s, ini, fim) => (s.rounds || []).reduce((a, r) => a + Math.max(0, Math.min(r.fim, fim) - Math.max(r.ini, ini)), 0);
+function sessaoDoTreino(meta) {
+  const ini = meta.inicioMs, fim = ini + meta.resumo.duracaoS * 1000;
+  let melhor = null, mx = 0;
+  for (const s of sessoes()) { const c = coincide(s, ini, fim); if (c > mx) { mx = c; melhor = s; } }
+  return melhor;
+}
+const treinoDaSessao = s => E.treinos.find(t => coincide(s, t.inicioMs, t.inicioMs + t.resumo.duracaoS * 1000) > 0) || null;
+function momentosDaSessao(s, meta) {
+  const ini = meta.inicioMs, dur = meta.resumo.duracaoS;
+  return s.rounds.map(r => ({ ini: clamp(Math.round((r.ini - ini) / 1000), 0, dur), fim: clamp(Math.round((r.fim - ini) / 1000), 0, dur), nome: '', origem: 'rola', fonte: 'cronometro' }))
+    .filter(m => m.fim - m.ini >= 20);
+}
+// cada nome antigo vai para um só trecho novo (o que mais coincide com ele);
+// um pico com nome que não coincide com nenhum trecho novo continua na lista
+function juntarNomes(antigos, novos) {
+  const comum = (a, b) => Math.max(0, Math.min(a.fim, b.fim) - Math.max(a.ini, b.ini));
+  const sobra = [];
+  for (const o of antigos.filter(x => x.nome)) {
+    let melhor = null, mx = 0;
+    for (const nv of novos) { const c = comum(o, nv); if (!nv.nome && c > mx) { mx = c; melhor = nv; } }
+    if (melhor && mx >= Math.min(o.fim - o.ini, melhor.fim - melhor.ini) / 2) melhor.nome = o.nome;
+    else if (!novos.some(nv => comum(o, nv) > 0)) sobra.push({ ini: o.ini, fim: o.fim, nome: o.nome, origem: o.origem === 'rola' ? 'rola' : 'pico' });
+  }
+  return novos.concat(sobra).sort((a, b) => a.ini - b.ini);
+}
+// marca no treino as rolas gravadas pelo cronômetro; devolve quantas
+function aplicarSessao(meta, s) {
+  const novos = momentosDaSessao(s, meta);
+  if (!novos.length) return 0;
+  meta.momentos = juntarNomes(meta.momentos || [], novos);
+  const T = CRONO_TIPOS[s.tipo];
+  if (T && T.tipo && palavraTrecho(meta.tipo).um !== palavraTrecho(T.tipo).um && !tipoDoEsporte(meta.esporteArquivo)) meta.tipo = T.tipo;
+  E.cfg.roundDur = { ...(E.cfg.roundDur || {}), [meta.tipo]: s.durS }; salvarConfig();
+  return novos.length;
+}
+
+// ----- som, vibração, tela acesa -----
+function prepararSom() {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    if (!C.audio) C.audio = new AC();
+    if (C.audio.state !== 'running') C.audio.resume().catch(() => {});
+    bipe(440, 0.03, 0, 0.0001); // no iPhone o som só é liberado depois de tocar algo a partir de um toque
+  } catch (e) { C.audio = null; }
+}
+function bipe(freq, dur, atraso = 0, vol = 0.2) {
+  const a = C.audio; if (!a) return;
+  try {
+    if (a.state === 'suspended') a.resume().catch(() => {});
+    const t0 = a.currentTime + 0.02 + atraso, o = a.createOscillator(), g = a.createGain();
+    o.type = 'square'; o.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.015);
+    g.gain.setValueAtTime(vol, t0 + Math.max(0.02, dur - 0.04)); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(a.destination); o.start(t0); o.stop(t0 + dur + 0.02);
+  } catch (e) { /* segue sem som */ }
+}
+function sinal(tipo) {
+  if (C.sessao?.som) {
+    if (tipo === 'conta') bipe(880, 0.12);
+    else if (tipo === 'inicio') bipe(1320, 0.7);
+    else { bipe(660, 0.25); bipe(660, 0.25, 0.35); bipe(660, 0.6, 0.7); }
+  }
+  if (tipo === 'conta') return;
+  try { navigator.vibrate?.(tipo === 'inicio' ? 500 : [300, 120, 300, 120, 600]); } catch (e) { /* sem vibração */ }
+  const tela = $('.crono-tela');
+  if (tela) { tela.classList.remove('piscar'); void tela.offsetWidth; tela.classList.add('piscar'); }
+}
+async function manterTelaAcesa() {
+  if (C.wake || !('wakeLock' in navigator) || document.visibilityState !== 'visible') return;
+  try { const w = await navigator.wakeLock.request('screen'); if (!cronoAtivo()) { w.release(); return; } C.wake = w; w.addEventListener('release', () => { if (C.wake === w) C.wake = null; }); }
+  catch (e) { C.wake = null; }
+}
+function soltarTela() { const w = C.wake; C.wake = null; try { w?.release(); } catch (e) { /* já estava solta */ } }
+
+// ----- fases: preparo › rola › descanso › rola … -----
+function irPara(fase, quando) {
+  const s = C.sessao;
+  C.fase = fase; C.ini = quando; C.pausa = 0; C.pausadoEm = null; C.ultBipe = null; C.confirmarParar = 0;
+  C.dur = fase === 'prep' ? PREPARO_S * 1000 : fase === 'luta' ? s.durS * 1000 : fase === 'desc' && s.descS ? s.descS * 1000 : null;
+}
+const decorrido = (t = Date.now()) => t - C.ini - C.pausa - (C.pausadoEm ? t - C.pausadoEm : 0);
+const restante = (t = Date.now()) => C.dur == null ? null : C.dur - decorrido(t);
+function gravarSessao() {
+  const s = C.sessao; if (!s) return;
+  const outras = sessoes().filter(x => x.id !== s.id);
+  E.cfg.sessoes = s.rounds.length ? [limpo(s), ...outras].slice(0, 40) : outras;
+  gravarConfig();
+}
+function fecharLuta(quando, avisar) {
+  const s = C.sessao;
+  s.rounds.push({ ini: C.ini, fim: quando });
+  gravarSessao();
+  if (s.qtd && s.rounds.length >= s.qtd) { encerrarCrono(quando, avisar); return; }
+  irPara('desc', quando);
+  if (avisar) sinal('fim');
+}
+function encerrarCrono(quando, avisar) {
+  const s = C.sessao;
+  clearInterval(C.relogio); C.relogio = null; soltarTela();
+  C.fase = 'fim'; s.fimMs = quando; gravarSessao();
+  document.body.classList.remove('com-crono');
+  if (avisar) sinal('fim');
+  if (C.aberto) desenharCrono(true); else abrirCrono();
+}
+function tique() {
+  if (!cronoAtivo()) return;
+  const t = Date.now();
+  // de volta de segundo plano, pode ter passado mais de uma fase: usa o horário exato de cada troca
+  for (let k = 0; k < 400 && cronoAtivo() && !C.pausadoEm && C.dur != null && restante(t) <= 0; k++) {
+    const fimFase = C.ini + C.pausa + C.dur, avisar = t - fimFase < 2000;
+    if (C.fase === 'luta') fecharLuta(fimFase, avisar);
+    else { C.n++; irPara('luta', fimFase); if (avisar) sinal('inicio'); }
+  }
+  if (!cronoAtivo()) return;
+  const r = restante(t);
+  if (r != null && !C.pausadoEm) { const s = Math.ceil(r / 1000); if (s >= 1 && s <= 3 && C.ultBipe !== s) { C.ultBipe = s; sinal('conta'); } }
+  desenharCrono();
+}
+function comecarCrono() {
+  const durIn = $('#cr-dur');
+  if (durIn) {
+    const v = lerTempo(durIn.value);
+    if (!(v >= 30 && v <= 3600)) { toast('Escreva a duração em minutos, por exemplo 5 ou 4:30.'); durIn.focus(); return; }
+    guardarCronoCfg({ dur: v, qtd: +$('#cr-qtd').value, desc: +$('#cr-desc').value }, true);
+    guardarCronoCfg({ som: $('#cr-som').checked });
+  }
+  const c = cronoCfg(), t = Date.now();
+  if (c.som) prepararSom();
+  C.sessao = { id: 's' + t.toString(36), tipo: c.tipo, durS: c.dur, descS: c.desc, qtd: c.qtd, som: c.som, inicioMs: t, rounds: [] };
+  C.n = 0; irPara('prep', t);
+  clearInterval(C.relogio); C.relogio = setInterval(tique, 200);
+  manterTelaAcesa();
+  document.body.classList.add('com-crono');
+  desenharCrono(true);
+}
+function acaoCrono(a) {
+  const t = Date.now();
+  if (!cronoAtivo()) return;
+  if (a === 'pausa') {
+    if (C.pausadoEm) { C.pausa += t - C.pausadoEm; C.pausadoEm = null; } else if (C.dur != null) C.pausadoEm = t;
+  } else if (a === 'pular') {
+    if (C.fase === 'luta') fecharLuta(t, true);
+    else { C.n++; irPara('luta', t); sinal('inicio'); }
+  } else if (a === 'parar') {
+    if (t - C.confirmarParar > 3000) { C.confirmarParar = t; desenharCrono(); return; }
+    if (C.fase === 'luta' && decorrido(t) >= 20000) C.sessao.rounds.push({ ini: C.ini, fim: t });
+    encerrarCrono(t, false); return;
+  }
+  if (cronoAtivo()) desenharCrono();
+}
+
+// ----- telas -----
+function textosCrono() {
+  const s = C.sessao, W = palavraCrono(s.tipo), t = Date.now(), r = restante(t);
+  const seg = r != null ? Math.max(0, Math.ceil(r / 1000)) : Math.floor(decorrido(t) / 1000);
+  const deQtd = s.qtd ? ` de ${s.qtd}` : '', proximo = `${ordinalG(C.n, W.f)} ${W.um}`;
+  const x = { tempo: fmtRelogio(seg), barra: r != null ? clamp(1 - r / C.dur, 0, 1) : null };
+  if (C.fase === 'prep') Object.assign(x, { fase: 'Prepare-se', curta: 'Prepare-se', sub: `${maiuscula(proximo)}${deQtd} · ${durTexto(s.durS)}`, forte: 'Começar já' });
+  else if (C.fase === 'luta') {
+    const ultima = s.qtd && C.n >= s.qtd;
+    Object.assign(x, { fase: `${ordinalG(C.n - 1, W.f)} ${W.um}`, curta: `${ordinalG(C.n - 1, W.f)} ${W.um}`, forte: `Encerrar ${W.um}`,
+      sub: `${s.qtd ? `${C.n}${deQtd} · ` : ''}${ultima ? `${W.f ? 'a última' : 'o último'}` : `depois, descanso ${s.descS ? 'de ' + fmtSeg(s.descS) : 'até você tocar'}`}` });
+  } else Object.assign(x, { fase: 'Descanso', curta: 'Descanso', forte: `Começar ${proximo}`,
+    sub: C.dur == null ? `Toque em “Começar” quando ${W.f ? 'a' : 'o'} ${proximo} começar` : `${W.f ? 'Próxima' : 'Próximo'}: ${proximo}${deQtd}` });
+  if (C.pausadoEm) x.sub = 'Pausado · ' + x.sub;
+  return x;
+}
+const definir = (el, txt) => { if (el && el.textContent !== txt) el.textContent = txt; };
+function desenharCrono(refazer) {
+  if (!C.aberto) { desenharPilula(); return; }
+  const el = $('#crono'); if (!el) return;
+  if (!cronoAtivo()) { el.dataset.modo = 'folha'; el.className = 'folha-fundo'; el.innerHTML = folhaCrono(); ligarFolhaCrono(el); return; }
+  if (refazer || el.dataset.modo !== 'tela') {
+    el.dataset.modo = 'tela'; el.className = '';
+    el.innerHTML = `<div class="crono-tela" role="dialog" aria-modal="true" aria-label="Cronômetro">
+      <div class="crono-topo"><button class="crono-min" data-c="min" aria-label="Minimizar o cronômetro">⌄ Minimizar</button><span class="crono-tit"></span></div>
+      <div class="crono-meio"><p class="crono-fase"></p><p class="crono-tempo" role="timer"></p><p class="crono-sub"></p><div class="crono-barra"><i></i></div></div>
+      <div class="crono-botoes"><button class="crono-bt" data-c="pausa"></button><button class="crono-bt forte" data-c="pular"></button></div>
+      <button class="crono-parar" data-c="parar"></button></div>`;
+  }
+  const x = textosCrono(), s = C.sessao, tela = $('.crono-tela', el), confirmar = Date.now() - C.confirmarParar < 3000;
+  for (const f of ['prep', 'luta', 'desc']) tela.classList.toggle('f-' + f, C.fase === f);
+  tela.classList.toggle('pausado', !!C.pausadoEm);
+  definir($('.crono-tit', el), `${CRONO_TIPOS[s.tipo].nome} · ${fmtHora(Date.now())}`);
+  definir($('.crono-fase', el), x.fase); definir($('.crono-tempo', el), x.tempo); $('.crono-tempo', el).classList.toggle('curto', x.tempo.length <= 4); definir($('.crono-sub', el), x.sub);
+  const barra = $('.crono-barra', el); barra.hidden = x.barra == null; if (x.barra != null) barra.firstElementChild.style.width = (x.barra * 100).toFixed(1) + '%';
+  const pausa = $('[data-c="pausa"]', el); pausa.hidden = C.dur == null; definir(pausa, C.pausadoEm ? 'Continuar' : 'Pausar');
+  $('.crono-botoes', el).classList.toggle('um', C.dur == null);
+  definir($('[data-c="pular"]', el), x.forte);
+  const parar = $('[data-c="parar"]', el); parar.classList.toggle('confirmar', confirmar); definir(parar, confirmar ? 'Toque de novo para parar' : 'Parar e gravar');
+}
+function desenharPilula() {
+  const p = $('#crono-pilula'); if (!p) return;
+  if (!cronoAtivo() || C.aberto) { p.hidden = true; return; }
+  const x = textosCrono();
+  p.hidden = false; p.classList.toggle('f-luta', C.fase === 'luta');
+  const txt = `${C.pausadoEm ? 'Pausado · ' : ''}${x.curta} · ${x.tempo}`;
+  if (p.textContent !== txt) { p.innerHTML = `<i></i><span>${esc(txt)}</span>`; p.setAttribute('aria-label', `Abrir o cronômetro: ${txt}`); }
+}
+function folhaCrono() {
+  const c = cronoCfg(), W = palavraCrono(c.tipo), fim = C.fase === 'fim' ? C.sessao : null, Wf = fim ? palavraCrono(fim.tipo) : W;
+  const resumo = !fim ? '' : fim.rounds.length
+    ? `<div class="crono-feito"><b>${esc(maiuscula(marcadosTxt(fim.rounds.length, Wf).replace(/marcad/, 'gravad')))}</b>
+      <ol>${fim.rounds.map((r, i) => `<li>${ordinalG(i, Wf.f)} ${Wf.um}: ${fmtHora(r.ini)}–${fmtHora(r.fim)} · ${fmtRelogio((r.fim - r.ini) / 1000)}</li>`).join('')}</ol>
+      ${(tr => tr ? `<p class="nota">O treino deste horário já está no app. <button class="btn-link" data-abrir="${esc(tr.id)}">Abra o treino</button> e toque em “Usar os horários”, em Picos e ${Wf.varios}.</p>`
+        : `<p class="nota">Quando você importar o arquivo do relógio deste treino, ${Wf.f ? 'as' : 'os'} ${Wf.varios} já ${Wf.f ? 'aparecem marcadas' : 'aparecem marcados'} no gráfico.</p>`)(treinoDaSessao(fim))}</div>`
+    : `<div class="crono-feito"><b>Nenhum${Wf.f ? 'a' : ''} ${Wf.um} completo${Wf.f ? 'a' : ''}; nada foi gravado.</b></div>`;
+  const lista = sessoes().slice(0, 5);
+  const itemSessao = s => {
+    const Ws = palavraCrono(s.tipo), n = s.rounds.length, tr = treinoDaSessao(s);
+    return `<li><span class="s-txt"><span>${esc(fmtDataCurta(s.inicioMs))} · ${esc(fmtHora(s.inicioMs))} · ${n} ${n === 1 ? Ws.um : Ws.varios} de ${esc(durTexto(s.durS))}</span>
+      <small>${tr ? `${Ws.f ? 'marcadas' : 'marcados'} em ${esc(nomeTreino(tr))}` : 'esperando o arquivo do relógio'}</small></span>
+      ${tr ? `<button class="btn-link" data-abrir="${esc(tr.id)}">Abrir</button>` : ''}<button class="btn-mini btn-perigo" data-c-apagar="${esc(s.id)}" aria-label="Apagar a sessão de ${esc(fmtDataCurta(s.inicioMs))}">×</button></li>`;
+  };
+  return `<div class="folha" role="dialog" aria-modal="true" aria-labelledby="crono-tit">
+    <div class="card-topo"><h2 id="crono-tit">Cronômetro</h2><button class="btn btn-icone" data-c="fechar" aria-label="Fechar">×</button></div>
+    ${resumo}
+    ${fim ? '' : `<p class="texto">Use durante o treino: toca e vibra no começo e no fim de cada ${W.um} e guarda os horários. Ao importar o arquivo do relógio, ${W.f ? 'as' : 'os'} ${W.varios} já ${W.f ? 'aparecem marcadas' : 'aparecem marcados'} no gráfico.</p>`}
+    <div class="campo"><span>Modalidade</span><div class="segmentado" id="cr-tipo">${Object.entries(CRONO_TIPOS).map(([k, T]) => `<button data-tipo="${k}" aria-pressed="${k === c.tipo}">${T.nome}</button>`).join('')}</div></div>
+    <div class="crono-campos">
+      <label class="campo"><span>Cada ${W.um} (min)</span><input type="text" id="cr-dur" inputmode="decimal" value="${esc(durCampo(c.dur))}"></label>
+      <label class="campo"><span>Quantas</span><select id="cr-qtd"><option value="0">Sem limite</option>${Array.from({ length: 20 }, (_, k) => `<option value="${k + 1}" ${c.qtd === k + 1 ? 'selected' : ''}>${k + 1}</option>`).join('')}</select></label>
+      <label class="campo largo"><span>Descanso entre ${W.f ? 'as' : 'os'} ${W.varios}</span><select id="cr-desc">${DESCANSOS.map(v => `<option value="${v}" ${v === c.desc ? 'selected' : ''}>${v ? fmtSeg(v) : 'Até eu tocar para começar'}</option>`).join('')}</select></label>
+    </div>
+    <div class="botoes"><button class="btn btn-acento" data-c="comecar">${fim ? 'Começar outra sessão' : 'Começar'}</button><label class="chave"><input type="checkbox" id="cr-som" ${c.som ? 'checked' : ''}>Som</label></div>
+    <p class="nota">A tela fica acesa enquanto o cronômetro corre. No iPhone, o som segue a chave do silencioso.</p>
+    ${lista.length ? `<h3>Sessões gravadas</h3><ul class="sessoes">${lista.map(itemSessao).join('')}</ul>` : ''}
+  </div>`;
+}
+function ligarFolhaCrono(el) {
+  $$('#cr-tipo button', el).forEach(b => b.addEventListener('click', () => { guardarCronoCfg({ tipo: b.dataset.tipo }); if (C.fase === 'fim') { C.fase = null; C.sessao = null; } desenharCrono(true); }));
+  $('#cr-dur', el).addEventListener('change', e => { const v = lerTempo(e.target.value); if (v >= 30 && v <= 3600) guardarCronoCfg({ dur: v }, true); else { toast('Escreva a duração em minutos, por exemplo 5 ou 4:30.'); e.target.value = durCampo(cronoCfg().dur); } });
+  $('#cr-qtd', el).addEventListener('change', e => guardarCronoCfg({ qtd: +e.target.value }, true));
+  $('#cr-desc', el).addEventListener('change', e => guardarCronoCfg({ desc: +e.target.value }, true));
+  $('#cr-som', el).addEventListener('change', e => guardarCronoCfg({ som: e.target.checked }));
+}
+function cliqueCrono(ev) {
+  const el = $('#crono');
+  if (ev.target.closest('[data-abrir]')) { fecharCrono(); return; }
+  const ap = ev.target.closest('[data-c-apagar]');
+  if (ap) {
+    const s = sessoes().find(x => x.id === ap.dataset.cApagar); if (!s) return;
+    E.cfg.sessoes = sessoes().filter(x => x.id !== s.id); gravarConfig(); desenharCrono(true);
+    toast('Sessão apagada.', 7000, { rotulo: 'Desfazer', fn: () => { E.cfg.sessoes = [s, ...sessoes().filter(x => x.id !== s.id)].sort((a, b) => b.inicioMs - a.inicioMs).slice(0, 40); gravarConfig(); if (C.aberto && !cronoAtivo()) desenharCrono(true); } });
+    return;
+  }
+  const b = ev.target.closest('[data-c]');
+  if (!b) { if (ev.target === el && !cronoAtivo()) fecharCrono(); return; }
+  const a = b.dataset.c;
+  if (a === 'min' || a === 'fechar') fecharCrono();
+  else if (a === 'comecar') comecarCrono();
+  else acaoCrono(a);
+}
+function teclaCrono(ev) {
+  if (ev.key === 'Escape') fecharCrono();
+  else if (ev.key === ' ' && cronoAtivo() && !ev.target.closest?.('button,input,select,textarea')) { ev.preventDefault(); acaoCrono('pausa'); }
+}
+function abrirCrono() {
+  fecharCartao();
+  let el = $('#crono');
+  if (!el) { el = document.createElement('div'); el.id = 'crono'; document.body.appendChild(el); el.addEventListener('click', cliqueCrono); }
+  C.aberto = true; $('#crono-pilula').hidden = true;
+  document.body.style.overflow = 'hidden'; document.addEventListener('keydown', teclaCrono);
+  desenharCrono(true);
+  $('#crono [data-c="fechar"], #crono [data-c="min"]')?.focus();
+}
+function fecharCrono() {
+  C.aberto = false; $('#crono')?.remove();
+  document.removeEventListener('keydown', teclaCrono); document.body.style.overflow = '';
+  if (C.fase === 'fim') { C.fase = null; C.sessao = null; }
+  desenharPilula();
+}
+window.addEventListener('beforeunload', ev => { if (cronoAtivo()) { ev.preventDefault(); ev.returnValue = ''; } });
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && cronoAtivo()) { manterTelaAcesa(); tique(); } });
+
+// ================= frequência: dias com treino e semanas seguidas =================
+const UM_DIA = 86400000;
+const chaveDia = (ms, fuso) => { const d = parede(ms, fuso); return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()); };
+const segundaDe = k => k - ((new Date(k).getUTCDay() + 6) % 7) * UM_DIA;
+function semanasSeguidas(lista) {
+  const sems = new Set(lista.map(t => segundaDe(chaveDia(t.inicioMs, t.fusoMin))));
+  const esta = segundaDe(chaveDia(Date.now()));
+  let k = sems.has(esta) ? esta : esta - 7 * UM_DIA, atual = 0;
+  while (sems.has(k)) { atual++; k -= 7 * UM_DIA; }
+  let melhor = 0, seq = 0, ant = null;
+  for (const s of [...sems].sort((a, b) => a - b)) { seq = ant != null && s - ant === 7 * UM_DIA ? seq + 1 : 1; melhor = Math.max(melhor, seq); ant = s; }
+  return { atual, melhor };
+}
+// calendário no estilo do GitHub: uma coluna por semana, mais escuro quanto mais minutos de treino no dia
+function cartaoFrequencia(lista, larg) {
+  const N = clamp(Math.floor(((larg || 360) - 58) / 16), 8, 26);
+  const hoje = chaveDia(Date.now()), ini = segundaDe(hoje) - (N - 1) * 7 * UM_DIA;
+  const dias = new Map();
+  for (const t of lista) {
+    const k = chaveDia(t.inicioMs, t.fusoMin); if (k < ini || k > hoje) continue;
+    const d = dias.get(k) || { s: 0, ts: [] }; d.s += t.resumo.duracaoS; d.ts.push(t); dias.set(k, d);
+  }
+  const nivel = s => s < 1800 ? 1 : s < 3600 ? 2 : s < 5400 ? 3 : 4;
+  let html = '';
+  ['seg', '', 'qua', '', 'sex', '', ''].forEach((r, i) => { if (r) html += `<span class="cal-sem" style="grid-row:${i + 2}">${r}</span>`; });
+  for (let w = 0; w < N; w++) {
+    const k0 = ini + w * 7 * UM_DIA, dom = new Date(k0 + 6 * UM_DIA);
+    if (dom.getUTCDate() <= 7) html += `<span class="cal-mes" style="grid-column:${w + 2} / ${Math.min(w + 5, N + 2)}">${MESES[dom.getUTCMonth()]}</span>`;
+    for (let i = 0; i < 7; i++) {
+      const k = k0 + i * UM_DIA; if (k > hoje) continue;
+      const d = dias.get(k), dt = new Date(k), rot = `${p2(dt.getUTCDate())} ${MESES[dt.getUTCMonth()]}`, pos = `style="grid-column:${w + 2};grid-row:${i + 2}"`, eHoje = k === hoje ? ' hoje' : '';
+      html += d ? `<button class="cal-d n${nivel(d.s)}${eHoje}" ${pos} data-abrir="${esc(d.ts[0].id)}" data-dica="${esc(`${rot} · ${d.ts.length === 1 ? nomeTreino(d.ts[0]) : `${d.ts.length} treinos`} · ${durCurta(d.s)}`)}" aria-label="${esc(`${rot}: ${d.ts.length} ${d.ts.length === 1 ? 'treino' : 'treinos'}, ${durCurta(d.s)}`)}"></button>`
+        : `<i class="cal-d${eHoje}" ${pos} data-dica="${esc(rot)} · sem treino"></i>`;
+    }
+  }
+  const seq = semanasSeguidas(lista), noPeriodo = lista.filter(t => chaveDia(t.inicioMs, t.fusoMin) >= ini).length;
+  const semanas = n => `${n} ${n === 1 ? 'semana' : 'semanas seguidas'}`;
+  return `<section class="card"><div class="card-topo"><h2>Frequência</h2><span class="nota">${seq.atual ? `${semanas(seq.atual)} com treino` : 'nenhum treino nas últimas 2 semanas'}</span></div>
+    <div class="cal" style="grid-template-columns:24px repeat(${N}, minmax(0, 20px))">${html}</div>
+    <div class="cal-leg"><span>menos</span>${[0, 1, 2, 3, 4].map(n => `<i class="cal-d n${n}"></i>`).join('')}<span>mais</span>
+      <span class="cal-num">${fmtN(noPeriodo / N, 1)} por semana · recorde: ${semanas(seq.melhor)}</span></div></section>`;
+}
+
+// ================= o treino em texto, para colar no WhatsApp =================
+function textoTreino(meta, series) {
+  const Z = zonasAtuais(), an = analisar(meta, series, Z), r = meta.resumo, tot = meta.totais || {}, W = palavraTrecho(meta.tipo);
+  const fim = meta.inicioMs + r.duracaoS * 1000, dist = tot.distanciaM > 0 ? tot.distanciaM : null;
+  const L = [meta.titulo ? `${meta.titulo} (${meta.tipo})` : nomeTreino(meta),
+    `${maiuscula(fmtDiaSemana(meta.inicioMs, meta.fusoMin))}, ${fmtData(meta.inicioMs, meta.fusoMin)} · ${fmtHora(meta.inicioMs, meta.fusoMin)}–${fmtHora(fim, meta.fusoMin)}`,
+    [`Duração ${durCurta(r.duracaoS)}`, `FC média ${fmtN(r.fcMed)} bpm`, `FC máx. ${r.fcMax} bpm`, tot.calorias != null ? `${fmtN(tot.calorias)} kcal` : null, dist ? `${fmtN(dist / 1000, 1)} km` : null].filter(Boolean).join(' · '),
+    'Zonas: ' + [5, 4, 3, 2, 1].filter(z => an.zt[z] >= 30).map(z => `Z${z} ${fmtMin(an.zt[z])}`).join(' · ')];
+  const trechos = trechosDoTreino(meta, series, an), rolas = trechos.filter(t => t.origem === 'rola'), comNome = trechos.filter(t => t.origem !== 'rola' && t.nome);
+  if (rolas.length) { L.push('', `${maiuscula(W.varios)} (FC média / máx.):`); rolas.forEach(t => L.push(`${t.rotulo}${t.nome ? ` – ${t.nome}` : ''}: ${durTexto(t.dur)} · ${fmtN(t.fcMed)} / ${t.fcMax ?? '–'} bpm`)); }
+  if (comNome.length) { L.push('', 'Picos:'); comNome.forEach(t => L.push(`${t.nome}: máx. ${t.fcMax ?? '–'} bpm`)); }
+  if (meta.pse != null) L.push('', `Esforço percebido: ${meta.pse} de 10`);
+  if (meta.notas && meta.notas.trim()) L.push('', meta.notas.trim());
+  L.push('', 'Pulso do Treino');
+  return L.join('\n');
+}
+async function copiarTexto(txt) {
+  try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(txt); return true; } } catch (e) { /* tenta o outro jeito */ }
+  try {
+    const ta = document.createElement('textarea'); ta.value = txt; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+    document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove(); return ok;
+  } catch (e) { return false; }
+}
+
+// ================= comparação com o treino anterior =================
+// o anterior da mesma pasta; sem pasta (ou sem anterior nela), o anterior da mesma modalidade
+function treinoAnterior(meta) {
+  const antes = E.treinos.filter(t => t.inicioMs < meta.inicioMs && t.id !== meta.id);
+  return (pastaDe(meta.pasta) && antes.find(t => t.pasta === meta.pasta)) || antes.find(t => t.tipo === meta.tipo) || null;
+}
+function linhaVs(meta, an, Z, W) {
+  const ant = treinoAnterior(meta); if (!ant) return '';
+  const zA = temposZona(ant.resumo.hist, Z.limites), r = meta.resumo;
+  const dif = (v, a, un = '') => { if (v == null || a == null) return null; const x = Math.round(v - a); return x === 0 ? 'igual' : `${x > 0 ? '+' : '−'}${fmtN(Math.abs(x))}${un}`; };
+  const rolas = m => (m.momentos || []).filter(x => x.origem === 'rola').length;
+  const itens = [['duração', dif(r.duracaoS / 60, ant.resumo.duracaoS / 60, ' min')], ['FC média', dif(r.fcMed, ant.resumo.fcMed)], ['FC máx.', dif(r.fcMax, ant.resumo.fcMax)], ['Z4–Z5', dif((an.zt[4] + an.zt[5]) / 60, (zA[4] + zA[5]) / 60, ' min')]];
+  if (rolas(meta) && rolas(ant)) itens.push([W.varios, dif(rolas(meta), rolas(ant))]);
+  const onde = pastaDe(meta.pasta) && ant.pasta === meta.pasta ? `na pasta ${pastaDe(meta.pasta).nome}` : `de ${ant.tipo}`;
+  return `<div class="vs"><button class="vs-tit" id="t-vs" aria-label="Comparar com o treino anterior ${esc(onde)}, de ${esc(fmtDataCurta(ant.inicioMs, ant.fusoMin))}">Comparado ao anterior ${esc(onde)} <b>(${esc(fmtDataCurta(ant.inicioMs, ant.fusoMin))}) ›</b></button>
+    ${itens.filter(i => i[1] != null).map(([n, v]) => `<span>${esc(n)} <b>${esc(v)}</b></span>`).join('')}</div>`;
 }
 
 // ================= aplicativo instalável =================
@@ -2279,7 +2770,16 @@ function mostrarAba(aba) {
   ({ treino: renderTreino, historico: renderHistorico, pastas: renderPastas, comparar: renderComparar, ajustes: renderAjustes })[aba]();
 }
 let toastId;
-function toast(msg, ms = 4500) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastId); toastId = setTimeout(() => { t.hidden = true; }, ms); }
+// acao = { rotulo, fn }: um botão no aviso, como o "Desfazer" depois de excluir
+function toast(msg, ms = 4500, acao) {
+  const t = $('#toast'); t.textContent = msg; t.hidden = false;
+  if (acao) {
+    const b = document.createElement('button'); b.className = 'toast-acao'; b.textContent = acao.rotulo;
+    b.addEventListener('click', () => { t.hidden = true; clearTimeout(toastId); acao.fn(); }, { once: true });
+    t.append(' ', b);
+  }
+  clearTimeout(toastId); toastId = setTimeout(() => { t.hidden = true; }, acao ? Math.max(ms, 7000) : ms);
+}
 
 function ligarEventos() {
   $$('.aba').forEach(b => b.addEventListener('click', () => {
@@ -2298,6 +2798,7 @@ function ligarEventos() {
     if (ev.target.closest('[data-backup]')) { fazerBackup(false); return; }
     if (ev.target.closest('[data-backup-enviar]')) { fazerBackup(true); return; }
     if (ev.target.closest('[data-instalar]')) { instalar(); return; }
+    if (ev.target.closest('[data-crono]')) { abrirCrono(); return; }
     const ab = ev.target.closest('[data-abrir]'); if (ab) abrirTreino(ab.dataset.abrir);
   });
   // arrastar e soltar
@@ -2334,6 +2835,7 @@ async function iniciar() {
   E.atual = E.treinos[0]?.id || null;
   E.carregando = false;
   mostrarAba(E.aba);
+  if (h === 'cronometro') abrirCrono();
 }
 iniciar();
 })();
