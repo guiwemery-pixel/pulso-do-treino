@@ -8,7 +8,9 @@ entre si. As zonas (Z1 a Z5) são definidas por você na aba **Ajustes**.
 Em **Picos e rolas** (ou partidas, no futebol) você dá nome a cada pico de FC e informa quanto tempo
 durou cada rola ou partida: o app encontra os trechos dessa duração em que a FC ficou mais alta e
 marca cada um no gráfico, com média, máxima e queda da FC no minuto seguinte. O treino também pode
-virar uma imagem para compartilhar (Stories, Feed ou Quadrado).
+virar uma imagem para compartilhar (Stories, Feed ou Quadrado), sobre fundo escuro, claro, sem fundo ou uma foto sua. Na
+tela de compartilhar você escolhe o que aparece (nome, data, números, esforço, mapa do percurso, gráfico, zonas, rolas e
+uma frase), quais números entram e em que ordem, a posição das informações sobre a foto e a cor de destaque.
 
 Na aba **Pastas** você cria pastas (por exemplo Jiu-jitsu e Pelada) e coloca os treinos nelas. Cada
 pasta mostra os números somados e a FC treino a treino, e dá para importar um arquivo direto para ela.
