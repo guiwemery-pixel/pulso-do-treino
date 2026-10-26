@@ -299,6 +299,21 @@ h3 { font-size: 13px; font-weight: 700; }
 .segmentado { display: flex; gap: 3px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 3px; }
 .segmentado button { flex: 1; border: 0; background: transparent; border-radius: 9px; padding: 6px 4px; min-height: 34px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); cursor: pointer; }
 .segmentado button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+/* editor da imagem: prévia sempre à vista, opções em abas */
+.folha .previa { position: sticky; top: -14px; z-index: 2; box-shadow: 0 6px 12px -8px rgba(0,0,0,.3); }
+.folha .previa canvas { max-height: min(42vh, 520px); }
+.abas-cartao button[aria-pressed="true"] { background: var(--ink); color: var(--bg); box-shadow: none; }
+.painel { display: flex; flex-direction: column; gap: 12px; }
+.chips-opcao { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips-opcao button { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); border-radius: 999px; padding: 6px 12px; min-height: 36px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.chips-opcao button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--ink); }
+.chips-opcao button[data-bloco][aria-pressed="true"]::before { content: "✓"; color: var(--accent-ink); font-weight: 700; }
+.chips-opcao small { font-weight: 400; color: var(--muted); font-variant-numeric: tabular-nums; }
+.chips-opcao .ordem { display: none; min-width: 18px; height: 18px; border-radius: 50%; background: var(--accent); color: var(--on-accent); font-size: 11px; align-items: center; justify-content: center; }
+.chips-opcao button[aria-pressed="true"] .ordem { display: inline-flex; }
+.cores-opcao { display: flex; gap: 10px; }
+.cores-opcao button { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--surface); box-shadow: 0 0 0 1px var(--line); cursor: pointer; }
+.cores-opcao button[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--ink); }
 
 /* avisos flutuantes */
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 50; background: var(--ink); color: var(--bg); padding: 10px 14px; border-radius: 10px; font-size: 13px; width: max-content; max-width: min(92vw, 520px); box-shadow: 0 8px 28px rgba(0,0,0,.25); white-space: pre-line; }
@@ -2599,168 +2614,267 @@ function escrever(ctx, txt, x, y, maxW, tam, peso, cor, alinhar = 'left') {
   return ctx.measureText(txt).width;
 }
 
-function desenharRota(ctx, series, gi, x, y, w, h, cor, tinta) {
+function desenharRota(ctx, series, gi, x, y, w, h, cor, tinta, grossura = 7) {
   const passo = Math.max(1, Math.ceil(gi.length / 600)), ll = gi.filter((_, k) => k % passo === 0).map(i => [series.lat[i], series.lon[i]]);
   let y0 = Infinity, y1 = -Infinity, x0 = Infinity, x1 = -Infinity;
   for (const [la, lo] of ll) { if (la < y0) y0 = la; if (la > y1) y1 = la; if (lo < x0) x0 = lo; if (lo > x1) x1 = lo; }
   const k = Math.cos((y0 + y1) / 2 * Math.PI / 180), sx = (x1 - x0) * k || 1e-6, sy = (y1 - y0) || 1e-6, e = Math.min((w - 16) / sx, (h - 16) / sy);
   const ox = x + (w - sx * e) / 2, oy = y + (h - sy * e) / 2;
   const P = ([la, lo]) => [ox + (lo - x0) * k * e, oy + sy * e - (la - y0) * e];
-  ctx.save(); ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = cor;
+  ctx.save(); ctx.lineWidth = grossura; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = cor;
   ctx.beginPath(); ll.forEach((p, i) => { const [px, py] = P(p); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }); ctx.stroke();
-  const [ax, ay] = P(ll[0]); ctx.fillStyle = tinta; ctx.beginPath(); ctx.arc(ax, ay, 9, 0, Math.PI * 2); ctx.fill();
+  const [ax, ay] = P(ll[0]); ctx.fillStyle = tinta; ctx.beginPath(); ctx.arc(ax, ay, grossura + 2, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
 }
-async function desenharCartao(cv, meta, series) {
-  const F = FORMATOS[E.cfg.cartaoFormato] || FORMATOS.stories, W = F.w, H = F.h, pad = 72;
+// o que pode ir na imagem: blocos que quem compartilha liga e desliga, e os números disponíveis no treino
+const BLOCOS_CARTAO = [['marca', 'Marca do app'], ['titulo', 'Nome'], ['data', 'Data e hora'], ['frase', 'Frase'], ['numeros', 'Números'], ['esforco', 'Esforço'], ['percurso', 'Mapa do percurso'], ['grafico', 'Gráfico da FC'], ['zonas', 'Zonas'], ['trechos', 'Rolas']];
+const BLOCOS_PADRAO = { marca: true, titulo: true, data: true, frase: false, numeros: true, esforco: true, percurso: true, grafico: true, zonas: true, trechos: false };
+const POSICOES = { topo: 'Topo', centro: 'Centro', base: 'Base' };
+const CORES_CARTAO = { laranja: ['#F28C4A', '#B9470F'], azul: ['#4F9BF0', '#1F5FAF'], verde: ['#2FC48D', '#137A52'], rosa: ['#F07AA6', '#B23A68'], branco: ['#F2EEE6', '#14181F'] };
+const MAX_NUMEROS = 8;
+// tudo que a imagem precisa saber do treino, calculado uma vez quando a folha abre
+function dadosDoCartao(meta, series) {
+  const Z = zonasAtuais(), r = meta.resumo, tot = meta.totais || {}, an = analisar(meta, series, Z), gps = analisarGPS(meta, series, an.P);
+  const kcal = tot.calorias ?? caloriasEstimadas(r.hist), dist = gps ? gps.distM : tot.distanciaM > 0 ? tot.distanciaM : null;
+  const W = palavraTrecho(meta.tipo), esf = esforcoDe(trimpDoHist(r.hist, Z)), vel = gps && usaVelocidade(meta.tipo);
+  const rolas = trechosDoTreino(meta, series, an).filter(t => t.origem === 'rola');
+  const [rit, unRit] = gps?.velMed ? ritmoOuVel(gps.velMed, meta.tipo) : [];
+  const numeros = [
+    ['duracao', 'Duração', durCurta(r.duracaoS), '', 'duração'],
+    ['fcMed', 'FC média', fmtN(r.fcMed), 'bpm', 'FC média'],
+    ['fcMax', 'FC máx.', fmtN(r.fcMax), 'bpm', 'FC máx.', true],
+    kcal != null && ['kcal', 'Calorias', fmtN(kcal), '', tot.calorias != null ? 'kcal' : 'kcal (estim.)'],
+    ['esforco', 'Esforço', fmtEsf(esf), '/21', 'esforço'],
+    dist && ['dist', 'Distância', fmtKm(dist), 'km', 'distância'],
+    rit && ['ritmo', vel ? 'Velocidade' : 'Ritmo', rit, unRit, vel ? 'velocidade' : 'ritmo'],
+    gps && ['mov', 'Em movimento', durCurta(gps.movS), '', 'em movimento'],
+    gps?.subidaM != null && ['subida', 'Subida', fmtN(gps.subidaM), 'm', 'subida'],
+    ['alta', 'Tempo em Z4–Z5', fmtN((an.zt[4] + an.zt[5]) / 60), 'min', 'em Z4–Z5'],
+    rolas.length && ['rolas', maiuscula(W.varios), String(rolas.length), '', W.varios],
+    an.recPico?.queda > 0 && ['rec', 'Recuperação', String(an.recPico.queda), 'bpm', 'queda em 1 min'],
+    meta.pse != null && ['pse', 'PSE', String(meta.pse), '/10', 'esforço percebido'],
+    ['fcMin', 'FC mín.', fmtN(r.fcMin), 'bpm', 'FC mín.']
+  ].filter(Boolean).map(([k, nome, v, un, rot, destaque]) => ({ k, nome, v, un, rot, destaque: !!destaque }));
+  const padrao = gps ? ['dist', 'ritmo', 'duracao', 'fcMed'] : ['duracao', 'fcMed', 'fcMax', kcal != null ? 'kcal' : 'esforco'];
+  return { Z, an, gps, esf, W, rolas, numeros, padrao, gi: indicesGPS(series) };
+}
+// blocos e números escolhidos (só os que existem neste treino)
+function escolhasCartao(D) {
+  const b = { ...BLOCOS_PADRAO, ...(E.cfg.cartaoBlocos || {}) };
+  if (!D.gi.length || D.gi.length < 10) b.percurso = false;
+  if (!D.rolas.length) b.trechos = false;
+  const existe = new Set(D.numeros.map(n => n.k));
+  let nums = (Array.isArray(E.cfg.cartaoNums) ? E.cfg.cartaoNums : []).filter(k => existe.has(k));
+  if (!nums.length) nums = D.padrao.filter(k => existe.has(k));
+  return { b, nums };
+}
+const rgba = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
+// quebra o texto em até `max` linhas que caibam na largura
+function linhasTexto(ctx, txt, maxW, max) {
+  const out = []; let atual = '';
+  for (const p of String(txt).split(/\s+/).filter(Boolean)) {
+    const tenta = atual ? atual + ' ' + p : p;
+    if (ctx.measureText(tenta).width <= maxW || !atual) atual = tenta; else { out.push(atual); atual = p; }
+  }
+  if (atual) out.push(atual);
+  if (out.length > max) { out.length = max; out[max - 1] = out[max - 1].replace(/\s*\S*$/, '') + '…'; }
+  return out;
+}
+
+async function desenharCartao(cv, meta, series, D, opc = {}) {
+  const formato = FORMATOS[E.cfg.cartaoFormato] ? E.cfg.cartaoFormato : 'stories';
+  const F = FORMATOS[formato], W = F.w, H = F.h, pad = 72, larg = W - 2 * pad;
   const fundo = E.cfg.cartaoFundo === 'foto' && !cartao.foto ? 'escuro' : (E.cfg.cartaoFundo || 'escuro');
   const semFundo = fundo === 'transparente', comFoto = fundo === 'foto';
-  const P = fundo === 'claro' ? PALETA_IMG.claro : semFundo || comFoto ? { ...PALETA_IMG.escuro, suave: '#E1E5EB' } : PALETA_IMG.escuro;
+  const base = fundo === 'claro' ? PALETA_IMG.claro : semFundo || comFoto ? { ...PALETA_IMG.escuro, suave: '#E1E5EB' } : PALETA_IMG.escuro;
+  const corEsc = CORES_CARTAO[E.cfg.cartaoCor] || CORES_CARTAO.laranja, P = { ...base, acento: fundo === 'claro' ? corEsc[1] : corEsc[0] };
   try { await Promise.all([document.fonts.load(fonteImg(700, 80)), document.fonts.load(fonteImg(400, 30)), document.fonts.load(fonteImg(600, 30))]); } catch (e) { /* usa a fonte do sistema */ }
   cv.width = W; cv.height = H;
   const ctx = cv.getContext('2d');
-  const Z = zonasAtuais(), r = meta.resumo, tot = meta.totais || {};
-  const zt = temposZona(r.hist, Z.limites), totalZ = zt.reduce((a, b) => a + b, 0) || 1;
-  const formato = E.cfg.cartaoFormato || 'stories';
-  const compacto = formato !== 'stories' || comFoto || semFundo;
-  const altGraf = comFoto ? { stories: 300, feed: 220, quadrado: 150 }[formato] : { stories: 400, feed: 300, quadrado: 220 }[formato];
-  const gap = formato === 'stories' && !compacto ? 60 : 42;
-  const altZonas = compacto ? 172 : 44 + 5 * 64;
-  const blocos = [50, gap, 150, gap, 132, gap + 6, altGraf, gap + 6, altZonas];
-  const total = blocos.reduce((a, b) => a + b, 0);
-  const y0 = comFoto ? H - pad - total : Math.max(pad, (H - total) / 2);
+  const { Z, an, gps, esf, W: Wt, rolas } = D, r = meta.resumo, { b, nums } = escolhasCartao(D);
+  const zt = an.zt, totalZ = zt.reduce((a, c) => a + c, 0) || 1;
+  const titulo = (opc.titulo ?? nomeTreino(meta)).trim(), frase = (opc.frase || '').trim();
+  const numeros = nums.map(k => D.numeros.find(n => n.k === k)).filter(Boolean);
+  const porLinha = numeros.length <= 4 ? numeros.length : Math.ceil(numeros.length / 2), linhasNum = Math.ceil(numeros.length / (porLinha || 1));
+
+  // montagem: cada bloco ligado ocupa uma faixa; mapa e gráfico dividem a sobra
+  const ideal = { stories: 1, feed: 0.72, quadrado: 0.52 }[formato] * (comFoto ? 0.7 : 1);
+  const blocos = [];
+  if (b.marca) blocos.push({ k: 'marca', h: 50 });
+  if (b.titulo && titulo) blocos.push({ k: 'titulo', h: 108 });
+  if (b.data) blocos.push({ k: 'data', h: 48 });
+  if (b.frase && frase) { ctx.font = fonteImg(600, 46); blocos.push({ k: 'frase', h: linhasTexto(ctx, frase, larg, 3).length * 60 + 6 }); }
+  if (b.numeros && numeros.length) blocos.push({ k: 'numeros', h: linhasNum * 134 + (linhasNum - 1) * 26 });
+  if (b.esforco) blocos.push({ k: 'esforco', h: 136 });
+  if (b.percurso) blocos.push({ k: 'percurso', flex: true, ideal: 560 * ideal, min: 200 });
+  if (b.grafico) blocos.push({ k: 'grafico', flex: true, ideal: 400 * ideal, min: 170 });
+  if (b.trechos) blocos.push({ k: 'trechos', h: 46 + Math.min(8, rolas.length) * 52 });
+  if (b.zonas) blocos.push({ k: 'zonas', h: 364, compacto: 172 });
+  const gap = formato === 'stories' ? 48 : 36, disp = H - 2 * pad - gap * Math.max(0, blocos.length - 1);
+  const flex = blocos.filter(x => x.flex), fixos = () => blocos.filter(x => !x.flex).reduce((a, x) => a + x.h, 0);
+  const zon = blocos.find(x => x.k === 'zonas');
+  if (zon && (formato !== 'stories' || comFoto || semFundo || fixos() + flex.reduce((a, x) => a + x.ideal, 0) > disp)) { zon.h = zon.compacto; zon.curto = true; }
+  const sobra = disp - fixos();
+  for (const x of flex) x.h = Math.round(clamp(sobra / flex.length, x.min, x.ideal));
+  const total = blocos.reduce((a, x) => a + x.h, 0) + gap * Math.max(0, blocos.length - 1);
+  const s = Math.min(1, (H - 2 * pad) / (total || 1)), altura = total * s;
+  const pos = POSICOES[E.cfg.cartaoPos] ? E.cfg.cartaoPos : comFoto ? 'base' : 'centro';
+  const y0 = pos === 'topo' ? pad : pos === 'base' ? H - pad - altura : (H - altura) / 2;
 
   // fundo
   ctx.clearRect(0, 0, W, H);
   if (comFoto) {
     const img = cartao.foto, e = Math.max(W / img.width, H / img.height), iw = img.width * e, ih = img.height * e;
     ctx.drawImage(img, (W - iw) / 2, (H - ih) / 2, iw, ih);
-    const g = ctx.createLinearGradient(0, 0, 0, H);
-    g.addColorStop(0, 'rgba(12,14,18,.10)'); g.addColorStop(clamp((y0 - 260) / H, 0, 1), 'rgba(12,14,18,.18)');
-    g.addColorStop(clamp((y0 + 80) / H, 0, 1), 'rgba(12,14,18,.78)'); g.addColorStop(1, 'rgba(12,14,18,.92)');
+    // escurece só em volta das informações, para a foto continuar aparecendo
+    const g = ctx.createLinearGradient(0, 0, 0, H), a = clamp((y0 - 260) / H, 0, 1), c = clamp((y0 + 40) / H, 0, 1), d = clamp((y0 + altura - 40) / H, 0, 1), f = clamp((y0 + altura + 260) / H, 0, 1);
+    g.addColorStop(0, `rgba(12,14,18,${pos === 'topo' ? 0.8 : 0.12})`); g.addColorStop(a, `rgba(12,14,18,${pos === 'topo' ? 0.8 : 0.16})`);
+    g.addColorStop(Math.max(a, c), 'rgba(12,14,18,.74)'); g.addColorStop(Math.max(a, c, d), 'rgba(12,14,18,.74)');
+    g.addColorStop(Math.max(a, c, d, f), `rgba(12,14,18,${pos === 'base' ? 0.86 : 0.16})`); g.addColorStop(1, `rgba(12,14,18,${pos === 'base' ? 0.9 : 0.12})`);
     ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   } else if (!semFundo) {
     ctx.fillStyle = P.fundo; ctx.fillRect(0, 0, W, H);
     const brilho = ctx.createRadialGradient(W * 0.85, H * 0.08, 0, W * 0.85, H * 0.08, W * 0.9);
-    brilho.addColorStop(0, fundo === 'claro' ? 'rgba(242,140,74,.16)' : 'rgba(242,140,74,.14)'); brilho.addColorStop(1, 'rgba(242,140,74,0)');
+    brilho.addColorStop(0, rgba(corEsc[0], 0.15)); brilho.addColorStop(1, rgba(corEsc[0], 0));
     ctx.fillStyle = brilho; ctx.fillRect(0, 0, W, H);
   }
   // sem fundo ou sobre foto, uma sombra leve mantém o texto legível
-  const sombra = (on) => { ctx.shadowColor = on && (semFundo || comFoto) ? 'rgba(0,0,0,.45)' : 'transparent'; ctx.shadowBlur = on ? 14 : 0; ctx.shadowOffsetY = on ? 2 : 0; };
+  const sombra = on => { ctx.shadowColor = on && (semFundo || comFoto) ? 'rgba(0,0,0,.45)' : 'transparent'; ctx.shadowBlur = on ? 14 : 0; ctx.shadowOffsetY = on ? 2 : 0; };
+  ctx.save();
+  ctx.translate(W / 2 * (1 - s), y0); ctx.scale(s, s);
   sombra(true);
-  let y = y0;
-
-  // marca
-  const mx = pad, my = y + 6, esc_ = 52 / 384;
-  ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = PALETA_IMG.escuro.acento;
-  ctx.beginPath();
-  [[64, 292], [168, 292], [204, 226], [246, 350], [292, 118], [336, 292], [448, 292]].forEach(([px, py], i) => { const X = mx + (px - 64) * esc_, Y = my + (py - 118) * esc_; i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); });
-  ctx.stroke();
-  ctx.fillStyle = P.tinta; ctx.beginPath(); ctx.arc(mx + (292 - 64) * esc_, my, 5, 0, Math.PI * 2); ctx.fill();
-  ctx.font = fonteImg(700, 26); ctx.fillStyle = P.suave; ctx.textAlign = 'left';
-  try { ctx.letterSpacing = '4px'; } catch (e) { /* sem espaçamento */ }
-  ctx.fillText('PULSO DO TREINO', mx + 66, y + 38);
-  try { ctx.letterSpacing = '0px'; } catch (e) { /* sem espaçamento */ }
-  y += blocos[0] + blocos[1];
-
-  // título e data
   const fim = meta.inicioMs + r.duracaoS * 1000;
-  // percurso do GPS no canto, como nos cartões do Strava
-  const gi = indicesGPS(series), rota = gi.length >= 10 ? 150 : 0, larTit = W - 2 * pad - (rota ? rota + 28 : 0);
-  if (rota) desenharRota(ctx, series, gi, W - pad - rota, y, rota, rota, P.acento, P.tinta);
-  escrever(ctx, nomeTreino(meta), pad, y + 92, larTit, 96, 700, P.tinta);
-  const Wt = palavraTrecho(meta.tipo), mom = Array.isArray(meta.momentos) ? meta.momentos : [];
-  const rolas = mom.filter(m => m.origem === 'rola'), d0 = rolas.length ? rolas[0].fim - rolas[0].ini : 0;
-  const resumoRolas = rolas.length ? ` · ${rolas.length} ${rolas.length === 1 ? Wt.um : Wt.varios}${rolas.every(m => m.fim - m.ini === d0) ? ` de ${durTexto(d0)}` : ''}` : '';
-  const sub = `${meta.titulo ? meta.tipo + ' · ' : ''}${fmtDiaSemana(meta.inicioMs, meta.fusoMin)}, ${fmtData(meta.inicioMs, meta.fusoMin)} · ${fmtHora(meta.inicioMs, meta.fusoMin)}${resumoRolas || `–${fmtHora(fim, meta.fusoMin)}`}`;
-  escrever(ctx, sub, pad, y + 142, larTit, 34, 400, P.suave);
-  y += blocos[2] + blocos[3];
-
-  // números
-  const dist = tot.distanciaM > 0 ? tot.distanciaM : null;
-  const quarto = tot.calorias != null ? [fmtN(tot.calorias), '', 'kcal'] : dist ? [fmtN(dist / 1000, 1), 'km', 'distância'] : [fmtN(r.fcMin), 'bpm', 'FC mín.'];
-  const nums = [[durCurta(r.duracaoS), '', 'duração'], [fmtN(r.fcMed), 'bpm', 'FC média'], [fmtN(r.fcMax), 'bpm', 'FC máx.', true], quarto];
-  const colW = (W - 2 * pad) / 4;
-  nums.forEach(([v, un, rot, destaque], i) => {
-    const x = pad + i * colW;
-    const wv = escrever(ctx, v, x, y + 78, colW - 12, 80, 700, destaque ? P.acento : P.tinta);
-    if (un && wv + 70 < colW) escrever(ctx, un, x + wv + 8, y + 78, 0, 28, 600, P.suave);
-    escrever(ctx, rot, x, y + 122, colW - 12, 28, 400, P.suave);
-  });
-  y += blocos[4] + blocos[5];
-
-  // gráfico da FC, com a linha na cor da zona
-  const gx0 = pad, gx1 = W - pad, gy0 = y, gy1 = y + altGraf - 40;
-  const s30 = suavizar(series.t, series.fc, 30), dur = series.t[series.t.length - 1] || 1;
-  const passo = Math.max(1, Math.floor(series.t.length / 320)), pts = [];
-  for (let i = 0; i < series.t.length; i += passo) if (s30[i] != null) pts.push([series.t[i], s30[i]]);
-  let vmin = Math.min(...pts.map(p => p[1])), vmax = Math.max(r.fcMax, ...pts.map(p => p[1]));
-  vmin -= 6; vmax += 10;
-  const GX = t => gx0 + t / dur * (gx1 - gx0), GY = v => gy1 - (v - vmin) / (vmax - vmin) * (gy1 - gy0);
-  sombra(false);
-  for (const m of mom) { ctx.fillStyle = fundo === 'claro' ? 'rgba(242,140,74,.14)' : 'rgba(242,140,74,.12)'; ctx.fillRect(GX(m.ini), gy0 - 10, Math.max(3, GX(m.fim) - GX(m.ini)), gy1 - gy0 + 10); }
-  const area = ctx.createLinearGradient(0, gy0, 0, gy1);
-  area.addColorStop(0, fundo === 'claro' ? 'rgba(242,140,74,.30)' : 'rgba(242,140,74,.34)'); area.addColorStop(1, 'rgba(242,140,74,0)');
-  ctx.beginPath(); ctx.moveTo(GX(pts[0][0]), gy1);
-  for (const [t, v] of pts) ctx.lineTo(GX(t), GY(v));
-  ctx.lineTo(GX(pts[pts.length - 1][0]), gy1); ctx.closePath(); ctx.fillStyle = area; ctx.fill();
-  ctx.strokeStyle = P.trilho; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(gx0, gy1 + 1); ctx.lineTo(gx1, gy1 + 1); ctx.stroke();
-  sombra(true);
-  ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  let zAtual = null;
-  for (let i = 1; i < pts.length; i++) {
-    const z = Math.max(1, zonaDe(Math.round((pts[i - 1][1] + pts[i][1]) / 2), Z.limites));
-    if (z !== zAtual) { if (zAtual != null) ctx.stroke(); ctx.strokeStyle = P.zonas[z]; ctx.beginPath(); ctx.moveTo(GX(pts[i - 1][0]), GY(pts[i - 1][1])); zAtual = z; }
-    ctx.lineTo(GX(pts[i][0]), GY(pts[i][1]));
-  }
-  ctx.stroke();
-  // pico
-  const px = GX(r.tFcMax), py = GY(r.fcMax);
-  ctx.fillStyle = P.tinta; ctx.beginPath(); ctx.arc(px, py, 11, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = PALETA_IMG.escuro.acento; ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI * 2); ctx.fill();
-  ctx.font = fonteImg(700, 30);
-  const rotPico = `máx. ${r.fcMax}`, wp = ctx.measureText(rotPico).width;
-  escrever(ctx, rotPico, clamp(px, gx0 + wp / 2, gx1 - wp / 2), Math.max(gy0 - 8, py - 26), 0, 30, 700, P.tinta, 'center');
-  escrever(ctx, '0 min', gx0, gy1 + 36, 0, 26, 400, P.suave, 'left');
-  escrever(ctx, `${fmtN(dur / 60)} min`, gx1, gy1 + 36, 0, 26, 400, P.suave, 'right');
-  y += blocos[6] + blocos[7];
-
-  // tempo em cada zona
-  escrever(ctx, 'Tempo nas zonas', pad, y + 30, 0, 30, 600, P.suave);
-  if (compacto) {
-    const by = y + 52, bh = 24, bw = W - 2 * pad;
-    sombra(false);
-    ctx.save(); retArred(ctx, pad, by, bw, bh, bh / 2); ctx.clip();
-    let x = pad;
-    const visiveis = zt.map((v, z) => [v, z]).filter(([v]) => v > 0);
-    visiveis.forEach(([v, z], i) => { const w = v / totalZ * bw; ctx.fillStyle = P.zonas[z]; ctx.fillRect(x, by, Math.max(0, w - (i < visiveis.length - 1 ? 4 : 0)), bh); x += w; });
-    ctx.restore();
-    sombra(true);
-    const cw = bw / 5;
-    for (let z = 1; z <= 5; z++) {
-      const cx = pad + (z - 1) * cw, cy = by + bh + 44;
-      ctx.fillStyle = P.zonas[z]; retArred(ctx, cx, cy - 18, 18, 18, 4); ctx.fill();
-      escrever(ctx, `Z${z}`, cx + 28, cy, 0, 28, 700, P.tinta);
-      escrever(ctx, fmtMin(zt[z]), cx, cy + 42, cw - 10, 32, 700, P.tinta);
-      escrever(ctx, fmtPct(zt[z] / totalZ), cx, cy + 76, cw - 10, 26, 400, P.suave);
-    }
-  } else {
-    const maxZ = Math.max(1, ...zt.slice(1));
-    for (let z = 1; z <= 5; z++) {
-      const ry = y + 44 + (z - 1) * 64 + 40;
-      ctx.fillStyle = P.zonas[z]; ctx.beginPath(); ctx.arc(pad + 10, ry - 11, 10, 0, Math.PI * 2); ctx.fill();
-      escrever(ctx, `Z${z}`, pad + 32, ry, 0, 32, 700, P.tinta);
-      escrever(ctx, NOMES_ZONA[z], pad + 92, ry, 170, 28, 400, P.suave);
-      const pct = fmtPct(zt[z] / totalZ), mins = fmtMin(zt[z]);
-      const wPct = escrever(ctx, pct, W - pad, ry, 0, 28, 400, P.suave, 'right');
-      escrever(ctx, mins, W - pad - wPct - 14, ry, 0, 32, 700, P.tinta, 'right');
-      const tx0 = pad + 280, tx1 = W - pad - 240;
+  let y = 0;
+  for (const bl of blocos) {
+    const h = bl.h;
+    if (bl.k === 'marca') {
+      const mx = pad, my = y + 6, e = 52 / 384;
+      ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = P.acento;
+      ctx.beginPath();
+      [[64, 292], [168, 292], [204, 226], [246, 350], [292, 118], [336, 292], [448, 292]].forEach(([px, py], i) => { const X = mx + (px - 64) * e, Y = my + (py - 118) * e; i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); });
+      ctx.stroke();
+      ctx.fillStyle = P.tinta; ctx.beginPath(); ctx.arc(mx + (292 - 64) * e, my, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.font = fonteImg(700, 26); ctx.fillStyle = P.suave; ctx.textAlign = 'left';
+      try { ctx.letterSpacing = '4px'; } catch (e2) { /* sem espaçamento */ }
+      ctx.fillText('PULSO DO TREINO', mx + 66, y + 38);
+      try { ctx.letterSpacing = '0px'; } catch (e2) { /* sem espaçamento */ }
+    } else if (bl.k === 'titulo') {
+      escrever(ctx, titulo, pad, y + 92, larg, 96, 700, P.tinta);
+    } else if (bl.k === 'data') {
+      const d0 = rolas.length ? rolas[0].dur : 0;
+      const resumoRolas = rolas.length ? ` · ${rolas.length} ${rolas.length === 1 ? Wt.um : Wt.varios}${rolas.every(m => m.dur === d0) ? ` de ${durTexto(d0)}` : ''}` : '';
+      const sub = `${titulo !== meta.tipo ? meta.tipo + ' · ' : ''}${fmtDiaSemana(meta.inicioMs, meta.fusoMin)}, ${fmtData(meta.inicioMs, meta.fusoMin)} · ${fmtHora(meta.inicioMs, meta.fusoMin)}${resumoRolas || `–${fmtHora(fim, meta.fusoMin)}`}`;
+      escrever(ctx, sub, pad, y + 36, larg, 34, 400, P.suave);
+    } else if (bl.k === 'frase') {
+      ctx.font = fonteImg(600, 46);
+      linhasTexto(ctx, frase, larg, 3).forEach((l, i) => escrever(ctx, l, pad, y + 48 + i * 60, larg, 46, 600, P.tinta));
+    } else if (bl.k === 'numeros') {
+      const colW = larg / porLinha;
+      numeros.forEach((n, i) => {
+        const x = pad + (i % porLinha) * colW, yy = y + Math.floor(i / porLinha) * 160;
+        const wv = escrever(ctx, n.v, x, yy + 78, colW - 30, porLinha > 3 ? 72 : 88, 700, n.destaque ? P.acento : P.tinta);
+        if (n.un && wv + ctx.measureText(n.un).width + 30 < colW) escrever(ctx, n.un, x + wv + 8, yy + 78, 0, 28, 600, P.suave);
+        escrever(ctx, n.rot, x, yy + 120, colW - 14, 28, 400, P.suave);
+      });
+    } else if (bl.k === 'esforco') {
+      const cx = pad + 58, cy = y + 66, raio = 54, nv = nivelEsforco(esf), foco = focoDoTreino(zt);
       sombra(false);
-      ctx.fillStyle = P.trilho; retArred(ctx, tx0, ry - 20, tx1 - tx0, 16, 8); ctx.fill();
-      if (zt[z] > 0) { ctx.fillStyle = P.zonas[z]; retArred(ctx, tx0, ry - 20, Math.max(16, (tx1 - tx0) * zt[z] / maxZ), 16, 8); ctx.fill(); }
+      ctx.lineWidth = 12; ctx.strokeStyle = P.trilho; ctx.beginPath(); ctx.arc(cx, cy, raio, 0, Math.PI * 2); ctx.stroke();
+      ctx.strokeStyle = P.acento; ctx.lineCap = 'round'; ctx.beginPath(); ctx.arc(cx, cy, raio, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * esf / 21); ctx.stroke();
       sombra(true);
+      escrever(ctx, fmtEsf(esf), cx, cy + 14, raio * 1.6, 40, 700, P.tinta, 'center');
+      const tx = pad + 150, tw = larg - 150;
+      escrever(ctx, `Esforço ${nv.nome.toLowerCase()}`, tx, y + 50, tw, 44, 700, P.tinta);
+      escrever(ctx, `${fmtEsf(esf)} de 21 · foco: ${foco.rotulo.toLowerCase()}`, tx, y + 92, tw, 30, 400, P.suave);
+      sombra(false);
+      let bx = tx; const bw = tw, by = y + 112;
+      ctx.save(); retArred(ctx, tx, by, bw, 12, 6); ctx.clip();
+      [[foco.base, P.zonas[1]], [foco.lim, P.zonas[3]], [foco.alta, P.zonas[5]]].forEach(([v, c]) => { ctx.fillStyle = c; ctx.fillRect(bx, by, v * bw, 12); bx += v * bw; });
+      ctx.restore(); sombra(true);
+    } else if (bl.k === 'percurso') {
+      sombra(false);
+      desenharRota(ctx, series, D.gi, pad, y, larg, h, P.acento, P.tinta, 10);
+      sombra(true);
+    } else if (bl.k === 'grafico') {
+      const gx0 = pad, gx1 = W - pad, gy0 = y + 40, gy1 = y + h - 40;
+      const s30 = suavizar(series.t, series.fc, 30), dur = series.t[series.t.length - 1] || 1;
+      const passo = Math.max(1, Math.floor(series.t.length / 320)), pts = [];
+      for (let i = 0; i < series.t.length; i += passo) if (s30[i] != null) pts.push([series.t[i], s30[i]]);
+      let vmin = Math.min(...pts.map(p => p[1])), vmax = Math.max(r.fcMax, ...pts.map(p => p[1]));
+      vmin -= 6; vmax += 10;
+      const GX = t => gx0 + t / dur * (gx1 - gx0), GY = v => gy1 - (v - vmin) / (vmax - vmin) * (gy1 - gy0);
+      sombra(false);
+      for (const m of rolas) { ctx.fillStyle = rgba(corEsc[0], fundo === 'claro' ? 0.14 : 0.12); ctx.fillRect(GX(m.ini), gy0 - 10, Math.max(3, GX(m.fim) - GX(m.ini)), gy1 - gy0 + 10); }
+      const area = ctx.createLinearGradient(0, gy0, 0, gy1);
+      area.addColorStop(0, rgba(corEsc[0], fundo === 'claro' ? 0.3 : 0.34)); area.addColorStop(1, rgba(corEsc[0], 0));
+      ctx.beginPath(); ctx.moveTo(GX(pts[0][0]), gy1);
+      for (const [t, v] of pts) ctx.lineTo(GX(t), GY(v));
+      ctx.lineTo(GX(pts[pts.length - 1][0]), gy1); ctx.closePath(); ctx.fillStyle = area; ctx.fill();
+      ctx.strokeStyle = P.trilho; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(gx0, gy1 + 1); ctx.lineTo(gx1, gy1 + 1); ctx.stroke();
+      sombra(true);
+      ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      let zAtual = null;
+      for (let i = 1; i < pts.length; i++) {
+        const z = Math.max(1, zonaDe(Math.round((pts[i - 1][1] + pts[i][1]) / 2), Z.limites));
+        if (z !== zAtual) { if (zAtual != null) ctx.stroke(); ctx.strokeStyle = P.zonas[z]; ctx.beginPath(); ctx.moveTo(GX(pts[i - 1][0]), GY(pts[i - 1][1])); zAtual = z; }
+        ctx.lineTo(GX(pts[i][0]), GY(pts[i][1]));
+      }
+      ctx.stroke();
+      const px = GX(r.tFcMax), py = GY(r.fcMax);
+      ctx.fillStyle = P.tinta; ctx.beginPath(); ctx.arc(px, py, 11, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = P.acento; ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.font = fonteImg(700, 30);
+      const rotPico = `máx. ${r.fcMax}`, wp = ctx.measureText(rotPico).width;
+      escrever(ctx, rotPico, clamp(px, gx0 + wp / 2, gx1 - wp / 2), Math.max(gy0 - 8, py - 26), 0, 30, 700, P.tinta, 'center');
+      escrever(ctx, '0 min', gx0, gy1 + 36, 0, 26, 400, P.suave, 'left');
+      escrever(ctx, `${fmtN(dur / 60)} min`, gx1, gy1 + 36, 0, 26, 400, P.suave, 'right');
+    } else if (bl.k === 'trechos') {
+      escrever(ctx, `${maiuscula(Wt.varios)} · FC média / máx.`, pad, y + 30, larg, 30, 600, P.suave);
+      rolas.slice(0, 8).forEach((t, i) => {
+        const ry = y + 46 + i * 52 + 38;
+        const dir = `${fmtN(t.fcMed)} / ${t.fcMax ?? '–'} bpm`;
+        const wd = escrever(ctx, dir, W - pad, ry, 0, 32, 700, P.tinta, 'right');
+        escrever(ctx, `${t.rotulo}${t.nome ? ' – ' + t.nome : ''} · ${durTexto(t.dur)}`, pad, ry, larg - wd - 24, 32, 400, P.tinta);
+      });
+    } else if (bl.k === 'zonas') {
+      escrever(ctx, 'Tempo nas zonas', pad, y + 30, 0, 30, 600, P.suave);
+      if (bl.curto) {
+        const by = y + 52, bh = 24;
+        sombra(false);
+        ctx.save(); retArred(ctx, pad, by, larg, bh, bh / 2); ctx.clip();
+        let x = pad;
+        const visiveis = zt.map((v, z) => [v, z]).filter(([v]) => v > 0);
+        visiveis.forEach(([v, z], i) => { const w = v / totalZ * larg; ctx.fillStyle = P.zonas[z]; ctx.fillRect(x, by, Math.max(0, w - (i < visiveis.length - 1 ? 4 : 0)), bh); x += w; });
+        ctx.restore();
+        sombra(true);
+        const cw = larg / 5;
+        for (let z = 1; z <= 5; z++) {
+          const cx = pad + (z - 1) * cw, cy = by + bh + 44;
+          ctx.fillStyle = P.zonas[z]; retArred(ctx, cx, cy - 18, 18, 18, 4); ctx.fill();
+          escrever(ctx, `Z${z}`, cx + 28, cy, 0, 28, 700, P.tinta);
+          escrever(ctx, fmtMin(zt[z]), cx, cy + 42, cw - 10, 32, 700, P.tinta);
+          escrever(ctx, fmtPct(zt[z] / totalZ), cx, cy + 76, cw - 10, 26, 400, P.suave);
+        }
+      } else {
+        const maxZ = Math.max(1, ...zt.slice(1));
+        for (let z = 1; z <= 5; z++) {
+          const ry = y + 44 + (z - 1) * 64 + 40;
+          ctx.fillStyle = P.zonas[z]; ctx.beginPath(); ctx.arc(pad + 10, ry - 11, 10, 0, Math.PI * 2); ctx.fill();
+          escrever(ctx, `Z${z}`, pad + 32, ry, 0, 32, 700, P.tinta);
+          escrever(ctx, NOMES_ZONA[z], pad + 92, ry, 170, 28, 400, P.suave);
+          const wPct = escrever(ctx, fmtPct(zt[z] / totalZ), W - pad, ry, 0, 28, 400, P.suave, 'right');
+          escrever(ctx, fmtMin(zt[z]), W - pad - wPct - 14, ry, 0, 32, 700, P.tinta, 'right');
+          const tx0 = pad + 280, tx1 = W - pad - 240;
+          sombra(false);
+          ctx.fillStyle = P.trilho; retArred(ctx, tx0, ry - 20, tx1 - tx0, 16, 8); ctx.fill();
+          if (zt[z] > 0) { ctx.fillStyle = P.zonas[z]; retArred(ctx, tx0, ry - 20, Math.max(16, (tx1 - tx0) * zt[z] / maxZ), 16, 8); ctx.fill(); }
+          sombra(true);
+        }
+      }
     }
+    y += h + gap;
   }
+  ctx.restore();
   sombra(false);
 }
 
@@ -2783,14 +2897,32 @@ function abrirCartao(meta, series) {
   fecharCartao();
   if (!FORMATOS[E.cfg.cartaoFormato]) E.cfg.cartaoFormato = 'stories';
   if (!FUNDOS[E.cfg.cartaoFundo] || (E.cfg.cartaoFundo === 'foto' && !cartao.foto)) E.cfg.cartaoFundo = 'escuro';
+  const D = dadosDoCartao(meta, series), opc = { titulo: nomeTreino(meta), frase: '' };
   const enviar = podeCompartilharImagem();
+  const blocos = BLOCOS_CARTAO.filter(([k]) => k !== 'percurso' || D.gi.length >= 10).filter(([k]) => k !== 'trechos' || D.rolas.length)
+    .map(([k, n]) => [k, k === 'trechos' ? maiuscula(D.W.varios) : n]);
   const el = document.createElement('div');
   el.className = 'folha-fundo'; el.id = 'cartao';
   el.innerHTML = `<div class="folha" role="dialog" aria-modal="true" aria-labelledby="cartao-tit">
     <div class="card-topo"><h2 id="cartao-tit">Compartilhar treino</h2><button class="btn btn-icone" id="cartao-fechar" aria-label="Fechar">×</button></div>
     <div class="previa" id="cartao-previa"><canvas id="cartao-cv" role="img" aria-label="Imagem do treino para compartilhar"></canvas></div>
-    <div class="campo"><span>Formato</span><div class="segmentado" data-grupo="cartaoFormato">${Object.entries(FORMATOS).map(([k, f]) => `<button data-valor="${k}">${f.nome}</button>`).join('')}</div></div>
-    <div class="campo"><span>Fundo</span><div class="segmentado" data-grupo="cartaoFundo">${Object.entries(FUNDOS).map(([k, n]) => `<button data-valor="${k}">${n}</button>`).join('')}</div></div>
+    <div class="segmentado abas-cartao" role="tablist" aria-label="Opções da imagem"><button data-painel="visual" aria-pressed="true">Visual</button><button data-painel="info" aria-pressed="false">Informações</button><button data-painel="texto" aria-pressed="false">Textos</button></div>
+    <div class="painel" data-painel-de="visual">
+      <div class="campo"><span>Formato</span><div class="segmentado" data-grupo="cartaoFormato">${Object.entries(FORMATOS).map(([k, f]) => `<button data-valor="${k}">${f.nome}</button>`).join('')}</div></div>
+      <div class="campo"><span>Fundo</span><div class="segmentado" data-grupo="cartaoFundo">${Object.entries(FUNDOS).map(([k, n]) => `<button data-valor="${k}">${n}</button>`).join('')}</div></div>
+      <div class="campo"><span>Posição das informações</span><div class="segmentado" data-grupo="cartaoPos">${Object.entries(POSICOES).map(([k, n]) => `<button data-valor="${k}">${n}</button>`).join('')}</div></div>
+      <div class="campo"><span>Cor de destaque</span><div class="cores-opcao">${Object.entries(CORES_CARTAO).map(([k, c]) => `<button data-cor="${k}" style="background:${c[0]}" aria-label="${maiuscula(k)}"></button>`).join('')}</div></div>
+    </div>
+    <div class="painel" data-painel-de="info" hidden>
+      <div class="campo"><span>O que aparece na imagem</span><div class="chips-opcao">${blocos.map(([k, n]) => `<button data-bloco="${k}">${esc(n)}</button>`).join('')}</div></div>
+      <div class="campo" id="cartao-nums"><span>Números: toque na ordem em que quer que apareçam (até ${MAX_NUMEROS})</span><div class="chips-opcao">${D.numeros.map(n => `<button data-num="${n.k}"><b class="ordem"></b>${esc(n.nome)} <small>${esc(n.v)}${n.un && n.un !== 'bpm' ? (n.un.startsWith('/') ? '' : ' ') + esc(n.un) : ''}</small></button>`).join('')}</div>
+        <div class="botoes"><button class="btn-link" id="cartao-nums-padrao">Voltar ao padrão</button></div></div>
+    </div>
+    <div class="painel" data-painel-de="texto" hidden>
+      <label class="campo"><span>Nome na imagem</span><input type="text" id="cartao-titulo" maxlength="60" value="${esc(opc.titulo)}"></label>
+      <label class="campo"><span>Frase (opcional)</span><input type="text" id="cartao-frase" maxlength="90" placeholder="Ex.: rola pesado hoje 🔥"></label>
+      <p class="nota">O nome e a frase valem só para esta imagem; o nome do treino não muda.</p>
+    </div>
     <input type="file" id="cartao-foto" accept="image/*" class="oculto-visual">
     <p class="nota" id="cartao-nota"></p>
     <div class="botoes">${enviar ? '<button class="btn btn-acento" id="cartao-enviar">Compartilhar</button>' : ''}<button class="btn${enviar ? '' : ' btn-acento'}" id="cartao-salvar">Salvar imagem</button><button class="btn" id="cartao-texto">Copiar como texto</button></div>
@@ -2799,28 +2931,58 @@ function abrirCartao(meta, series) {
   const cv = $('#cartao-cv');
   const notas = { escuro: '', claro: '', foto: 'Toque em Foto de novo para trocar a imagem.', transparente: 'Imagem sem fundo, para colocar por cima de uma foto nos Stories.' };
   const atualizar = async () => {
-    $$('.segmentado button', el).forEach(b => b.setAttribute('aria-pressed', String(E.cfg[b.parentElement.dataset.grupo] === b.dataset.valor)));
+    const { b, nums } = escolhasCartao(D);
+    if (!POSICOES[E.cfg.cartaoPos]) E.cfg.cartaoPos = E.cfg.cartaoFundo === 'foto' ? 'base' : 'centro';
+    $$('.segmentado[data-grupo] button', el).forEach(x => x.setAttribute('aria-pressed', String(E.cfg[x.parentElement.dataset.grupo] === x.dataset.valor)));
+    $$('[data-cor]', el).forEach(x => x.setAttribute('aria-pressed', String((CORES_CARTAO[E.cfg.cartaoCor] ? E.cfg.cartaoCor : 'laranja') === x.dataset.cor)));
+    $$('[data-bloco]', el).forEach(x => x.setAttribute('aria-pressed', String(!!b[x.dataset.bloco])));
+    $$('[data-num]', el).forEach(x => { const i = nums.indexOf(x.dataset.num); x.setAttribute('aria-pressed', String(i >= 0)); x.firstElementChild.textContent = i >= 0 ? i + 1 : ''; });
+    $('#cartao-nums').hidden = !b.numeros;
     $('#cartao-previa').classList.toggle('xadrez', E.cfg.cartaoFundo === 'transparente');
     $('#cartao-nota').textContent = notas[E.cfg.cartaoFundo] || '';
-    await desenharCartao(cv, meta, series);
+    await desenharCartao(cv, meta, series, D, opc);
   };
   const gerar = () => new Promise(ok => {
     const jpg = E.cfg.cartaoFundo === 'foto';
-    cv.toBlob(b => ok({ blob: b, ext: jpg ? 'jpg' : 'png', tipo: jpg ? 'image/jpeg' : 'image/png' }), jpg ? 'image/jpeg' : 'image/png', 0.92);
+    cv.toBlob(bl => ok({ blob: bl, ext: jpg ? 'jpg' : 'png', tipo: jpg ? 'image/jpeg' : 'image/png' }), jpg ? 'image/jpeg' : 'image/png', 0.92);
   });
   const nomeArq = ext => { const d = parede(meta.inicioMs, meta.fusoMin); return `pulso-${semAcento(meta.tipo)}-${d.getUTCFullYear()}-${p2(d.getUTCMonth() + 1)}-${p2(d.getUTCDate())}.${ext}`; };
   el.addEventListener('click', ev => { if (ev.target === el) fecharCartao(); });
   document.addEventListener('keydown', teclaCartao);
   $('#cartao-fechar').addEventListener('click', fecharCartao);
-  $$('.segmentado button', el).forEach(b => b.addEventListener('click', () => {
-    const grupo = b.parentElement.dataset.grupo, valor = b.dataset.valor;
+  $$('[data-painel]', el).forEach(x => x.addEventListener('click', () => {
+    $$('[data-painel]', el).forEach(y => y.setAttribute('aria-pressed', String(y === x)));
+    $$('[data-painel-de]', el).forEach(p => { p.hidden = p.dataset.painelDe !== x.dataset.painel; });
+  }));
+  $$('.segmentado[data-grupo] button', el).forEach(x => x.addEventListener('click', () => {
+    const grupo = x.parentElement.dataset.grupo, valor = x.dataset.valor;
     if (grupo === 'cartaoFundo' && valor === 'foto' && (!cartao.foto || E.cfg.cartaoFundo === 'foto')) { $('#cartao-foto').click(); return; }
     E.cfg[grupo] = valor; salvarConfig(); atualizar();
   }));
+  $$('[data-cor]', el).forEach(x => x.addEventListener('click', () => { E.cfg.cartaoCor = x.dataset.cor; salvarConfig(); atualizar(); }));
+  $$('[data-bloco]', el).forEach(x => x.addEventListener('click', () => {
+    const { b } = escolhasCartao(D); E.cfg.cartaoBlocos = { ...b, [x.dataset.bloco]: !b[x.dataset.bloco] };
+    if (x.dataset.bloco === 'frase' && E.cfg.cartaoBlocos.frase && !opc.frase) { $$('[data-painel]', el).find(y => y.dataset.painel === 'texto').click(); $('#cartao-frase').focus(); }
+    salvarConfig(); atualizar();
+  }));
+  $$('[data-num]', el).forEach(x => x.addEventListener('click', () => {
+    const { nums } = escolhasCartao(D), k = x.dataset.num;
+    if (nums.includes(k)) { if (nums.length === 1) { toast('Deixe pelo menos um número, ou desligue "Números".'); return; } E.cfg.cartaoNums = nums.filter(n => n !== k); }
+    else { if (nums.length >= MAX_NUMEROS) { toast(`Cabem até ${MAX_NUMEROS} números. Tire um antes.`); return; } E.cfg.cartaoNums = [...nums, k]; }
+    salvarConfig(); atualizar();
+  }));
+  $('#cartao-nums-padrao').addEventListener('click', () => { E.cfg.cartaoNums = null; salvarConfig(); atualizar(); });
+  const redesenhar = debounce(atualizar, 150);
+  $('#cartao-titulo').addEventListener('input', e => { opc.titulo = e.target.value; redesenhar(); });
+  $('#cartao-frase').addEventListener('input', e => {
+    opc.frase = e.target.value;
+    if (opc.frase.trim() && !escolhasCartao(D).b.frase) { E.cfg.cartaoBlocos = { ...escolhasCartao(D).b, frase: true }; salvarConfig(); }
+    redesenhar();
+  });
   $('#cartao-foto').addEventListener('change', async e => {
     const f = e.target.files[0]; e.target.value = '';
     if (!f) return;
-    try { cartao.foto = await carregarFoto(f); E.cfg.cartaoFundo = 'foto'; salvarConfig(); atualizar(); }
+    try { cartao.foto = await carregarFoto(f); E.cfg.cartaoFundo = 'foto'; if (E.cfg.cartaoPos === 'centro') E.cfg.cartaoPos = 'base'; salvarConfig(); atualizar(); }
     catch (err) { toast('Não consegui abrir essa foto. Tente outra imagem.'); }
   });
   const btE = $('#cartao-enviar');
