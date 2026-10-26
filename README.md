@@ -23,6 +23,17 @@ seguidas com treino. No topo de cada treino aparece a comparação com o treino 
 modalidade); tocar nela abre a comparação completa. Na tela de compartilhar, **Copiar como texto** copia o
 resumo do treino para colar no WhatsApp. Ao excluir um treino ou uma pasta, o aviso traz **Desfazer**.
 
+Em treinos com **GPS** (corrida, pedal, caminhada), o percurso aparece num mapa de verdade (OpenStreetMap), colorido
+pela zona da FC, pelo ritmo ou pela altitude, com as marcas de cada km e o ponto da FC máxima. Passar o dedo no gráfico da
+FC mostra no mapa onde você estava. Há também ritmo médio, tempo em movimento, subida, **parciais por km** e as melhores
+marcas do treino (400 m, 1 km, 5 km…). Sem internet, o trajeto é desenhado sem o mapa de fundo.
+
+Cada treino recebe um **esforço de 0 a 21** (no estilo do Whoop, calculado pelo TRIMP), o **foco** (base aeróbica, limiar
+ou alta intensidade) e uma **Leitura do treino** que explica os números: comparação com a sua média na modalidade,
+recuperação da FC depois do pico, FC subindo ao longo das rolas e o desacoplamento ritmo × FC. Com peso e idade em
+**Ajustes**, o app estima as calorias quando o relógio não manda. No **Histórico**, o card **Carga e forma** mostra
+condicionamento, fadiga e forma (como no Strava) e a carga da semana comparada às últimas quatro.
+
 **Endereço:** https://guiwemery-pixel.github.io/pulso-do-treino/
 
 ![Capa do Pulso do Treino](capa.png)

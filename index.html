@@ -370,6 +370,73 @@ button.cal-d { cursor: pointer; }
 .crono-pilula i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: none; }
 @media (min-width: 721px) { .crono-pilula { bottom: 20px; } body.com-crono .toast { bottom: 76px; } }
 .texto-copiar { min-height: 140px; font-size: 13px !important; }
+
+/* esforço (0 a 21) e foco do treino, no resumo */
+.esf { display: flex; align-items: center; gap: 12px; border-top: 1px solid rgba(255,255,255,.1); padding-top: 12px; }
+.anel { width: 60px; height: 60px; flex: none; }
+.anel circle { fill: none; stroke-width: 6; }
+.anel .anel-trilho { stroke: var(--hero-2); }
+.anel .anel-valor { stroke: var(--accent); stroke-linecap: round; }
+.anel text { fill: var(--hero-ink); font: 700 17px var(--sans); font-variant-numeric: tabular-nums; }
+.esf-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: var(--hero-muted); }
+.esf-txt b { color: var(--hero-ink); font-size: 14px; font-weight: 700; }
+.foco { display: flex; gap: 2px; height: 6px; border-radius: 3px; overflow: hidden; }
+.foco i { display: block; height: 100%; min-width: 2px; }
+.foco-leg { display: flex; flex-wrap: wrap; gap: 2px 10px; font-size: 11px; font-variant-numeric: tabular-nums; }
+.foco-leg span { display: inline-flex; align-items: center; gap: 4px; }
+.foco-leg i { width: 7px; height: 7px; border-radius: 2px; flex: none; }
+.stats-gps { border-top: 1px solid rgba(255,255,255,.1); padding-top: 10px; }
+
+/* leitura do treino */
+.leituras { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.leituras li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 13.5px; color: var(--ink-2); }
+.leituras b { color: var(--ink); }
+.leituras .ic { width: 30px; height: 30px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent-ink); }
+.leituras .ic.bom { background: color-mix(in srgb, var(--good) 14%, transparent); color: var(--good); }
+.leituras .ic.alerta { background: color-mix(in srgb, var(--bad) 12%, transparent); color: var(--bad); }
+.leituras .ic svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* mapa do percurso */
+.mapa { position: relative; height: clamp(240px, 58vw, 400px); border-radius: 10px; overflow: hidden; background: var(--surface-2); z-index: 0; }
+.mapa > svg { width: 100%; height: 100%; }
+.mapa-caixa { position: relative; }
+.mapa-caixa.cheio { position: fixed; inset: 0; z-index: 46; background: var(--bg); }
+.mapa-caixa.cheio .mapa { height: 100%; border-radius: 0; }
+.mapa-caixa.cheio .mapa-acoes { top: calc(10px + env(safe-area-inset-top, 0px)); }
+.mapa-acoes { position: absolute; top: 8px; right: 8px; z-index: 800; display: flex; gap: 6px; }
+.mapa-acoes button { border: 0; border-radius: 999px; min-height: 34px; padding: 6px 12px; background: var(--surface); color: var(--ink); font-size: 12.5px; font-weight: 700; box-shadow: 0 2px 10px rgba(0,0,0,.22); cursor: pointer; }
+.mapa .leaflet-container { background: var(--surface-2); font: 12px var(--sans); }
+.mapa .leaflet-control-attribution { font-size: 10px; }
+.pino { display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 5px rgba(0,0,0,.35); color: #fff; font: 700 10px var(--sans); }
+.pino-ini { background: #1C7C3A; }
+.pino-fim { background: #14181F; }
+.pino-km { background: #14181F; color: #fff; }
+.pino-max { background: #B3261E; }
+.cursor-mapa { width: 16px; height: 16px; border-radius: 50%; background: var(--accent); border: 3px solid #fff; box-shadow: 0 0 0 2px rgba(20,24,31,.35); }
+.escala { display: flex; height: 8px; border-radius: 4px; overflow: hidden; }
+.escala i { flex: 1; }
+.escala-rot { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* parciais por km */
+.km-barra { display: block; height: 8px; border-radius: 4px; background: var(--s1); min-width: 4px; }
+.tabela td.km-bar { width: 40%; vertical-align: middle; }
+.tabela tr.melhor td { font-weight: 700; }
+.recordes { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+.recorde { background: var(--surface-2); border-radius: 10px; padding: 8px 10px; display: flex; flex-direction: column; font-variant-numeric: tabular-nums; }
+.recorde span { font-size: 11px; color: var(--muted); }
+.recorde b { font-size: 16px; }
+.recorde small { font-size: 11.5px; color: var(--ink-2); }
+
+/* carga e forma */
+.forma-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 520px) { .forma-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 10px; } }
+.selo { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700; background: var(--accent-soft); color: var(--accent-ink); }
+.selo.bom { background: color-mix(in srgb, var(--good) 14%, transparent); color: var(--good); }
+.selo.alerta { background: color-mix(in srgb, var(--bad) 12%, transparent); color: var(--bad); }
+.medidor { position: relative; height: 10px; border-radius: 5px; background: linear-gradient(90deg, var(--s1) 0 26.7%, var(--good) 26.7% 60%, var(--s4) 60% 73.3%, var(--bad) 73.3% 100%); opacity: .85; }
+.medidor b { position: absolute; top: -4px; width: 4px; height: 18px; border-radius: 2px; background: var(--ink); transform: translateX(-2px); }
+.medidor-rot { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lt-esf { color: var(--accent-ink); font-weight: 700; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 </head>
@@ -954,12 +1021,171 @@ function analisar(meta, series, Z) {
   };
 }
 
+// ================= interpretação: esforço, foco, calorias e forma =================
+// TRIMP de Banister: minutos × fração da FC de reserva × fator exponencial (pesa mais o tempo em FC alta).
+// Sai do histograma da FC que já fica no resumo, então vale para qualquer treino sem abrir a série.
+const fcRepouso = () => E.cfg.fcrep || 60;
+function trimpDoHist(hist, Z) {
+  if (!hist) return 0;
+  const rep = fcRepouso(), span = Math.max(20, Z.fcmax - rep);
+  const [a, b] = E.cfg.sexo === 'f' ? [0.86, 1.67] : [0.64, 1.92];
+  let s = 0;
+  hist.s.forEach((seg, i) => { if (!seg) return; const x = clamp((hist.de + i - rep) / span, 0, 1); s += seg / 60 * x * a * Math.exp(b * x); });
+  return s;
+}
+// escala de 0 a 21, no estilo do Whoop: cresce rápido no começo e fica cada vez mais difícil chegar ao topo
+const esforcoDe = trimp => 21 * (1 - Math.exp(-trimp / 80));
+const NIVEIS_ESFORCO = [
+  { de: 18, nome: 'Muito alto', texto: 'esforço quase máximo; o corpo pede um dia leve depois' },
+  { de: 14, nome: 'Alto', texto: 'treino puxado, que gera adaptação e cansaço' },
+  { de: 10, nome: 'Moderado', texto: 'mantém o condicionamento sem cansar demais' },
+  { de: 0, nome: 'Leve', texto: 'ajuda a recuperar e a construir base' }
+];
+const nivelEsforco = e => NIVEIS_ESFORCO.find(n => e >= n.de);
+const fmtEsf = e => fmtN(e, 1);
+// para onde o treino puxou: base aeróbica (até Z2), limiar (Z3) ou alta intensidade (Z4–Z5)
+function focoDoTreino(zt) {
+  const tot = zt.reduce((a, b) => a + b, 0) || 1;
+  const base = (zt[0] + zt[1] + zt[2]) / tot, lim = zt[3] / tot, alta = (zt[4] + zt[5]) / tot;
+  const partes = [{ nome: 'Base', v: base, cor: 'var(--z1)' }, { nome: 'Limiar', v: lim, cor: 'var(--z3)' }, { nome: 'Alta', v: alta, cor: 'var(--z5)' }];
+  let rotulo, texto;
+  if (alta >= 0.3) { rotulo = 'Alta intensidade'; texto = 'muito tempo em Z4–Z5: treina potência e a tolerância a esforços acima do limiar (anaeróbico).'; }
+  else if (lim + alta >= 0.4) { rotulo = 'Limiar'; texto = 'esforço forte e contínuo: melhora a capacidade de sustentar ritmo alto por mais tempo.'; }
+  else if (base >= 0.75) { rotulo = 'Base aeróbica'; texto = 'quase tudo em FC baixa: constrói resistência e ajuda na recuperação.'; }
+  else { rotulo = 'Misto'; texto = 'alternou entre esforço leve e forte, como num treino intervalado.'; }
+  return { partes, rotulo, texto, base, lim, alta };
+}
+// calorias pela FC (Keytel et al., 2005), quando o relógio não manda; precisa de peso e idade
+function caloriasEstimadas(hist) {
+  const c = E.cfg; if (!c.peso || !c.idade || !hist) return null;
+  const hom = hr => (-55.0969 + 0.6309 * hr + 0.1988 * c.peso + 0.2017 * c.idade) / 4.184;
+  const mul = hr => (-20.4022 + 0.4472 * hr - 0.1263 * c.peso + 0.074 * c.idade) / 4.184;
+  const f = c.sexo === 'f' ? mul : c.sexo === 'm' ? hom : hr => (hom(hr) + mul(hr)) / 2;
+  let kcal = 0;
+  hist.s.forEach((seg, i) => { if (seg) kcal += Math.max(1.2, f(hist.de + i)) * seg / 60; });
+  return kcal;
+}
+const leituraQueda = q => q >= 30 ? 'ótima' : q >= 20 ? 'boa' : q >= 12 ? 'normal' : 'baixa';
+// média pessoal: treinos da mesma modalidade nos 90 dias antes deste
+function basePessoal(meta, Z) {
+  const de = meta.inicioMs - 90 * 86400000;
+  const outros = E.treinos.filter(t => t.id !== meta.id && t.tipo === meta.tipo && t.inicioMs < meta.inicioMs && t.inicioMs >= de);
+  if (outros.length < 3) return null;
+  const m = f => outros.reduce((a, t) => a + f(t), 0) / outros.length;
+  return {
+    n: outros.length, esforco: m(t => esforcoDe(trimpDoHist(t.resumo.hist, Z))), fcMed: m(t => t.resumo.fcMed || 0),
+    alta: m(t => { const zt = temposZona(t.resumo.hist, Z.limites), tot = zt.reduce((a, b) => a + b, 0) || 1; return (zt[4] + zt[5]) / tot; }), dur: m(t => t.resumo.duracaoS)
+  };
+}
+// condicionamento (média de 42 dias) e fadiga (média de 7 dias) da carga diária, como no gráfico de forma do Strava
+function calcForma(Z) {
+  if (!E.treinos.length) return null;
+  const carga = new Map();
+  for (const t of E.treinos) { const k = chaveDia(t.inicioMs, t.fusoMin); carga.set(k, (carga.get(k) || 0) + trimpDoHist(t.resumo.hist, Z)); }
+  const ks = [...carga.keys()], ini = Math.min(...ks), fim = Math.max(chaveDia(Date.now()), ...ks);
+  let ctl = 0, atl = 0; const dias = [];
+  for (let k = ini; k <= fim; k += UM_DIA) { const x = carga.get(k) || 0; ctl += (x - ctl) / 42; atl += (x - atl) / 7; dias.push({ k, x, ctl, atl }); }
+  const soma = n => dias.slice(-n).reduce((a, d) => a + d.x, 0);
+  const ult = dias[dias.length - 1], a7 = soma(7), c28 = soma(28) / 4;
+  return { dias, ctl: ult.ctl, atl: ult.atl, forma: ult.ctl - ult.atl, a7, c28, acwr: c28 > 0 && dias.length >= 21 ? a7 / c28 : null, diasHist: dias.length };
+}
+function leituraForma(f) {
+  return f > 5 ? { nome: 'Descansado', cls: 'bom', texto: 'A fadiga está abaixo do condicionamento: bom momento para um treino forte ou uma competição.' }
+    : f >= -10 ? { nome: 'Equilibrado', cls: '', texto: 'Carga e descanso estão em equilíbrio: dá para manter o ritmo de treinos.' }
+    : f >= -30 ? { nome: 'Em construção', cls: '', texto: 'A fadiga está acima do condicionamento, o que é normal numa fase de treinos fortes. Cuide do sono e da alimentação.' }
+    : { nome: 'Sobrecarga', cls: 'alerta', texto: 'Fadiga muito acima do condicionamento. Um ou dois dias leves ajudam o corpo a absorver o treino.' };
+}
+function leituraAcwr(r) {
+  if (r == null) return null;
+  return r < 0.8 ? { nome: 'Abaixo do habitual', cls: '', texto: 'Treinou menos nesta semana do que nas últimas quatro: bom para recuperar, mas por muito tempo o condicionamento cai.' }
+    : r <= 1.3 ? { nome: 'Ponto ideal', cls: 'bom', texto: 'A carga da semana está na faixa de 0,8 a 1,3 vez a média das últimas quatro, onde o condicionamento sobe com menos risco de lesão.' }
+    : r <= 1.5 ? { nome: 'Acima do habitual', cls: '', texto: 'A carga da semana subiu mais rápido que o costume. Vale observar o cansaço e as dores.' }
+    : { nome: 'Pico de carga', cls: 'alerta', texto: 'Mais de 1,5 vez a carga habitual. Saltos assim estão ligados a mais lesões; considere um dia leve.' };
+}
+
+// ================= GPS: percurso, ritmo, parciais e melhores marcas =================
+const usaVelocidade = tipo => /cicl|bike|pedal|mtb|bicic|spinning/i.test(String(tipo || ''));
+const fmtRitmo = sPorKm => { if (sPorKm == null || !isFinite(sPorKm)) return '–'; const s = Math.round(sPorKm); return `${Math.floor(s / 60)}:${p2(s % 60)}`; };
+const ritmoOuVel = (velMs, tipo) => !velMs ? ['–', ''] : usaVelocidade(tipo) ? [fmtN(velMs * 3.6, 1), 'km/h'] : [fmtRitmo(1000 / velMs), '/km'];
+const fmtKm = m => m >= 10000 ? fmtN(m / 1000, 1) : fmtN(m / 1000, 2);
+function indicesGPS(series) {
+  const { t, lat, lon } = series, out = [];
+  if (!lat || !lon) return out;
+  for (let i = 0; i < t.length; i++) if (lat[i] != null && lon[i] != null && (lat[i] !== 0 || lon[i] !== 0)) out.push(i);
+  return out;
+}
+// velocidade (m/s) a partir da distância acumulada, suavizada em 30 s
+function velocidadeSuave(series) {
+  const { t, dist } = series, inst = new Array(t.length).fill(null);
+  if (!dist) return inst;
+  let ant = -1;
+  for (let i = 0; i < t.length; i++) {
+    if (dist[i] == null) continue;
+    if (ant >= 0) { const dt = t[i] - t[ant]; if (dt > 0 && dt <= 60) inst[i] = Math.max(0, (dist[i] - dist[ant]) / dt); }
+    ant = i;
+  }
+  return suavizar(t, inst, 30);
+}
+function analisarGPS(meta, series, P) {
+  const gi = indicesGPS(series);
+  if (gi.length < 10 || !series.dist) return null;
+  const { t, dist } = series, iv = [];
+  for (let i = 0; i < t.length; i++) if (dist[i] != null) iv.push(i);
+  if (iv.length < 10) return null;
+  const d0 = dist[iv[0]], total = dist[iv[iv.length - 1]] - d0;
+  if (!(total >= 300)) return null;
+  const altS = series.alt ? suavizar(t, series.alt, 30) : null;
+  const altEm = seg => { if (!altS) return null; const i = maisProximo(t, seg); return i >= 0 ? altS[i] : null; };
+  // tempo em movimento e parciais de 1 km (o tempo parado não entra no ritmo)
+  let mov = 0, k = 1, movKm = 0;
+  const marcas = [{ t: t[iv[0]], d: d0 }], movPorKm = [];
+  for (let j = 1; j < iv.length; j++) {
+    const a = iv[j - 1], b = iv[j], dt = t[b] - t[a], dd = dist[b] - dist[a];
+    const andando = dt > 0 && dt <= 60 && dd / dt > 0.6;
+    if (andando) { mov += dt; movKm += dt; }
+    while (dist[b] - d0 >= k * 1000 && dd > 0) {
+      const fr = (d0 + k * 1000 - dist[a]) / dd;
+      marcas.push({ t: t[a] + fr * dt, d: d0 + k * 1000 });
+      movPorKm.push(movKm); movKm = 0; k++;
+    }
+  }
+  if (total - (k - 1) * 1000 >= 100) { marcas.push({ t: t[iv[iv.length - 1]], d: d0 + total, parcial: true }); movPorKm.push(movKm); }
+  const splits = [];
+  for (let j = 1; j < marcas.length; j++) {
+    const a = marcas[j - 1], b = marcas[j], distM = b.d - a.d, durMov = movPorKm[j - 1] || (b.t - a.t);
+    const ea = altEm(a.t), eb = altEm(b.t);
+    splits.push({ n: j, distM, dur: b.t - a.t, durMov, ritmo: durMov / (distM / 1000), vel: distM / durMov, fcMed: mediaEntre(series, P, a.t, b.t), elev: ea != null && eb != null ? eb - ea : null, parcial: !!b.parcial, ini: a.t, fim: b.t });
+  }
+  // melhores marcas: o menor tempo para cobrir cada distância
+  const melhores = [[400, '400 m'], [1000, '1 km'], [5000, '5 km'], [10000, '10 km'], [21097.5, 'Meia maratona'], [42195, 'Maratona']].filter(([m]) => total >= m).map(([m, nome]) => {
+    let best = Infinity, ini = 0, jj = 0;
+    for (let i = 0; i < iv.length; i++) {
+      while (jj < iv.length && dist[iv[jj]] - dist[iv[i]] < m) jj++;
+      if (jj >= iv.length) break;
+      const dt = t[iv[jj]] - t[iv[i]]; if (dt > 0 && dt < best) { best = dt; ini = t[iv[i]]; }
+    }
+    return isFinite(best) ? { nome, m, s: best, ini } : null;
+  }).filter(Boolean);
+  // desacoplamento: quanto a relação ritmo/FC piorou da 1ª para a 2ª metade (só em esforço contínuo)
+  let dec = null;
+  const durT = t[t.length - 1];
+  if (mov >= 1200 && mov / durT >= 0.8) {
+    const meio = durT / 2, dAt = s => { const i = maisProximo(t, s); for (let q = i; q >= 0; q--) if (dist[q] != null) return dist[q]; return null; };
+    const v1 = (dAt(meio) - d0) / meio, v2 = (dAt(durT) - dAt(meio)) / (durT - meio);
+    const h1 = mediaEntre(series, P, 0, meio), h2 = mediaEntre(series, P, meio, durT + 1);
+    if (v1 > 0 && v2 > 0 && h1 && h2) dec = ((v1 / h1) - (v2 / h2)) / (v1 / h1);
+  }
+  let sobe = null;
+  if (altS) { sobe = 0; let ant = null; for (const v of altS) { if (v == null) continue; if (ant != null && v > ant) sobe += v - ant; ant = v; } }
+  return { distM: total, movS: mov, velMed: mov ? total / mov : null, splits, melhores, dec, subidaM: meta.totais?.subidaM ?? sobe, nGps: gi.length };
+}
+
 // ================= estado e configuração =================
 const TIPOS_PADRAO = ['Jiu-jitsu', 'Futebol', 'Musculação', 'Corrida', 'Ciclismo', 'Natação', 'Caminhada', 'Funcional', 'Muay thai', 'Judô', 'Boxe', 'Wrestling', 'Mobilidade'];
 const NOMES_ZONA = ['Abaixo da Z1', 'Muito leve', 'Leve', 'Moderada', 'Intensa', 'Máxima'];
 const PSE = ['Repouso', 'Muito, muito leve', 'Leve', 'Moderado', 'Um pouco difícil', 'Difícil', 'Difícil+', 'Muito difícil', 'Muito difícil+', 'Quase máximo', 'Máximo'];
 const PCTS_PADRAO = [50, 60, 70, 80, 90];
-const CONFIG_PADRAO = { metodo: 'fcmax', fcmax: null, fcrep: null, idade: null, pcts: PCTS_PADRAO.slice(), limites: null, esforco: 'z3', esforcoBpm: 140, ultimoTipo: null, mostrarPicos: true };
+const CONFIG_PADRAO = { metodo: 'fcmax', fcmax: null, fcrep: null, idade: null, pcts: PCTS_PADRAO.slice(), limites: null, esforco: 'z3', esforcoBpm: 140, ultimoTipo: null, mostrarPicos: true, peso: null, sexo: null, corMapa: 'zona' };
 const CORES_CMP = ['var(--s1)', 'var(--s2)', 'var(--s3)', 'var(--s4)', 'var(--s5)', 'var(--s6)'];
 const MAX_CMP = 6;
 
@@ -1297,7 +1523,7 @@ function desenharLinha(el, o) {
   el.innerHTML = s.join('');
   const svg = el.firstElementChild, cursor = svg.querySelector('.cursor'), linha = cursor.firstElementChild, pontos = [...cursor.querySelectorAll('circle')], dica = el.lastElementChild;
   let idx = -1, ultimoX = null;
-  const esconder = () => { cursor.setAttribute('visibility', 'hidden'); dica.hidden = true; };
+  const esconder = () => { cursor.setAttribute('visibility', 'hidden'); dica.hidden = true; o.aoMover?.(null); };
   function mostrar(xv) {
     const linhas = []; let xs = null;
     o.series.forEach((se, k) => {
@@ -1308,7 +1534,7 @@ function desenharLinha(el, o) {
       linhas.push({ cor: se.cor, nome: se.nome, y: se.y[i], x: se.x[i], i, k });
     });
     if (xs == null) return esconder();
-    ultimoX = xs;
+    ultimoX = xs; o.aoMover?.(xs);
     linha.setAttribute('x1', X(xs)); linha.setAttribute('x2', X(xs)); cursor.setAttribute('visibility', 'visible');
     preencherDica(dica, o.dica ? o.dica(xs, linhas) : { titulo: String(xs), linhas: linhas.map(l => ({ cor: l.cor, valor: fmtN(l.y), nome: l.nome })) });
     dica.hidden = false;
@@ -1437,13 +1663,29 @@ async function renderTreino() {
   const dist = tot.distanciaM > 0 ? tot.distanciaM : null;
   const aviso = demo ? `<div class="aviso"><span>Treino fictício de exemplo. Importe o arquivo do seu treino.</span><label class="btn-link" for="arquivo">Importar</label></div>`
     : Z.provisoria ? `<div class="aviso"><span>Zonas provisórias, pela maior FC registrada (${Z.fcmax} bpm).</span><button class="btn-link" data-ir="ajustes">Ajustar</button></div>` : '';
-  const quarto = tot.calorias != null ? stat(fmtN(tot.calorias), 'kcal') : dist ? stat(`${fmtN(dist / 1000, 1)} km`, 'distância') : stat(fmtN(r.fcMin), 'FC mín.');
+  const gps = analisarGPS(meta, series, an.P);
+  const esf = esforcoDe(trimpDoHist(r.hist, Z)), nivel = nivelEsforco(esf), foco = focoDoTreino(an.zt);
+  const kcalEst = tot.calorias == null ? caloriasEstimadas(r.hist) : null;
+  const quarto = tot.calorias != null ? stat(fmtN(tot.calorias), 'kcal') : kcalEst != null ? stat(fmtN(kcalEst), 'kcal (estimado)') : dist && !gps ? stat(`${fmtN(dist / 1000, 1)} km`, 'distância') : stat(fmtN(r.fcMin), 'FC mín.');
+  const statsGps = gps ? (() => { const [v] = ritmoOuVel(gps.velMed, meta.tipo); return `<div class="stats stats-gps">${stat(`${fmtKm(gps.distM)} km`, 'distância')}${stat(v, usaVelocidade(meta.tipo) ? 'km/h média' : 'ritmo /km')}${stat(durCurta(gps.movS), 'em movimento')}${stat(gps.subidaM != null ? `${fmtN(gps.subidaM)} m` : '–', 'subida')}</div>`; })() : '';
+  const circ = 2 * Math.PI * 26;
+  const blocoEsf = `<div class="esf"><svg class="anel" viewBox="0 0 64 64" role="img" aria-label="Esforço ${esc(fmtEsf(esf))} de 21"><circle class="anel-trilho" cx="32" cy="32" r="26"/><circle class="anel-valor" cx="32" cy="32" r="26" stroke-dasharray="${(esf / 21 * circ).toFixed(1)} ${circ.toFixed(1)}" transform="rotate(-90 32 32)"/><text x="32" y="38" text-anchor="middle">${esc(fmtEsf(esf))}</text></svg>
+    <div class="esf-txt"><span><b>Esforço ${esc(nivel.nome.toLowerCase())}</b> · foco: ${esc(foco.rotulo.toLowerCase())}</span>
+      <div class="foco" aria-hidden="true">${foco.partes.map(p => p.v > 0 ? `<i style="flex:${p.v.toFixed(3)} 1 0;background:${p.cor}"></i>` : '').join('')}</div>
+      <div class="foco-leg">${foco.partes.map(p => `<span><i style="background:${p.cor}"></i>${p.nome} ${fmtPct(p.v)}</span>`).join('')}</div></div></div>`;
   const resumo = `<section class="resumo">
     <div class="resumo-topo"><div class="resumo-nome"><div class="nome-linha" id="t-nome-linha"><h1>${esc(nomeTreino(meta))}</h1>${demo ? '' : `<button class="btn-lapis" id="t-renomear" aria-label="Dar nome ao treino"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM14 6l4 4"/></svg>${meta.titulo ? '' : '<span>Dar nome</span>'}</button>`}</div>
     <p class="resumo-sub">${meta.titulo ? `${esc(meta.tipo)} · ` : ''}${esc(fmtDiaSemana(meta.inicioMs, meta.fusoMin))}, ${esc(fmtData(meta.inicioMs, meta.fusoMin))} · ${esc(fmtHora(meta.inicioMs, meta.fusoMin))}–${esc(fmtHora(fim, meta.fusoMin))}</p>
     ${demo ? '' : `<div class="pasta-linha" id="t-pasta-linha"><button class="chip-pasta${pastaDe(meta.pasta) ? ' tem' : ''}" id="t-pasta" aria-label="Pasta do treino">${ICONE_PASTA}<span>${esc(pastaDe(meta.pasta)?.nome || 'Pôr numa pasta')}</span></button></div>`}</div>
     <button class="btn-compart" id="t-compartilhar" aria-label="Compartilhar a imagem do treino"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg><span>Compartilhar</span></button></div>
-    <div class="stats">${stat(durCurta(r.duracaoS), 'duração')}${stat(fmtN(r.fcMed), 'FC média')}${stat(fmtN(r.fcMax), 'FC máx.')}${quarto}</div>${demo ? '' : linhaVs(meta, an, Z, palavraTrecho(meta.tipo))}</section>`;
+    <div class="stats">${stat(durCurta(r.duracaoS), 'duração')}${stat(fmtN(r.fcMed), 'FC média')}${stat(fmtN(r.fcMax), 'FC máx.')}${quarto}</div>${statsGps}${blocoEsf}${demo ? '' : linhaVs(meta, an, Z, palavraTrecho(meta.tipo))}</section>`;
+  const corMapa = E.cfg.corMapa || 'zona';
+  const cartaoMapa = gps ? `<section class="card"><div class="card-topo"><h2>Percurso</h2><div class="alternar" role="group" aria-label="Cor do percurso">${[['zona', 'Zona FC'], ['ritmo', usaVelocidade(meta.tipo) ? 'Velocidade' : 'Ritmo'], ...(series.alt ? [['alt', 'Altitude']] : [])].map(([k, n]) => `<button data-cor-mapa="${k}" aria-pressed="${corMapa === k}">${n}</button>`).join('')}</div></div>
+    <div class="mapa-caixa" id="mapa-caixa"><div class="mapa"></div><div class="mapa-acoes"><button data-mapa-cheio>Tela cheia</button></div></div><div id="mapa-leg"></div>
+    <p class="nota">Passe o dedo no gráfico da FC para ver onde você estava; toque no percurso para ver os números de cada ponto. ♥: FC máxima.</p></section>` : '';
+  const leituras = leiturasDoTreino(meta, series, an, Z, gps, esf, nivel, foco);
+  const cartaoLeitura = `<section class="card"><h2>Leitura do treino</h2><ul class="leituras">${leituras.map(l => `<li><span class="ic ${l.cls || ''}" aria-hidden="true">${ICONES_LEITURA[l.ic]}</span><span>${l.html}</span></li>`).join('')}</ul>
+    <p class="nota">Interpretação automática pela FC${gps ? ' e pelo GPS' : ''}. O esforço (0 a 21) vem do TRIMP, que pesa mais o tempo em FC alta; ${E.cfg.fcrep ? '' : 'sem a FC de repouso em Ajustes, o app usa 60 bpm; '}não é o mesmo número do Whoop.</p></section>`;
   const zonasMax = Math.max(1, ...an.zt);
   const listaZonas = [0, 1, 2, 3, 4, 5].filter(z => z > 0 || an.zt[0] > 0).map(z => `<div class="zl">
       <span class="zl-rot"><b>${z ? 'Z' + z : 'Abaixo'}</b><small>${esc(faixaZona(z, Z.limites).replace(' bpm', ''))}</small></span>
@@ -1489,16 +1731,19 @@ async function renderTreino() {
     <datalist id="tipos">${[...new Set([...TIPOS_PADRAO, ...E.treinos.map(t => t.tipo)])].map(t => `<option value="${esc(t)}">`).join('')}</datalist>
     <p class="nota" id="n-status">${meta.pse != null ? `Carga da sessão: PSE ${meta.pse} × ${fmtN(durMin)} min = ${fmtN(meta.pse * durMin)}.` : 'Com a PSE, o app calcula a carga da sessão (PSE × minutos).'}</p>`;
   const canaisExtra = [['alt', 'Altitude', 'm', v => v], ['vel', 'Velocidade', 'km/h', v => v * 3.6], ['cad', 'Cadência', 'rpm', v => v], ['pot', 'Potência', 'W', v => v], ['temp', 'Temperatura', '°C', v => v]].filter(([k]) => series[k]);
-  const outros = canaisExtra.length || series.lat ? secao('outros', 'Outros registros', canaisExtra.map(c => c[1].toLowerCase()).concat(series.lat ? ['percurso'] : []).join(', '),
-    canaisExtra.map(([k, nome, un]) => `<h3>${nome} <span class="nota">(${un})</span></h3><div class="graf" id="g-${k}"></div>`).join('') + (series.lat ? '<h3>Percurso</h3><div class="graf" id="g-mapa"></div>' : '')) : '';
+  const outros = canaisExtra.length ? secao('outros', 'Outros registros', canaisExtra.map(c => c[1].toLowerCase()).join(', '),
+    canaisExtra.map(([k, nome, un]) => `<h3>${nome} <span class="nota">(${un})</span></h3><div class="graf" id="g-${k}"></div>`).join('')) : '';
+  const parciaisKm = gps && gps.splits.length ? secao('km', 'Parciais por km', `${gps.splits.length} ${gps.splits.length === 1 ? 'parcial' : 'parciais'}${gps.melhores.length ? ' · melhores marcas' : ''}`, tabelaKm(gps, meta, Z)) : '';
   const subAnot = [meta.pse != null ? `PSE ${meta.pse}` : null, meta.rounds ? `${meta.rounds} rounds` : null, meta.notas ? 'com notas' : null].filter(Boolean).join(' · ');
   const excluir = demo ? '' : `<div class="confirmar"><button class="btn-link btn-perigo" id="excluir">Excluir este treino</button></div>`;
-  raiz.innerHTML = `${aviso}${seletor}${resumo}
+  removerMapa();
+  raiz.innerHTML = `${aviso}${seletor}${resumo}${cartaoMapa}${cartaoLeitura}
     <section class="card"><div class="card-topo"><h2>Frequência cardíaca</h2><label class="chave"><input type="checkbox" id="c-picos" ${picos ? 'checked' : ''}>Picos</label></div><div class="graf" id="g-fc"></div>
       ${picos && nomeados ? `<ol class="leg-trechos">${trechos.map(tr => tr.nome ? `<li><b>${esc(tr.curto)}</b> ${esc(tr.nome)}</li>` : '').join('')}</ol>` : ''}
       ${picos ? `<p class="nota">${marcados ? `Faixas: ${contagem}.` : nBlocos ? `Faixas: ${nBlocos === 1 ? 'o pico' : `os ${nBlocos} picos`} acima de ${fmtN(an.limiar)} bpm. Dê nomes a ${nBlocos === 1 ? 'ele' : 'eles'} em “Picos e ${W.varios}”.` : `Nenhum pico acima de ${fmtN(an.limiar)} bpm.`}</p>` : ''}</section>
     <section class="card"><div class="card-topo"><h2>Tempo em cada zona</h2><span class="nota">carga ${fmtN(an.carga)}</span></div><div class="zonas-lista">${listaZonas}</div></section>
     <section class="card mais">
+      ${parciaisKm}
       ${secao('picos', `Picos e ${W.varios}`, marcados ? `${contagem}${nomeados ? ` · ${nomeados} com nome` : ''}` : `${nBlocos} ${nBlocos === 1 ? 'pico' : 'picos'}${nomeados ? ` · ${nomeados} com nome` : ''}`, blocos)}
       ${secao('partes', 'FC por parte do treino', '', partes)}
       ${secao('anotacoes', 'Anotações', subAnot || 'modalidade, esforço, notas', anotacoes)}
@@ -1514,7 +1759,7 @@ async function renderTreino() {
     faixas: [1, 2, 3, 4, 5].map(z => ({ y0: Z.limites[z - 1], y1: z < 5 ? Z.limites[z] : 400, cor: corZona(z), rotulo: 'Z' + z, op: 0.13 })),
     blocos: picos ? trechos.map(tr => ({ x0: tr.ini / 60, x1: tr.fim / 60, rotulo: tr.curto })) : [],
     marcas: [{ x: r.tFcMax / 60, y: r.fcMax, texto: `máx. ${r.fcMax}`, prioridade: 2 }].concat(picos ? trechos.filter(tr => tr.tMax != null && tr.tMax !== r.tFcMax).map(tr => ({ x: tr.tMax / 60, y: tr.fcMax, texto: String(tr.fcMax), r: 4, prioridade: 1 })) : []),
-    xTicks: pw => ticksMinutos(durMin, pw), yFmt: v => fmtN(v),
+    xTicks: pw => ticksMinutos(durMin, pw), yFmt: v => fmtN(v), aoMover: gps ? x => mapaAtual?.marcar(x == null ? null : x * 60) : undefined,
     dica: (x, ls) => {
       const k = picos ? trechos.findIndex(tr => x * 60 >= tr.ini && x * 60 <= tr.fim) : -1, tr = trechos[k];
       return { titulo: fmtRelogio(x * 60) + (tr ? ` · ${rotuloTrecho(tr, k, W)}${tr.nome ? ': ' + tr.nome : ''}` : ''), linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y)} bpm`, nome: 'Z' + zonaDe(Math.round(l.y), Z.limites) })) };
@@ -1532,17 +1777,24 @@ async function renderTreino() {
     const ys = series[k].map(v => v == null ? null : f(v));
     graficoLinha($('#g-' + k), { rotulo: `${nome} ao longo do treino`, xMin: 0, xMax: durMin, altura: 170, series: [{ nome, cor: 'var(--s1)', x: xs, y: suavizar(series.t, ys, 10) }], xTicks: pw => ticksMinutos(durMin, pw), yFmt: v => fmtN(v), dica: (x, ls) => ({ titulo: fmtRelogio(x * 60), linhas: ls.map(l => ({ cor: l.cor, valor: `${fmtN(l.y, k === 'vel' ? 1 : 0)} ${un}`, nome })) }) });
   }
-  if (series.lat) desenharMapa($('#g-mapa'), series);
+  if (gps) {
+    montarMapa($('#mapa-caixa'), $('#mapa-leg'), meta, series, Z);
+    $$('[data-cor-mapa]', raiz).forEach(b => b.addEventListener('click', () => {
+      E.cfg.corMapa = b.dataset.corMapa; salvarConfig();
+      $$('[data-cor-mapa]', raiz).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      mapaAtual?.colorir(b.dataset.corMapa);
+    }));
+  }
   ligarSeletor();
   $('#t-compartilhar').addEventListener('click', () => abrirCartao(meta, series));
   const ren = $('#t-renomear'); if (ren) ren.addEventListener('click', () => renomearTreino(meta));
   ligarChipPasta(meta);
   $('#c-parc').addEventListener('change', e => { E.tamParcial = +e.target.value; renderTreino(); });
   $('#c-picos').addEventListener('change', e => { E.cfg.mostrarPicos = e.target.checked; salvarConfig(); renderTreino(); });
-  const esf = $('#c-esf');
-  if (esf) {
-    esf.value = E.cfg.esforco || 'z3';
-    esf.addEventListener('change', e => { E.cfg.esforco = e.target.value; salvarConfig(); renderTreino(); });
+  const selEsf = $('#c-esf');
+  if (selEsf) {
+    selEsf.value = E.cfg.esforco || 'z3';
+    selEsf.addEventListener('change', e => { E.cfg.esforco = e.target.value; salvarConfig(); renderTreino(); });
     $('#c-esf-bpm').addEventListener('change', e => { const v = +e.target.value; if (v >= 60 && v <= 230) { E.cfg.esforcoBpm = v; salvarConfig(); renderTreino(); } });
   }
   if (demo) return;
@@ -1561,6 +1813,65 @@ async function renderTreino() {
   $('#excluir').addEventListener('click', () => excluirTreino(meta.id));
   const vs = $('#t-vs');
   if (vs) vs.addEventListener('click', () => { const ant = treinoAnterior(meta); if (!ant) return; E.cmp = []; E.corCmp.clear(); alternarCmp(ant.id, true); alternarCmp(meta.id, true); mostrarAba('comparar'); window.scrollTo({ top: 0 }); });
+}
+// leitura do treino: frases curtas que explicam os números, comparando com a sua média quando dá
+const ICONES_LEITURA = {
+  esforco: '<svg viewBox="0 0 24 24"><path d="M12 3c.5 3.5 5 5.5 5 10.5a5 5 0 0 1-10 0c0-2.6 1.4-4 2.4-5.5.6 1.6 1.6 2.5 2.6 3 .4-2.6-.4-5.2 0-8z"/></svg>',
+  foco: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>',
+  coracao: '<svg viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></svg>',
+  tendencia: '<svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>',
+  percurso: '<svg viewBox="0 0 24 24"><circle cx="6" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 18h7.5a3 3 0 0 0 0-6h-7a3 3 0 0 1 0-6H16"/></svg>',
+  pico: '<svg viewBox="0 0 24 24"><path d="M13 2L4.5 13.5H11L10 22l8.5-11.5H12z"/></svg>'
+};
+function leiturasDoTreino(meta, series, an, Z, gps, esf, nivel, foco) {
+  const L = [], r = meta.resumo, W = palavraTrecho(meta.tipo), base = meta.exemplo ? null : basePessoal(meta, Z), tipo = esc(meta.tipo);
+  let t = `<b>Esforço ${fmtEsf(esf)} de 21 (${nivel.nome.toLowerCase()})</b>: ${nivel.texto}.`;
+  if (base) { const d = esf - base.esforco; t += Math.abs(d) < 1 ? ` Na sua média de ${tipo} (${fmtEsf(base.esforco)}).` : ` ${d > 0 ? 'Acima' : 'Abaixo'} da sua média de ${tipo}, que é ${fmtEsf(base.esforco)} nos últimos 90 dias.`; }
+  L.push({ ic: 'esforco', html: t });
+  L.push({ ic: 'foco', html: `<b>Foco: ${foco.rotulo.toLowerCase()}</b>, ${foco.texto}${base && Math.abs(foco.alta - base.alta) >= 0.1 ? ` Teve ${foco.alta > base.alta ? 'mais' : 'menos'} tempo em Z4–Z5 que o normal para você (${fmtPct(foco.alta)}, contra ${fmtPct(base.alta)}).` : ''}` });
+  const pctMax = r.fcMax / Z.fcmax;
+  if (pctMax >= 0.95) L.push({ ic: 'pico', cls: pctMax > 1 ? 'alerta' : '', html: `<b>Chegou a ${fmtPct(pctMax)} da FC máxima</b> (${r.fcMax} de ${Z.fcmax} bpm), aos ${fmtRelogio(r.tFcMax)}.${pctMax > 1 ? ' Passou da FC máxima usada nas zonas: se o sensor estiver certo, atualize o valor em Ajustes.' : ''}` });
+  // queda pequena costuma ser só o esforço que continuou depois do pico, então não vira alerta
+  if (an.recPico && an.recPico.queda >= 12) {
+    const l = leituraQueda(an.recPico.queda);
+    L.push({ ic: 'coracao', cls: l === 'baixa' ? 'alerta' : l === 'normal' ? '' : 'bom', html: `<b>Recuperação ${l}</b>: depois do pico, a FC caiu ${an.recPico.queda} bpm em 1 minuto (de ${an.recPico.de} para ${an.recPico.para}). Quanto mais cai, mais rápido o coração se recupera entre um esforço e outro.` });
+  }
+  const rolas = trechosDoTreino(meta, series, an).filter(x => x.origem === 'rola' && x.fcMed != null);
+  if (rolas.length >= 3) {
+    const p = rolas[0], u = rolas[rolas.length - 1], d = u.fcMed - p.fcMed, de = W.f ? 'da' : 'do', a = W.f ? 'a' : 'o';
+    L.push({ ic: 'tendencia', html: Math.abs(d) < 4 ? `<b>FC parecida em ${W.f ? 'todas as' : 'todos os'} ${W.varios}</b> (de ${fmtN(p.fcMed)} a ${fmtN(u.fcMed)} bpm de média): manteve a intensidade até o fim.`
+      : d > 0 ? `<b>A FC média subiu ${fmtN(d)} bpm ${de} ${p.rotulo} para ${a} ${u.rotulo}</b>: o cansaço foi se acumulando, ou ${W.f ? 'as últimas foram' : 'os últimos foram'} mais ${W.f ? 'intensas' : 'intensos'}.`
+      : `<b>A FC média caiu ${fmtN(-d)} bpm ${de} ${p.rotulo} para ${a} ${u.rotulo}</b>: o ritmo baixou no final.` });
+  } else if (!gps && an.metades[0] && an.metades[1] && r.duracaoS >= 1200) {
+    const d = an.metades[1] - an.metades[0];
+    if (Math.abs(d) >= 6) L.push({ ic: 'tendencia', html: `<b>Na 2ª metade, a FC média foi ${fmtN(Math.abs(d))} bpm ${d > 0 ? 'maior' : 'menor'}</b> que na 1ª (${fmtN(an.metades[1])} contra ${fmtN(an.metades[0])} bpm)${d > 0 ? ': o treino ficou mais forte ou o cansaço apareceu.' : ': o treino ficou mais leve no final.'}` });
+  }
+  if (gps) {
+    const [v, un] = ritmoOuVel(gps.velMed, meta.tipo), inteiros = gps.splits.filter(s => !s.parcial);
+    const melhor = inteiros.length > 1 ? inteiros.reduce((a, s) => s.ritmo < a.ritmo ? s : a) : null;
+    let g = `<b>${fmtKm(gps.distM)} km em ${durCurta(gps.movS)} de movimento</b>, a ${v} ${un}.`;
+    if (melhor) g += ` O km mais rápido foi o ${melhor.n}º, a ${ritmoOuVel(melhor.vel, meta.tipo).join(' ')}.`;
+    if (gps.dec != null) {
+      const pc = fmtPct(Math.abs(gps.dec), 1);
+      g += gps.dec < 0.05 ? ` Ritmo e FC andaram juntos do começo ao fim (desacoplamento de ${pc}): sinal de boa base aeróbica para esse ritmo.`
+        : gps.dec < 0.1 ? ` Na 2ª metade, a FC subiu ${pc} em relação ao ritmo: o cansaço ou o calor pesaram.`
+        : ` Desacoplamento de ${pc}: no fim, a FC disparou para o mesmo ritmo. O esforço passou do que a base aeróbica sustenta hoje.`;
+    }
+    L.push({ ic: 'percurso', cls: gps.dec != null && gps.dec < 0.05 ? 'bom' : '', html: g });
+  }
+  return L;
+}
+// parciais de 1 km, como no Strava: ritmo (ou velocidade), barra na cor da zona, FC e elevação
+function tabelaKm(gps, meta, Z) {
+  const vel = usaVelocidade(meta.tipo), inteiros = gps.splits.filter(s => !s.parcial);
+  const melhor = inteiros.length > 1 ? inteiros.reduce((a, s) => s.ritmo < a.ritmo ? s : a) : null;
+  const maxV = Math.max(...gps.splits.map(s => s.vel || 0)) || 1;
+  const linhas = gps.splits.map(s => `<tr${s === melhor ? ' class="melhor"' : ''}><td>${s.parcial ? fmtN(s.distM / 1000, 2) : s.n}</td><td class="num">${vel ? fmtN(s.vel * 3.6, 1) : fmtRitmo(s.ritmo)}</td>
+    <td class="km-bar"><span class="km-barra" style="width:${(s.vel / maxV * 100).toFixed(1)}%;background:${corZona(zonaDe(Math.round(s.fcMed || 0), Z.limites))}"></span></td>
+    <td class="num">${fmtN(s.fcMed)}</td><td class="num">${s.elev == null ? '–' : `${s.elev >= 0 ? '+' : '−'}${fmtN(Math.abs(s.elev))}`}</td></tr>`).join('');
+  const recordes = gps.melhores.length ? `<h3>Melhores marcas neste treino</h3><div class="recordes">${gps.melhores.map(m => `<div class="recorde"><span>${esc(m.nome)}</span><b>${fmtRelogio(m.s)}</b><small>${vel ? `${fmtN(m.m / m.s * 3.6, 1)} km/h` : `${fmtRitmo(m.s / (m.m / 1000))} /km`} · aos ${fmtRelogio(m.ini)}</small></div>`).join('')}</div>` : '';
+  return `<div class="rolagem"><table class="tabela"><thead><tr><th>Km</th><th class="num">${vel ? 'km/h' : 'Ritmo'}</th><th></th><th class="num">FC</th><th class="num">Elev. (m)</th></tr></thead><tbody>${linhas}</tbody></table></div>
+    <p class="nota">Barra: velocidade da parcial, na cor da zona da FC média. Em negrito, o km mais rápido. O ritmo conta só o tempo em movimento.</p>${recordes}`;
 }
 // picos e rolas: nomear, encontrar pela duração, ajustar o início
 const salvarTrechos = debounce(async (meta) => {
@@ -1700,22 +2011,148 @@ function cartaoArquivo(meta) {
     <h3>Canais registrados</h3><div class="rolagem"><table class="tabela"><thead><tr><th>Canal</th><th class="num">Registros</th><th class="num">Mín.</th><th class="num">Média</th><th class="num">Máx.</th></tr></thead><tbody>${canais}</tbody></table></div>`;
 }
 
-function desenharMapa(el, series) {
-  montar(el, () => {
-    const W = Math.max(240, el.clientWidth || 400), H = Math.round(W * 0.65); el._w = el.clientWidth;
-    const la = series.lat, lo = series.lon, pts = [];
-    for (let i = 0; i < la.length; i++) if (la[i] != null && lo[i] != null) pts.push([lo[i], la[i]]);
-    if (pts.length < 2) { el.innerHTML = '<p class="nota">Sem pontos de GPS suficientes.</p>'; return; }
-    const lats = pts.map(p => p[1]), lons = pts.map(p => p[0]);
-    const k = Math.cos((Math.min(...lats) + Math.max(...lats)) / 2 * Math.PI / 180);
-    const x0 = Math.min(...lons), x1 = Math.max(...lons), y0 = Math.min(...lats), y1 = Math.max(...lats);
-    const sx = (x1 - x0) * k || 1e-6, sy = (y1 - y0) || 1e-6, e = Math.min((W - 24) / sx, (H - 24) / sy);
-    const ox = (W - sx * e) / 2, oy = (H - sy * e) / 2;
-    const P = ([x, y]) => [ox + (x - x0) * k * e, H - oy - (y - y0) * e];
-    const d = pts.map((p, i) => (i ? 'L' : 'M') + P(p).map(v => v.toFixed(1)).join(' ')).join('');
-    const [ax, ay] = P(pts[0]), [bx, by] = P(pts[pts.length - 1]);
-    el.innerHTML = `<svg class="svg-graf" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Percurso registrado pelo GPS"><rect width="${W}" height="${H}" rx="10" style="fill:var(--surface-2)"/><path d="${d}" style="fill:none;stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round"/><circle cx="${ax}" cy="${ay}" r="5" style="fill:var(--good);stroke:var(--surface);stroke-width:2"/><circle cx="${bx}" cy="${by}" r="5" style="fill:var(--ink);stroke:var(--surface);stroke-width:2"/></svg><p class="nota">Verde: início · escuro: fim.</p>`;
+// ----- mapa do percurso -----
+// Mapa de verdade (Leaflet com OpenStreetMap) quando há internet; sem ela, o trajeto desenhado em SVG.
+const LEAFLET = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/';
+const ESCALA_MAPA = ['#2a78d6', '#1baf7a', '#e0b100', '#eb6834', '#c0261e'];
+let promessaLeaflet = null, mapaAtual = null;
+function carregarLeaflet() {
+  if (window.L?.map) return Promise.resolve(window.L);
+  if (!promessaLeaflet) promessaLeaflet = new Promise((ok, erro) => {
+    let feito = false;
+    const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = LEAFLET + 'leaflet.min.css';
+    const js = document.createElement('script'); js.src = LEAFLET + 'leaflet.min.js';
+    const falhou = () => { if (feito) return; feito = true; promessaLeaflet = null; js.remove(); erro(new Error('mapa indisponível')); };
+    js.onload = () => { if (window.L?.map) { feito = true; ok(window.L); } else falhou(); };
+    js.onerror = falhou;
+    setTimeout(falhou, 10000);
+    document.head.append(css, js);
   });
+  return promessaLeaflet;
+}
+const temaEscuro = () => { const t = document.documentElement.dataset.theme; return t === 'dark' || (t !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches); };
+const corCSS = nome => getComputedStyle(document.documentElement).getPropertyValue(nome).trim() || '#888';
+function removerMapa() { try { mapaAtual?.remover(); } catch (e) { /* já removido */ } mapaAtual = null; }
+// cor de cada ponto do percurso conforme a métrica (zona da FC, ritmo ou altitude), e a legenda
+function coresDoPercurso(series, pts, metrica, Z, tipo) {
+  if (metrica === 'zona') {
+    const s = suavizar(series.t, series.fc, 10), cores = [0, 1, 2, 3, 4, 5].map(z => corCSS(`--z${z}`));
+    return { cor: pts.map(i => s[i] == null ? cores[0] : cores[zonaDe(Math.round(s[i]), Z.limites)]), leg: { tipo: 'zonas' } };
+  }
+  const vals = metrica === 'ritmo' ? velocidadeSuave(series) : series.alt ? suavizar(series.t, series.alt, 20) : null;
+  if (!vals) return null;
+  const vs = pts.map(i => vals[i]).filter(v => v != null && (metrica !== 'ritmo' || v > 0.3)).sort((a, b) => a - b);
+  if (vs.length < 5) return null;
+  const q = f => vs[Math.floor(f * (vs.length - 1))], cortes = [0.2, 0.4, 0.6, 0.8].map(q);
+  const fmt = metrica === 'ritmo' ? v => ritmoOuVel(v, tipo).join(' ').trim() : v => `${fmtN(v)} m`;
+  return {
+    cor: pts.map(i => ESCALA_MAPA[vals[i] == null ? 0 : cortes.filter(c => vals[i] > c).length]),
+    leg: { tipo: 'escala', de: fmt(q(0.05)), ate: fmt(q(0.95)), rotDe: metrica === 'ritmo' ? 'mais lento' : 'mais baixo', rotAte: metrica === 'ritmo' ? 'mais rápido' : 'mais alto' }
+  };
+}
+function legendaMapa(c, Z) {
+  if (!c) return '';
+  if (c.leg.tipo === 'zonas') return legendaZonas(Z, false);
+  return `<div class="escala" aria-hidden="true">${ESCALA_MAPA.map(k => `<i style="background:${k}"></i>`).join('')}</div><div class="escala-rot"><span>${esc(c.leg.rotDe)} · ${esc(c.leg.de)}</span><span>${esc(c.leg.ate)} · ${esc(c.leg.rotAte)}</span></div>`;
+}
+// trechos consecutivos da mesma cor viram uma linha só
+function trechosDeCor(n, cor) {
+  const out = []; let ini = 0;
+  for (let k = 1; k <= n; k++) if (k === n || cor[k] !== cor[ini]) { out.push([ini, Math.min(k, n - 1), cor[ini]]); ini = k; }
+  return out;
+}
+function mapaSVG(el, ll, cor) {
+  const W = Math.max(240, el.clientWidth || 400), H = Math.max(200, el.clientHeight || Math.round(W * 0.6)); el._w = el.clientWidth;
+  let y0 = Infinity, y1 = -Infinity, x0 = Infinity, x1 = -Infinity;
+  for (const [la, lo] of ll) { if (la < y0) y0 = la; if (la > y1) y1 = la; if (lo < x0) x0 = lo; if (lo > x1) x1 = lo; }
+  const k = Math.cos((y0 + y1) / 2 * Math.PI / 180), sx = (x1 - x0) * k || 1e-6, sy = (y1 - y0) || 1e-6, e = Math.min((W - 40) / sx, (H - 40) / sy);
+  const ox = (W - sx * e) / 2, oy = (H - sy * e) / 2;
+  const P = ([la, lo]) => [ox + (lo - x0) * k * e, H - oy - (la - y0) * e];
+  const xy = ll.map(P), d = (a, b) => xy.slice(a, b + 1).map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('');
+  const linhas = trechosDeCor(ll.length, cor).map(([a, b, c]) => `<path d="${d(a, b)}" style="fill:none;stroke:${c};stroke-width:4;stroke-linejoin:round;stroke-linecap:round"/>`).join('');
+  const [ax, ay] = xy[0], [bx, by] = xy[xy.length - 1];
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Percurso registrado pelo GPS"><path d="${d(0, ll.length - 1)}" style="fill:none;stroke:var(--surface);stroke-width:8;stroke-linejoin:round;stroke-linecap:round"/>${linhas}
+    <circle cx="${ax}" cy="${ay}" r="6" style="fill:#1C7C3A;stroke:#fff;stroke-width:2"/><circle cx="${bx}" cy="${by}" r="6" style="fill:#14181F;stroke:#fff;stroke-width:2"/>
+    <circle class="cursor-svg" r="7" visibility="hidden" style="fill:var(--accent);stroke:#fff;stroke-width:3"/></svg>`;
+  return P;
+}
+async function montarMapa(caixa, legEl, meta, series, Z) {
+  removerMapa();
+  const el = $('.mapa', caixa), gi = indicesGPS(series), passo = Math.max(1, Math.ceil(gi.length / 2500));
+  const pts = gi.filter((_, k) => k % passo === 0 || k === gi.length - 1), ll = pts.map(i => [series.lat[i], series.lon[i]]);
+  const vel = velocidadeSuave(series), s10 = suavizar(series.t, series.fc, 10);
+  let metrica = E.cfg.corMapa || 'zona';
+  const cores = () => { const c = coresDoPercurso(series, pts, metrica, Z, meta.tipo) || coresDoPercurso(series, pts, 'zona', Z, meta.tipo); legEl.innerHTML = legendaMapa(c, Z); return c; };
+  const pontoNoTempo = seg => { const k = maisProximo(pts.map(i => series.t[i]), seg); return k < 0 || Math.abs(series.t[pts[k]] - seg) > 90 ? -1 : k; };
+  const tPts = pts.map(i => series.t[i]);
+  const infoPonto = k => { const i = pts[k], [v, un] = ritmoOuVel(vel[i], meta.tipo); return `${fmtRelogio(series.t[i])} · ${s10[i] != null ? fmtN(s10[i]) + ' bpm' : '–'}${vel[i] > 0.3 ? ` · ${v} ${un}` : ''}${series.dist?.[i] != null ? ` · ${fmtKm(series.dist[i] - (series.dist.find(x => x != null) || 0))} km` : ''}`; };
+  let L = null;
+  try { L = await carregarLeaflet(); } catch (e) { L = null; }
+  if (!caixa.isConnected) return;
+  if (!L) {
+    let P = null, c = null;
+    const desenhar = () => { if (!c) c = cores(); P = mapaSVG(el, ll, c.cor); };
+    montar(el, desenhar);
+    mapaAtual = {
+      colorir: m => { metrica = m; c = null; desenhar(); },
+      marcar: seg => { const cur = $('.cursor-svg', el); if (!cur || !P) return; const k = seg == null ? -1 : maisProximo(tPts, seg); if (k < 0) { cur.setAttribute('visibility', 'hidden'); return; } const [x, y] = P(ll[k]); cur.setAttribute('cx', x); cur.setAttribute('cy', y); cur.setAttribute('visibility', 'visible'); },
+      remover() {}, alternarCheio() {}
+    };
+    caixa.querySelector('[data-mapa-cheio]')?.remove();
+    return;
+  }
+  const escuro = temaEscuro();
+  const mapa = L.map(el, { scrollWheelZoom: false, dragging: !L.Browser.mobile, tap: false, zoomSnap: 0.25 });
+  L.tileLayer(`https://{s}.basemaps.cartocdn.com/${escuro ? 'dark_all' : 'rastertiles/voyager'}/{z}/{x}/{y}{r}.png`, {
+    maxZoom: 19, subdomains: 'abcd', crossOrigin: true,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+  }).addTo(mapa);
+  mapa.fitBounds(L.latLngBounds(ll), { padding: [28, 28] });
+  L.polyline(ll, { color: escuro ? '#0b0d11' : '#ffffff', weight: 9, opacity: 0.9, interactive: false }).addTo(mapa);
+  const camada = L.layerGroup().addTo(mapa);
+  const pintar = () => { camada.clearLayers(); const c = cores(); for (const [a, b, cor] of trechosDeCor(ll.length, c.cor)) L.polyline(ll.slice(a, b + 1), { color: cor, weight: 5, opacity: 1, lineCap: 'round', lineJoin: 'round', interactive: false }).addTo(camada); };
+  pintar();
+  const pino = (cls, tam, html = '') => L.divIcon({ className: '', html: `<div class="pino ${cls}" style="width:${tam}px;height:${tam}px">${html}</div>`, iconSize: [tam, tam], iconAnchor: [tam / 2, tam / 2] });
+  // marcas de cada km (no máximo umas 25 no mapa)
+  const an = analisarGPS(meta, series, pesos(series.t));
+  if (an) {
+    const inteiros = an.splits.filter(s => !s.parcial), pulo = Math.max(1, Math.ceil(inteiros.length / 25));
+    inteiros.forEach((s, j) => { if ((j + 1) % pulo) return; const k = pontoNoTempo(s.fim); if (k >= 0) L.marker(ll[k], { icon: pino('pino-km', 20, s.n), interactive: false, keyboard: false }).addTo(mapa); });
+  }
+  const kMax = pontoNoTempo(meta.resumo.tFcMax);
+  if (kMax >= 0) L.marker(ll[kMax], { icon: pino('pino-max', 22, '♥'), title: `FC máxima: ${meta.resumo.fcMax} bpm`, keyboard: false }).bindTooltip(`FC máxima: ${meta.resumo.fcMax} bpm · ${fmtRelogio(meta.resumo.tFcMax)}`).addTo(mapa);
+  L.marker(ll[0], { icon: pino('pino-ini', 18), interactive: false, keyboard: false }).addTo(mapa);
+  L.marker(ll[ll.length - 1], { icon: pino('pino-fim', 18), interactive: false, keyboard: false }).addTo(mapa);
+  // cursor: segue o dedo no gráfico da FC e aparece ao tocar no percurso
+  const cursor = L.marker(ll[0], { icon: L.divIcon({ className: '', html: '<div class="cursor-mapa"></div>', iconSize: [16, 16], iconAnchor: [8, 8] }), interactive: false, keyboard: false, zIndexOffset: 1000 });
+  cursor.bindTooltip('', { direction: 'top', offset: [0, -10] });
+  const mostrarK = k => { if (k < 0) { cursor.remove(); return; } cursor.setLatLng(ll[k]); if (!mapa.hasLayer(cursor)) cursor.addTo(mapa); cursor.setTooltipContent(infoPonto(k)); cursor.openTooltip(); };
+  const pertoDe = ev => {
+    const p = ev.containerPoint; let melhor = -1, dmin = 32 * 32;
+    for (let k = 0; k < ll.length; k++) { const q = mapa.latLngToContainerPoint(ll[k]), d = (q.x - p.x) ** 2 + (q.y - p.y) ** 2; if (d < dmin) { dmin = d; melhor = k; } }
+    return melhor;
+  };
+  mapa.on('click', ev => mostrarK(pertoDe(ev)));
+  if (!L.Browser.mobile) mapa.on('mousemove', debounce(ev => { const k = pertoDe(ev); if (k >= 0) mostrarK(k); }, 30));
+  const caixaCheia = () => caixa.classList.contains('cheio');
+  const bt = caixa.querySelector('[data-mapa-cheio]');
+  const alternarCheio = forcar => {
+    const cheio = forcar ?? !caixaCheia();
+    caixa.classList.toggle('cheio', cheio); document.body.style.overflow = cheio ? 'hidden' : '';
+    if (bt) bt.textContent = cheio ? 'Fechar' : 'Tela cheia';
+    if (cheio) { mapa.dragging.enable(); mapa.scrollWheelZoom.enable(); } else { if (L.Browser.mobile) mapa.dragging.disable(); mapa.scrollWheelZoom.disable(); }
+    setTimeout(() => { mapa.invalidateSize(); mapa.fitBounds(L.latLngBounds(ll), { padding: [28, 28] }); }, 60);
+  };
+  const tecla = ev => { if (ev.key === 'Escape' && caixaCheia()) alternarCheio(false); };
+  document.addEventListener('keydown', tecla);
+  if (bt) bt.addEventListener('click', () => alternarCheio());
+  const obs = 'ResizeObserver' in window ? new ResizeObserver(() => mapa.invalidateSize()) : null; obs?.observe(el);
+  mapaAtual = {
+    colorir: m => { metrica = m; pintar(); },
+    marcar: seg => mostrarK(seg == null ? -1 : pontoNoTempo(seg)),
+    remover() { document.removeEventListener('keydown', tecla); obs?.disconnect(); if (caixaCheia()) document.body.style.overflow = ''; mapa.remove(); },
+    alternarCheio
+  };
 }
 
 // ----- pastas -----
@@ -1895,6 +2332,30 @@ function graficoEvolucao(el, lista) {
     aoClicar: x => { const i = maisProximo(xsE, x); if (i >= 0) abrirTreino(cron[i].id); }
   });
 }
+// carga e forma: condicionamento, fadiga e a razão entre a carga da semana e a das últimas quatro
+function cartaoForma(f) {
+  if (!f) return '';
+  const lf = leituraForma(f.forma), la = leituraAcwr(f.acwr), pouco = f.diasHist < 42;
+  const pos = f.acwr == null ? null : clamp((f.acwr - 0.4) / 1.5 * 100, 0, 100);
+  const sinal = v => `${v > 0.5 ? '+' : v < -0.5 ? '−' : ''}${fmtN(Math.abs(v))}`;
+  return `<section class="card"><div class="card-topo"><h2>Carga e forma</h2><span class="selo ${lf.cls}">${esc(lf.nome)}</span></div>
+    <div class="stats forma-stats">${stat(fmtN(f.ctl), 'condicionamento')}${stat(fmtN(f.atl), 'fadiga')}${stat(sinal(f.forma), 'forma')}${stat(f.acwr == null ? '–' : fmtN(f.acwr, 2), 'semana ÷ habitual')}</div>
+    <p class="texto">${esc(lf.texto)}</p>
+    ${la ? `<div><div class="medidor" role="img" aria-label="Carga da semana: ${esc(fmtN(f.acwr, 2))} vez a habitual"><b style="left:${pos.toFixed(1)}%"></b></div><div class="medidor-rot"><span>0,4</span><span>0,8</span><span>1,3</span><span>1,5</span><span>1,9+</span></div></div>
+      <p class="texto"><span class="selo ${la.cls}">${esc(la.nome)}</span> ${esc(la.texto)}</p>` : ''}
+    <div class="graf" id="g-forma"></div>
+    <div class="legenda"><span><i class="lk" style="background:var(--s1)"></i>condicionamento (42 dias)</span><span><i class="lk" style="background:var(--s2)"></i>fadiga (7 dias)</span><span><i class="lk" style="background:var(--s3)"></i>forma</span></div>
+    <p class="nota">Carga de cada dia: TRIMP pela FC, somando todos os treinos (sem os filtros acima). Forma = condicionamento − fadiga.${pouco ? ' Com menos de 6 semanas de histórico, o condicionamento ainda está subestimado.' : ''}</p></section>`;
+}
+function graficoForma(el, f) {
+  const ult = f.dias.slice(-120), xs = ult.map(d => d.k), xMin = xs[0], xMax = xs[xs.length - 1] || xMin + UM_DIA;
+  graficoLinha(el, {
+    rotulo: 'Condicionamento, fadiga e forma nos últimos meses', xMin, xMax, altura: 180, yPad: 2,
+    series: [{ nome: 'condicionamento', cor: 'var(--s1)', x: xs, y: ult.map(d => d.ctl), area: true, areaOp: 0.1 }, { nome: 'fadiga', cor: 'var(--s2)', x: xs, y: ult.map(d => d.atl), larg: 1.5 }, { nome: 'forma', cor: 'var(--s3)', x: xs, y: ult.map(d => d.ctl - d.atl), larg: 1.5 }],
+    xTicks: pw => { const n = Math.max(2, Math.min(6, Math.floor(pw / 80))), out = []; for (let i = 0; i < n; i++) { const v = xMin + (xMax - xMin) * i / (n - 1); const d = new Date(v); out.push({ v, rotulo: `${p2(d.getUTCDate())} ${MESES[d.getUTCMonth()]}` }); } return out; },
+    dica: (x, ls) => { const d = new Date(ls[0]?.x ?? x), dia = ult[maisProximo(xs, ls[0]?.x ?? x)]; return { titulo: `${p2(d.getUTCDate())} ${MESES[d.getUTCMonth()]}${dia?.x ? ` · carga do dia ${fmtN(dia.x)}` : ''}`, linhas: ls.map(l => ({ cor: l.cor, valor: fmtN(l.y), nome: l.nome })) }; }
+  });
+}
 function renderHistorico() {
   const raiz = $('#aba-historico');
   if (!E.treinos.length) { raiz.innerHTML = vazio('Seu histórico está vazio'); return; }
@@ -1910,19 +2371,21 @@ function renderHistorico() {
   const dados = lista.map(t => { const zt = temposZona(t.resumo.hist, Z.limites), total = zt.reduce((a, b) => a + b, 0); return { t, zt, total, alta: zt[4] + zt[5] }; });
   const soma = f => dados.reduce((a, d) => a + (f(d) || 0), 0);
   const fcMedia = soma(d => d.t.resumo.fcMed * d.t.resumo.tempoFcS) / (soma(d => d.t.resumo.tempoFcS) || 1);
-  const marcados = E.cmp.length;
+  const marcados = E.cmp.length, forma = calcForma(Z);
   raiz.innerHTML = `${avisoBackup()}${filtros}
     <section class="card"><div class="stats">${stat(fmtN(lista.length), lista.length === 1 ? 'treino' : 'treinos')}${stat(durCurta(soma(d => d.t.resumo.duracaoS)), 'tempo total')}${stat(fmtN(fcMedia), 'FC média')}${stat(durCurta(soma(d => d.alta)), 'em Z4–Z5')}</div></section>
+    ${cartaoForma(forma)}
     ${cartaoFrequencia(treinosFiltrados(true), raiz.clientWidth)}
     <section class="card"><div class="card-topo"><h2>FC por treino</h2><div class="legenda"><span><i class="lk" style="background:var(--s1)"></i>média</span><span><i class="lk" style="background:var(--s2)"></i>máxima</span></div></div><div class="graf" id="g-evol"></div></section>
     <section class="card"><div class="card-topo"><h2>Treinos</h2><button class="btn" id="h-comparar" ${marcados < 2 ? 'disabled' : ''}>Comparar (${marcados})</button></div>
       <ul class="lista-treinos">${dados.map(d => `<li class="lt"><input type="checkbox" data-cmp="${esc(d.t.id)}" ${E.cmp.includes(d.t.id) ? 'checked' : ''} aria-label="Marcar para comparar: ${esc(rotuloTreino(d.t))}">
         <button class="lt-abrir" data-abrir="${esc(d.t.id)}"><span class="lt-l1"><span class="lt-tipo">${esc(nomeTreino(d.t))}</span><span class="lt-data">${esc(fmtDataCurta(d.t.inicioMs, d.t.fusoMin))} · ${esc(fmtHora(d.t.inicioMs, d.t.fusoMin))}</span></span>
-        <span class="lt-metr">${d.t.titulo ? `${esc(d.t.tipo)} · ` : ''}${esc(durCurta(d.t.resumo.duracaoS))} · média ${fmtN(d.t.resumo.fcMed)} · máx. ${d.t.resumo.fcMax}${d.t.totais?.calorias != null ? ` · ${fmtN(d.t.totais.calorias)} kcal` : ''}${(() => { const n = (d.t.momentos || []).filter(m => m.origem === 'rola').length, Wd = palavraTrecho(d.t.tipo); return n ? ` · ${n} ${n === 1 ? Wd.um : Wd.varios}` : ''; })()}</span>
+        <span class="lt-metr"><span class="lt-esf" title="Esforço de 0 a 21">${esc(fmtEsf(esforcoDe(trimpDoHist(d.t.resumo.hist, Z))))}</span> · ${d.t.titulo ? `${esc(d.t.tipo)} · ` : ''}${esc(durCurta(d.t.resumo.duracaoS))} · média ${fmtN(d.t.resumo.fcMed)} · máx. ${d.t.resumo.fcMax}${d.t.totais?.calorias != null ? ` · ${fmtN(d.t.totais.calorias)} kcal` : ''}${(() => { const n = (d.t.momentos || []).filter(m => m.origem === 'rola').length, Wd = palavraTrecho(d.t.tipo); return n ? ` · ${n} ${n === 1 ? Wd.um : Wd.varios}` : ''; })()}</span>
         <span class="pilha" aria-hidden="true">${pilhaZonas(d.zt, d.total, d.t.tipo)}</span></button></li>`).join('')}</ul></section>
     <section class="card mais">${secao('semanas', 'Tempo por semana', 'por zona', `<div class="graf" id="g-sem"></div>${legendaZonas(Z)}`)}</section>`;
   ligarFiltros(); ligarSecoes(raiz);
   graficoEvolucao($('#g-evol'), lista);
+  if (forma && $('#g-forma')) graficoForma($('#g-forma'), forma);
   const umDia = 86400000, semanas = new Map();
   const inicioSemana = (ms, fuso) => { const d = parede(ms, fuso); const dia = (d.getUTCDay() + 6) % 7; return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() - dia); };
   for (const d of dados) { const k = inicioSemana(d.t.inicioMs, d.t.fusoMin); const s = semanas.get(k) || { zt: [0, 0, 0, 0, 0, 0], n: 0, dur: 0 }; d.zt.forEach((v, z) => { s.zt[z] += v; }); s.n++; s.dur += d.t.resumo.duracaoS; semanas.set(k, s); }
@@ -1971,7 +2434,8 @@ async function renderComparar() {
   if (E.aba !== 'comparar' || tok !== E.tok) return;
   const itens = sel.map((t, i) => {
     const s = series[i], zt = temposZona(t.resumo.hist, Z.limites), total = zt.reduce((a, b) => a + b, 0);
-    return { t, s, zt, total, an: s ? analisar(t, s, Z) : null, cor: CORES_CMP[E.corCmp.get(t.id)], rot: rot(t) };
+    const an = s ? analisar(t, s, Z) : null;
+    return { t, s, zt, total, an, gps: s ? analisarGPS(t, s, an.P) : null, cor: CORES_CMP[E.corCmp.get(t.id)], rot: rot(t) };
   });
   const durMax = Math.max(...itens.map(it => it.t.resumo.duracaoS)) / 60;
   const linhaM = (nome, f, fmt = v => fmtN(v)) => {
@@ -1984,7 +2448,9 @@ async function renderComparar() {
     ${linhaM('FC média', it => it.t.resumo.fcMed)}
     ${linhaM('FC máxima', it => it.t.resumo.fcMax)}
     ${[1, 2, 3, 4, 5].map(z => linhaM(`Z${z} (min)`, it => it.zt[z] / 60, v => fmtN(v, 1))).join('')}
+    ${linhaM('Esforço (0–21)', it => esforcoDe(trimpDoHist(it.t.resumo.hist, Z)), v => fmtN(v, 1))}
     ${linhaM('Carga por zonas', it => cargaZonas(it.zt))}
+    ${itens.some(it => it.gps) ? linhaM('Distância (km)', it => it.gps ? it.gps.distM / 1000 : null, v => fmtN(v, 2)) + (itens.some(it => it.gps && usaVelocidade(it.t.tipo)) ? linhaM('Velocidade (km/h)', it => it.gps?.velMed ? it.gps.velMed * 3.6 : null, v => fmtN(v, 1)) : linhaM('Ritmo (min/km)', it => it.gps?.velMed ? 1000 / it.gps.velMed : null, v => fmtRitmo(v))) : ''}
     ${linhaM('Queda 1 min após o pico', it => it.an?.recPico?.queda ?? null)}
     ${itens.some(it => (it.t.momentos || []).some(m => m.origem === 'rola')) ? (() => { const Wc = palavraTrecho(itens[0].t.tipo), rolasDe = it => (it.t.momentos || []).filter(m => m.origem === 'rola'); return linhaM(maiuscula(Wc.varios), it => rolasDe(it).length || null) + linhaM(`FC média ${Wc.f ? 'nas' : 'nos'} ${Wc.varios}`, it => { if (!it.s || !rolasDe(it).length) return null; let sm = 0, ps = 0; for (const m of rolasDe(it)) { const e = estatTrecho(it.s, it.an.P, it.an.s10, m.ini, m.fim); if (e.fcMed != null) { sm += e.fcMed * (m.fim - m.ini); ps += m.fim - m.ini; } } return ps ? sm / ps : null; }); })() : ''}
     ${linhaM('PSE', it => it.t.pse)}
@@ -2024,6 +2490,11 @@ function renderAjustes() {
       <label class="campo"><span>FC máxima</span><input type="number" id="z-fcmax" min="120" max="230" inputmode="numeric" value="${c.fcmax ?? ''}" placeholder="${Z.fcmax}"></label>
       <label class="campo"><span>FC repouso</span><input type="number" id="z-fcrep" min="30" max="110" inputmode="numeric" value="${c.fcrep ?? ''}" placeholder="opcional"></label>
     </div>
+    <div class="form-grade form-2">
+      <label class="campo"><span>Peso (kg)</span><input type="number" id="z-peso" min="30" max="250" inputmode="decimal" value="${c.peso ?? ''}" placeholder="opcional"></label>
+      <label class="campo"><span>Sexo</span><select id="z-sexo"><option value="">Prefiro não dizer</option><option value="m">Masculino</option><option value="f">Feminino</option></select></label>
+    </div>
+    <p class="nota">Peso e sexo servem para estimar as calorias quando o relógio não manda e para ajustar o cálculo do esforço. A FC de repouso (medida ao acordar) deixa o esforço mais preciso.</p>
     <p class="nota" id="z-info">${esc(textoFcmax(Z))}${obs && c.fcmax !== obs ? ` <button class="btn-link" id="z-obs">Usar ${obs} bpm</button>` : ''}</p>
     <label class="campo"><span>Cálculo das zonas</span><select id="z-met"><option value="fcmax">% da FC máxima</option><option value="reserva">% da FC de reserva (Karvonen)</option><option value="manual">Limites em bpm, definidos por mim</option></select></label>
     ${metodo === 'reserva' && !c.fcrep ? '<p class="aviso">Informe a FC de repouso para usar a FC de reserva. Até lá, vale o % da FC máxima.</p>' : ''}
@@ -2043,10 +2514,18 @@ function renderAjustes() {
         <li>FC máxima pela idade (208 − 0,7 × idade): Tanaka H, Monahan KD, Seals DR. Age-predicted maximal heart rate revisited. J Am Coll Cardiol. 2001;37(1):153-6.</li>
         <li>Zonas pela FC de reserva: Karvonen MJ, Kentala E, Mustala O. The effects of training on heart rate; a longitudinal study. Ann Med Exp Biol Fenn. 1957;35(3):307-15.</li>
         <li>Carga pela PSE da sessão: Foster C, Florhaug JA, Franklin J, et al. A new approach to monitoring exercise training. J Strength Cond Res. 2001;15(1):109-15.</li>
+        <li>Esforço pelo TRIMP: Banister EW. Modeling elite athletic performance. In: MacDougall JD, Wenger HA, Green HJ, eds. Physiological Testing of the High-Performance Athlete. 2nd ed. Human Kinetics; 1991:403-24.</li>
+        <li>Condicionamento, fadiga e forma (médias de 42 e 7 dias): Banister EW, Calvert TW, Savage MV, Bach T. A systems model of training for athletic performance. Aust J Sports Med. 1975;7:57-61.</li>
+        <li>Carga da semana ÷ habitual: Gabbett TJ. The training–injury prevention paradox: should athletes be training smarter and harder? Br J Sports Med. 2016;50(5):273-80.</li>
+        <li>Calorias pela FC: Keytel LR, Goedecke JH, Noakes TD, et al. Prediction of energy expenditure from heart rate monitoring during submaximal exercise. J Sports Sci. 2005;23(3):289-97.</li>
+        <li>Queda da FC no 1º minuto: Cole CR, Blackstone EH, Pashkow FJ, et al. Heart-rate recovery immediately after exercise as a predictor of mortality. N Engl J Med. 1999;341(18):1351-7.</li>
         <li>Precisão de sensores de pulso: Wang R, Blackburn G, Desai M, et al. Accuracy of wrist-worn heart rate monitors. JAMA Cardiol. 2017;2(1):104-6.</li></ul>
-      <p class="nota">A estimativa pela idade erra vários bpm de pessoa para pessoa; um teste de esforço dá o valor real. A carga por zonas soma os minutos de cada zona multiplicados pelo número da zona.</p>`)}</section>`;
+      <p class="nota">A estimativa pela idade erra vários bpm de pessoa para pessoa; um teste de esforço dá o valor real. A carga por zonas soma os minutos de cada zona multiplicados pelo número da zona. O esforço de 0 a 21 transforma o TRIMP numa escala parecida com a do Whoop (21 × (1 − e<sup>−TRIMP/80</sup>)), mas a fórmula do Whoop não é pública, então os números não são iguais. O desacoplamento compara ritmo ÷ FC na 1ª e na 2ª metade; abaixo de 5% indica boa base aeróbica.</p>`)}</section>`;
   ligarSecoes(raiz);
   $('#z-met').value = metodo;
+  $('#z-sexo').value = c.sexo || '';
+  $('#z-peso').addEventListener('input', e => { const v = parseFloat(e.target.value); E.cfg.peso = v >= 30 && v <= 250 ? v : null; salvarConfig(); st(); });
+  $('#z-sexo').addEventListener('change', e => { E.cfg.sexo = e.target.value || null; salvarConfig(); st(); });
   const st = () => { const s = $('#z-status'); if (s) s.textContent = 'Salvo'; };
   const reaplicar = () => { const Zn = zonasAtuais(); $$('[data-faixa]', raiz).forEach(td => { td.textContent = faixaZona(+td.dataset.faixa, Zn.limites); }); salvarConfig(); st(); };
   const num = (el, a, b) => { const v = el.value === '' ? null : Math.round(+el.value); return v != null && v >= a && v <= b ? v : null; };
@@ -2120,6 +2599,18 @@ function escrever(ctx, txt, x, y, maxW, tam, peso, cor, alinhar = 'left') {
   return ctx.measureText(txt).width;
 }
 
+function desenharRota(ctx, series, gi, x, y, w, h, cor, tinta) {
+  const passo = Math.max(1, Math.ceil(gi.length / 600)), ll = gi.filter((_, k) => k % passo === 0).map(i => [series.lat[i], series.lon[i]]);
+  let y0 = Infinity, y1 = -Infinity, x0 = Infinity, x1 = -Infinity;
+  for (const [la, lo] of ll) { if (la < y0) y0 = la; if (la > y1) y1 = la; if (lo < x0) x0 = lo; if (lo > x1) x1 = lo; }
+  const k = Math.cos((y0 + y1) / 2 * Math.PI / 180), sx = (x1 - x0) * k || 1e-6, sy = (y1 - y0) || 1e-6, e = Math.min((w - 16) / sx, (h - 16) / sy);
+  const ox = x + (w - sx * e) / 2, oy = y + (h - sy * e) / 2;
+  const P = ([la, lo]) => [ox + (lo - x0) * k * e, oy + sy * e - (la - y0) * e];
+  ctx.save(); ctx.lineWidth = 7; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = cor;
+  ctx.beginPath(); ll.forEach((p, i) => { const [px, py] = P(p); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }); ctx.stroke();
+  const [ax, ay] = P(ll[0]); ctx.fillStyle = tinta; ctx.beginPath(); ctx.arc(ax, ay, 9, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
 async function desenharCartao(cv, meta, series) {
   const F = FORMATOS[E.cfg.cartaoFormato] || FORMATOS.stories, W = F.w, H = F.h, pad = 72;
   const fundo = E.cfg.cartaoFundo === 'foto' && !cartao.foto ? 'escuro' : (E.cfg.cartaoFundo || 'escuro');
@@ -2174,12 +2665,15 @@ async function desenharCartao(cv, meta, series) {
 
   // título e data
   const fim = meta.inicioMs + r.duracaoS * 1000;
-  escrever(ctx, nomeTreino(meta), pad, y + 92, W - 2 * pad, 96, 700, P.tinta);
+  // percurso do GPS no canto, como nos cartões do Strava
+  const gi = indicesGPS(series), rota = gi.length >= 10 ? 150 : 0, larTit = W - 2 * pad - (rota ? rota + 28 : 0);
+  if (rota) desenharRota(ctx, series, gi, W - pad - rota, y, rota, rota, P.acento, P.tinta);
+  escrever(ctx, nomeTreino(meta), pad, y + 92, larTit, 96, 700, P.tinta);
   const Wt = palavraTrecho(meta.tipo), mom = Array.isArray(meta.momentos) ? meta.momentos : [];
   const rolas = mom.filter(m => m.origem === 'rola'), d0 = rolas.length ? rolas[0].fim - rolas[0].ini : 0;
   const resumoRolas = rolas.length ? ` · ${rolas.length} ${rolas.length === 1 ? Wt.um : Wt.varios}${rolas.every(m => m.fim - m.ini === d0) ? ` de ${durTexto(d0)}` : ''}` : '';
   const sub = `${meta.titulo ? meta.tipo + ' · ' : ''}${fmtDiaSemana(meta.inicioMs, meta.fusoMin)}, ${fmtData(meta.inicioMs, meta.fusoMin)} · ${fmtHora(meta.inicioMs, meta.fusoMin)}${resumoRolas || `–${fmtHora(fim, meta.fusoMin)}`}`;
-  escrever(ctx, sub, pad, y + 142, W - 2 * pad, 34, 400, P.suave);
+  escrever(ctx, sub, pad, y + 142, larTit, 34, 400, P.suave);
   y += blocos[2] + blocos[3];
 
   // números
@@ -2699,11 +3193,14 @@ function cartaoFrequencia(lista, larg) {
 // ================= o treino em texto, para colar no WhatsApp =================
 function textoTreino(meta, series) {
   const Z = zonasAtuais(), an = analisar(meta, series, Z), r = meta.resumo, tot = meta.totais || {}, W = palavraTrecho(meta.tipo);
-  const fim = meta.inicioMs + r.duracaoS * 1000, dist = tot.distanciaM > 0 ? tot.distanciaM : null;
+  const fim = meta.inicioMs + r.duracaoS * 1000, gps = analisarGPS(meta, series, an.P), dist = !gps && tot.distanciaM > 0 ? tot.distanciaM : null;
+  const esf = esforcoDe(trimpDoHist(r.hist, Z)), foco = focoDoTreino(an.zt), [ritmo, unRitmo] = gps ? ritmoOuVel(gps.velMed, meta.tipo) : [];
   const L = [meta.titulo ? `${meta.titulo} (${meta.tipo})` : nomeTreino(meta),
     `${maiuscula(fmtDiaSemana(meta.inicioMs, meta.fusoMin))}, ${fmtData(meta.inicioMs, meta.fusoMin)} · ${fmtHora(meta.inicioMs, meta.fusoMin)}–${fmtHora(fim, meta.fusoMin)}`,
     [`Duração ${durCurta(r.duracaoS)}`, `FC média ${fmtN(r.fcMed)} bpm`, `FC máx. ${r.fcMax} bpm`, tot.calorias != null ? `${fmtN(tot.calorias)} kcal` : null, dist ? `${fmtN(dist / 1000, 1)} km` : null].filter(Boolean).join(' · '),
-    'Zonas: ' + [5, 4, 3, 2, 1].filter(z => an.zt[z] >= 30).map(z => `Z${z} ${fmtMin(an.zt[z])}`).join(' · ')];
+    gps ? `${fmtKm(gps.distM)} km · ${ritmo} ${unRitmo} · ${durCurta(gps.movS)} em movimento${gps.subidaM != null ? ` · ${fmtN(gps.subidaM)} m de subida` : ''}` : null,
+    `Esforço ${fmtEsf(esf)} de 21 (${nivelEsforco(esf).nome.toLowerCase()}) · foco: ${foco.rotulo.toLowerCase()}`,
+    'Zonas: ' + [5, 4, 3, 2, 1].filter(z => an.zt[z] >= 30).map(z => `Z${z} ${fmtMin(an.zt[z])}`).join(' · ')].filter(x => x != null);
   const trechos = trechosDoTreino(meta, series, an), rolas = trechos.filter(t => t.origem === 'rola'), comNome = trechos.filter(t => t.origem !== 'rola' && t.nome);
   if (rolas.length) { L.push('', `${maiuscula(W.varios)} (FC média / máx.):`); rolas.forEach(t => L.push(`${t.rotulo}${t.nome ? ` – ${t.nome}` : ''}: ${durTexto(t.dur)} · ${fmtN(t.fcMed)} / ${t.fcMax ?? '–'} bpm`)); }
   if (comNome.length) { L.push('', 'Picos:'); comNome.forEach(t => L.push(`${t.nome}: máx. ${t.fcMax ?? '–'} bpm`)); }
