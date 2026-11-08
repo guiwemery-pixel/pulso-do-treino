@@ -30,6 +30,13 @@ pela zona da FC, pelo ritmo ou pela altitude, com as marcas de cada km e o ponto
 FC mostra no mapa onde você estava. Há também ritmo médio, tempo em movimento, subida, **parciais por km** e as melhores
 marcas do treino (400 m, 1 km, 5 km…). Sem internet, o trajeto é desenhado sem o mapa de fundo.
 
+Nas corridas, o card **Parciais** mostra cada km (ou cada 500 m, ou cada volta gravada pelo relógio) com tempo, ritmo,
+**GAP** (ritmo ajustado ao relevo), FC média e máxima, cadência, passada, contato com o solo e elevação, num gráfico de
+barras com a linha da FC. Tocar num km destaca o trecho no mapa. O resumo da corrida compara a 1ª e a 2ª metade (split
+negativo ou positivo), mede a constância do ritmo e a subida da FC do 1º ao último km. Em **Ritmo, cadência e dinâmica**
+aparecem os gráficos ao longo do treino, incluindo oscilação vertical, tempo de contato com o solo, comprimento do passo e
+razão vertical quando o relógio grava (arquivo FIT). Corridas de esteira, com distância mas sem GPS, também têm parciais.
+
 Cada treino recebe um **esforço de 0 a 21** (no estilo do Whoop, calculado pelo TRIMP), o **foco** (base aeróbica, limiar
 ou alta intensidade) e uma **Leitura do treino** que explica os números: comparação com a sua média na modalidade,
 recuperação da FC depois do pico, FC subindo ao longo das rolas e o desacoplamento ritmo × FC. Com peso e idade em
